@@ -1,9 +1,9 @@
 
-trait Language{
+object Language {
   def getFunctionType(argument: Type, result: Type) = ConcreteType("Func", Seq(argument, result))
 
 }
-trait Expression extends Language {
+trait Expression {
   def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
 }
 
@@ -28,7 +28,7 @@ class Factory
   }
 }
 
-trait LanguageType extends Language
+trait LanguageType
 {
   def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
 }
@@ -43,7 +43,7 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val inputType = factory.typeVariable
     val outputType = factory.typeVariable
-    Seq(TypesAreEqual(_type, getFunctionType(inputType, outputType))) ++
+    Seq(TypesAreEqual(_type, Language.getFunctionType(inputType, outputType))) ++
       argument.constraints(factory, inputType, scope) ++
       result.constraints(factory, outputType, scope)
   }
@@ -59,7 +59,7 @@ case class Lambda(name: String, argumentType: LanguageType, body: Expression) ex
     Seq(ParentScope(bodyScope, scope),
       DeclarationInScope(argumentDeclaration, bodyScope),
       DeclarationOfType(argumentDeclaration, argumentConstraintType),
-      TypesAreEqual(_type, getFunctionType(argumentConstraintType, bodyType))) ++
+      TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
         body.constraints(factory, bodyType, bodyScope) ++
         argumentType.constraints(factory, argumentConstraintType, scope)
   }
@@ -77,7 +77,7 @@ case class Application(function: Expression, value: Expression) extends Expressi
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val functionType = factory.typeVariable
     val argumentType = factory.typeVariable
-    Seq(TypesAreEqual(functionType, getFunctionType(argumentType, _type))) ++
+    Seq(TypesAreEqual(functionType, Language.getFunctionType(argumentType, _type))) ++
       function.constraints(factory, functionType, scope) ++
       value.constraints(factory, argumentType, scope)
   }

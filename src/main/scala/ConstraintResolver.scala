@@ -16,15 +16,19 @@ object ConstraintResolver
       environment = environment.mapValues(existingType => if (existingType == v) t else existingType)
     }
 
-    def unifyTypes(constraints: Seq[Constraint], left: Type, right: Type): Unit = (left,right) match {
-      case (v: TypeVariable,_) => instantiateType(v,right)
-      case (_,v: TypeVariable) => instantiateType(v,left)
-      case (ConcreteType(leftName, leftArguments), ConcreteType(rightName, rightArguments)) => if (leftName == rightName && leftArguments.size == rightArguments.size)
+    def unifyTypes(constraints: Seq[Constraint], left: Type, right: Type): Boolean = (left,right) match {
+      case (v: TypeVariable,_) => instantiateType(v,right); true
+      case (_,v: TypeVariable) => instantiateType(v,left); true
+      case (ConcreteType(leftName, leftArguments), ConcreteType(rightName, rightArguments)) =>
+        if (leftName == rightName && leftArguments.size == rightArguments.size)
+        {
           leftArguments.zip(rightArguments).foreach(t => unifyTypes(constraints, t._1, t._2))
+          true
+        }
         else
-          throw new IllegalStateException("type collision")
+          false
       case _ =>
-        throw new IllegalStateException("type collision2")
+        false
     }
 
     while(progress && constraintsForNextRun.nonEmpty)
@@ -49,11 +53,15 @@ object ConstraintResolver
           {
             constraintsForNextRun.enqueue(x)
           }
-        case TypesAreEqual(left, right) => unifyTypes(allConstraints, left, right)
+        case TypesAreEqual(left, right) => if (!unifyTypes(allConstraints, left, right))
+          constraintsForNextRun.enqueue(x)
         case DeclarationOfType(declaration, _type) =>
           environment.get(declaration).fold[Unit](() => {
             environment = environment + (declaration -> _type)
-          })(existingType => unifyTypes(allConstraints, existingType, _type))
+          })(existingType => {
+            if (!unifyTypes(allConstraints, existingType, _type))
+              constraintsForNextRun.enqueue(x)
+          })
       })
       progress = constraintsForNextRun.size != startingSize
     }
@@ -92,7 +100,8 @@ case class Declares(target: ScopeNode) extends GraphEdge
 class Graph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def resolve(reference: Reference): NamedDeclaration = {
-    val reachableNodes = depthFirst(new ReferenceNode(reference)).collect({case d:DeclarationNode => d})
+    val reachableNodes = depthFirst(new ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
+      filter(d => d.declaration.name == reference.name)
     if (reachableNodes.size == 1)
     {
       return reachableNodes.head.declaration
