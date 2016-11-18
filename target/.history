@@ -1,0 +1,8 @@
+compile
+sbt help
+sbt --help
+--help
+tasks
+compile
+reload
+compile
