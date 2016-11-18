@@ -1,6 +1,4 @@
-/**
-  * Created by RemyW on 18-11-2016.
-  */
+
 object StaticChecker {
 
   def check(program: Expression) : Boolean = {

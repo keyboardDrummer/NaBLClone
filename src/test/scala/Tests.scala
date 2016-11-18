@@ -13,8 +13,23 @@ class Tests extends FunSuite {
     assert(StaticChecker.check(program))
   }
 
+  test("addVariable") {
+    val program = Add(Const(3), Variable("jo"))
+    assert(!StaticChecker.check(program))
+  }
+
   test("floatingVariable") {
     val program = Variable("jo")
+    assert(!StaticChecker.check(program))
+  }
+
+  test("lambdaApplication") {
+    val program = Application(Lambda("x", IntLanguageType, Variable("x")), Const(3))
+    assert(StaticChecker.check(program))
+  }
+
+  test("lambda") {
+    val program = Lambda("x", IntLanguageType, Variable("x"))
     assert(!StaticChecker.check(program))
   }
 }
