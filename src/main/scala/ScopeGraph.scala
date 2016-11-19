@@ -1,7 +1,7 @@
 import scala.collection.mutable
 
 trait GraphNode
-case class ScopeNode(scope: Scope) extends GraphNode
+case class ScopeNode(scope: ConcreteScope) extends GraphNode
 {
   override def toString = scope.toString
 }

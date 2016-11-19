@@ -3,6 +3,12 @@
   */
 class Factory
 {
+  private var scopeVariableCounter: Int = 0
+  def scopeVariable: ScopeVariable = {
+    scopeVariableCounter += 1
+    ScopeVariable(scopeVariableCounter.toString)
+  }
+
   private var scopeCounter: Int = 0
   def freshScope: ConcreteScope = {
     scopeCounter += 1

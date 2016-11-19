@@ -1,9 +1,10 @@
-import scala.collection.mutable
+
 
 
 trait Constraint {
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {}
   def instantiateType(variable: TypeVariable, instance: Type) = {}
+  def instantiateScope(variable: ScopeVariable, instance: Scope) = {}
 }
 
 trait ScopeConstraint extends Constraint
@@ -36,20 +37,48 @@ trait Scope
 case class ConcreteScope(number: Int) extends Scope
 case class ScopeVariable(name: String) extends Scope
 
-case class ReferenceInScope(reference: Reference, scope: Scope) extends ScopeConstraint
+case class ReferenceInScope(reference: Reference, var scope: Scope) extends ScopeConstraint {
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+    if (scope == variable)
+      scope = instance
+  }
+}
 
-case class DeclarationInsideScope(var declaration: NamedDeclaration, scope: Scope) extends ScopeConstraint
+case class DeclarationInsideScope(var declaration: NamedDeclaration, var scope: Scope) extends ScopeConstraint {
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+    if (scope == variable)
+      scope = instance
+  }
+}
 
-case class ParentScope(child: Scope, parent: Scope) extends ScopeConstraint
+case class ParentScope(var child: Scope, var parent: Scope) extends ScopeConstraint {
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+    if (child == variable)
+      child = instance
+    if (parent == variable)
+      parent = instance
+  }
+}
 
+case class ScopeImport(var importingScope: Scope, var importedScope: Scope) extends ScopeConstraint {
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+    if (importingScope == variable)
+      importingScope = instance
+    if (importedScope == variable)
+      importedScope = instance
+  }
+}
 
-case class ScopeImport(importingScope: Scope, importedScope: Scope) extends ScopeConstraint
-
-case class DeclarationOfScope(var declaration: Declaration, scope: Scope) extends ResolutionConstraint
+case class DeclarationOfScope(var declaration: Declaration, var scope: Scope) extends ResolutionConstraint
 {
   override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
     if (declaration == variable)
       declaration = instance
+  }
+
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+    if (scope == variable)
+      scope = instance
   }
 }
 

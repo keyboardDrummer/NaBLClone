@@ -4,6 +4,37 @@ object Language {
   def getFunctionType(argument: Type, result: Type) = ConcreteType("Func", Seq(argument, result))
 }
 
+case class Program(modules: Seq[Module])
+{
+  def constraints(factory: Factory): Seq[Constraint] = {
+    val scope = factory.freshScope
+    modules.flatten(module => module.constraints(factory, scope))
+  }
+}
+
+class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.empty, imports: Seq[ModuleImport] = Seq.empty)
+{
+  def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
+    val scope = factory.freshScope
+    val moduleDeclaration = NamedDeclaration(name, this)
+    Seq(DeclarationInsideScope(moduleDeclaration, parentScope), DeclarationOfScope(moduleDeclaration, scope), ParentScope(scope, parentScope)) ++
+      structs.flatMap(struct => struct.constraints(factory, scope)) ++
+      bindings.flatMap(binding => binding.constraints(factory, scope)) ++
+      imports.flatMap(_import => _import.constraints(factory, scope))
+  }
+}
+
+class Binding(name: String, _type: LanguageType, body: Expression)
+{
+  def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
+    val typeVariable = factory.typeVariable
+    val declaration = NamedDeclaration(name, this)
+    Seq(DeclarationInsideScope(declaration, parentScope)) ++
+      body.constraints(factory, typeVariable, parentScope) ++
+      _type.constraints(factory, typeVariable, parentScope)
+  }
+}
+
 trait Expression {
   def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
 }
@@ -25,44 +56,13 @@ class Struct(name: String, fields: Seq[Field])
   }
 }
 
-case class Program(modules: Seq[Module])
-{
-  def constraints(factory: Factory): Seq[Constraint] = {
-    val scope = factory.freshScope
-    modules.flatten(module => module.constraints(factory, scope))
-  }
-}
-
 class ModuleImport(name: String) {
   def constraints(factory: Factory, scope: Scope): Seq[Constraint] = {
     val importedDeclaration = factory.declarationVariable
-    val importedScope = factory.freshScope
+    val importedScope = factory.scopeVariable
     val reference: Reference = Reference(name, this)
     Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, importedDeclaration), DeclarationOfScope(importedDeclaration, importedScope),
       ScopeImport(scope, importedScope))
-  }
-}
-
-class Binding(name: String, _type: LanguageType, body: Expression)
-{
-  def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
-    val typeVariable = factory.typeVariable
-    val declaration = NamedDeclaration(name, this)
-    Seq(DeclarationInsideScope(declaration, parentScope)) ++
-      body.constraints(factory, typeVariable, parentScope) ++
-      _type.constraints(factory, typeVariable, parentScope)
-  }
-}
-
-class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.empty, imports: Seq[ModuleImport] = Seq.empty)
-{
-  def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
-    val scope = factory.freshScope
-    val moduleDeclaration = NamedDeclaration(name, this)
-    Seq(DeclarationInsideScope(moduleDeclaration, parentScope), DeclarationOfScope(moduleDeclaration, scope), ParentScope(scope, parentScope)) ++
-      structs.flatMap(struct => struct.constraints(factory, scope)) ++
-      bindings.flatMap(binding => binding.constraints(factory, scope)) ++
-      imports.flatMap(_import => _import.constraints(factory, scope))
   }
 }
 
