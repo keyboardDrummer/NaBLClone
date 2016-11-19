@@ -39,9 +39,9 @@ case class Declares(target: ScopeNode) extends GraphEdge {
 class Graph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def resolve(reference: Reference): NamedDeclaration = {
-    val reachableNodes = depthFirst(new ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
+    val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
       filter(d => d.declaration.name == reference.name)
-    if (reachableNodes.size == 1)
+    if (reachableNodes.nonEmpty)
     {
       return reachableNodes.head.declaration
     }

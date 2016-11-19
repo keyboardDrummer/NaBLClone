@@ -67,7 +67,8 @@ class Tests extends FunSuite {
 
   test("Shadowing")  {
     val identity = new Lambda("x", IntLanguageType, new Variable("x"))
-    val program = Application(Application(new Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType), new Lambda("x", IntLanguageType, new Variable("x"))), identity), Const(2))
+    val program = Application(Application(new Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType),
+      new Lambda("x", IntLanguageType, new Variable("x"))), identity), Const(2))
     assert(StaticChecker.check(program))
   }
 
