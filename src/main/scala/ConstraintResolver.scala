@@ -43,7 +43,7 @@ object ConstraintResolver
           if (resolvedDeclaration != null)
           {
             declaration match {
-              case NamedDeclaration(name) => if (name != resolvedDeclaration.name)
+              case NamedDeclaration(name, _) => if (name != resolvedDeclaration.name)
                 throw new IllegalStateException("collision!")
               case v@DeclarationVariable(name) =>
                 allConstraints.foreach(x => x.instantiateDeclaration(v, resolvedDeclaration))

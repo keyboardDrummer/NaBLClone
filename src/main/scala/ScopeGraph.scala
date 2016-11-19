@@ -17,12 +17,24 @@ case class DeclarationNode(declaration: NamedDeclaration) extends GraphNode
 
 trait GraphEdge {
   def target: GraphNode
+  def traverse: Boolean
 }
 case class ReferenceEdge(target: ScopeNode) extends GraphEdge
-case class ImportEdge(target: ScopeNode) extends GraphEdge
-case class DeclaredIn(target: DeclarationNode) extends GraphEdge
-case class Parent(target: ScopeNode) extends GraphEdge
-case class Declares(target: ScopeNode) extends GraphEdge
+{
+  override def traverse: Boolean = true
+}
+case class ImportEdge(target: ScopeNode) extends GraphEdge {
+  override def traverse: Boolean = true
+}
+case class DeclaredIn(target: DeclarationNode) extends GraphEdge {
+  override def traverse: Boolean = true
+}
+case class Parent(target: ScopeNode) extends GraphEdge {
+  override def traverse: Boolean = true
+}
+case class Declares(target: ScopeNode) extends GraphEdge {
+  override def traverse: Boolean = false
+}
 
 class Graph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
@@ -47,7 +59,7 @@ class Graph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[Grap
       if (visited.add(element))
       {
         result ::= element
-        this.get(element).foreach(x => x.foreach(c => queue.enqueue(c.target)))
+        this.get(element).foreach(x => x.filter(c => c.traverse).foreach(c => queue.enqueue(c.target)))
       }
     }
     result.reverse

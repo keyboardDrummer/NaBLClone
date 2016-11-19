@@ -14,70 +14,70 @@ class Tests extends FunSuite {
   }
 
   test("addVariable") {
-    val program = Add(Const(3), Variable("jo"))
+    val program = Add(Const(3), new Variable("jo"))
     assert(!StaticChecker.check(program))
   }
 
   test("badArgumentUse") {
-    val program = Application(Lambda("x", IntLanguageType, Application(Variable("x"), Const(3))), Const(2))
+    val program = Application(new Lambda("x", IntLanguageType, Application(new Variable("x"), Const(3))), Const(2))
     assert(!StaticChecker.check(program))
   }
 
   test("floatingVariable") {
-    val program = Variable("jo")
+    val program = new Variable("jo")
     assert(!StaticChecker.check(program))
   }
 
   test("lambdaApplication") {
-    val program = Application(Lambda("x", IntLanguageType, Variable("x")), Const(3))
+    val program = Application(new Lambda("x", IntLanguageType, new Variable("x")), Const(3))
     assert(StaticChecker.check(program))
   }
 
   test("lambdaApplicationAddInside") {
-    val program = Application(Lambda("x", IntLanguageType, Add(Const(3), Variable("x"))), Const(3))
+    val program = Application(new Lambda("x", IntLanguageType, Add(Const(3), new Variable("x"))), Const(3))
     assert(StaticChecker.check(program))
   }
 
   test("lambdaApplicationAddInside2") {
-    val program = Application(Lambda("x", IntLanguageType, Add(Variable("x"), Variable("x"))), Const(3))
+    val program = Application(new Lambda("x", IntLanguageType, Add(new Variable("x"), new Variable("x"))), Const(3))
     assert(StaticChecker.check(program))
   }
 
   test("lambdaApplicationAddInside3") {
-    val program = Application(Lambda("x", IntLanguageType, Add(Variable("y"), Variable("x"))), Const(3))
+    val program = Application(new Lambda("x", IntLanguageType, Add(new Variable("y"), new Variable("x"))), Const(3))
     assert(!StaticChecker.check(program))
   }
 
   test("lambda") {
-    val program = Lambda("x", IntLanguageType, Variable("x"))
+    val program = new Lambda("x", IntLanguageType, new Variable("x"))
     assert(!StaticChecker.check(program))
   }
 
   test("addLambda)") {
-    val program = Add(Const(3), Lambda("x", IntLanguageType, Variable("x")))
+    val program = Add(Const(3), new Lambda("x", IntLanguageType, new Variable("x")))
     assert(!StaticChecker.check(program))
   }
 
   test("lambdaAsArgument)") {
-    val identity = Lambda("x", IntLanguageType, Variable("x"))
-    val functionIdentity = Lambda("y", FunctionLanguageType(IntLanguageType, IntLanguageType), Variable("y"))
+    val identity = new Lambda("x", IntLanguageType, new Variable("x"))
+    val functionIdentity = new Lambda("y", FunctionLanguageType(IntLanguageType, IntLanguageType), new Variable("y"))
     val program = Application(Application(functionIdentity, identity), Const(3))
     assert(StaticChecker.check(program))
   }
 
   test("Shadowing")  {
-    val identity = Lambda("x", IntLanguageType, Variable("x"))
-    val program = Application(Application(Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType), Lambda("x", IntLanguageType, Variable("x"))), identity), Const(2))
+    val identity = new Lambda("x", IntLanguageType, new Variable("x"))
+    val program = Application(Application(new Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType), new Lambda("x", IntLanguageType, new Variable("x"))), identity), Const(2))
     assert(StaticChecker.check(program))
   }
 
   test("Shadowing2")  {
-    val program = Application(Application(Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType), Lambda("x", IntLanguageType, Variable("x"))), Const(3)), Const(2))
+    val program = Application(Application(new Lambda("x", FunctionLanguageType(IntLanguageType, IntLanguageType), new Lambda("x", IntLanguageType, new Variable("x"))), Const(3)), Const(2))
     assert(!StaticChecker.check(program))
   }
 
   test("nestedFunction")  {
-    val program = Application(Application(Lambda("x", IntLanguageType, Lambda("y", IntLanguageType, Add(Variable("x"), Variable("y")))), Const(3)), Const(2))
+    val program = Application(Application(new Lambda("x", IntLanguageType, new Lambda("y", IntLanguageType, Add(new Variable("x"), new Variable("y")))), Const(3)), Const(2))
     assert(StaticChecker.check(program))
   }
 }

@@ -8,16 +8,16 @@ trait Expression {
   def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
 }
 
-case class Field(name: String, _type: LanguageType)
-case class Struct(name: String, fields: Seq[Field])
+class Field(val name: String, val _type: LanguageType)
+class Struct(name: String, fields: Seq[Field])
 {
   def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] =
   {
     val scope = factory.freshScope
     val _type = factory.typeVariable
-    val structDeclaration: NamedDeclaration = NamedDeclaration(name)
+    val structDeclaration: NamedDeclaration = NamedDeclaration(name, this)
     val fieldConstraints: Seq[Constraint] = fields.flatMap(field => {
-      val fieldDeclaration: NamedDeclaration = NamedDeclaration(field.name)
+      val fieldDeclaration: NamedDeclaration = NamedDeclaration(field.name, field)
       Seq(DeclarationInsideScope(fieldDeclaration, scope), DeclarationOfType(fieldDeclaration, _type)) ++ field._type.constraints(factory, _type, scope)
     })
     Seq(ParentScope(scope, parentScope), DeclarationOfScope(structDeclaration, scope),
@@ -32,32 +32,33 @@ case class Program(modules: Seq[Module])
     modules.flatten(module => module.constraints(factory, scope))
   }
 }
-case class ModuleImport(name: String) {
+
+class ModuleImport(name: String) {
   def constraints(factory: Factory, scope: Scope): Seq[Constraint] = {
     val importedDeclaration = factory.declarationVariable
     val importedScope = factory.freshScope
-    val reference: Reference = Reference(name)
+    val reference: Reference = Reference(name, this)
     Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, importedDeclaration), DeclarationOfScope(importedDeclaration, importedScope),
       ScopeImport(scope, importedScope))
   }
 }
 
-case class Binding(name: String, _type: LanguageType, body: Expression)
+class Binding(name: String, _type: LanguageType, body: Expression)
 {
   def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
     val typeVariable = factory.typeVariable
-    val declaration = NamedDeclaration(name)
+    val declaration = NamedDeclaration(name, this)
     Seq(DeclarationInsideScope(declaration, parentScope)) ++
       body.constraints(factory, typeVariable, parentScope) ++
       _type.constraints(factory, typeVariable, parentScope)
   }
 }
 
-case class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.empty, imports: Seq[ModuleImport] = Seq.empty)
+class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.empty, imports: Seq[ModuleImport] = Seq.empty)
 {
   def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
     val scope = factory.freshScope
-    val moduleDeclaration = NamedDeclaration(name)
+    val moduleDeclaration = NamedDeclaration(name, this)
     Seq(DeclarationInsideScope(moduleDeclaration, parentScope), DeclarationOfScope(moduleDeclaration, scope), ParentScope(scope, parentScope)) ++
       structs.flatMap(struct => struct.constraints(factory, scope)) ++
       bindings.flatMap(binding => binding.constraints(factory, scope)) ++
@@ -87,10 +88,10 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
 }
 
 
-case class Lambda(name: String, argumentType: LanguageType, body: Expression) extends Expression {
+class Lambda(name: String, argumentType: LanguageType, body: Expression) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val bodyScope: ConcreteScope = factory.freshScope
-    val argumentDeclaration: NamedDeclaration = NamedDeclaration(name)
+    val argumentDeclaration: NamedDeclaration = NamedDeclaration(name, this)
     val bodyType = factory.typeVariable
     val argumentConstraintType = factory.typeVariable
     Seq(ParentScope(bodyScope, scope),
@@ -102,10 +103,10 @@ case class Lambda(name: String, argumentType: LanguageType, body: Expression) ex
   }
 }
 
-case class Variable(name: String) extends Expression {
+class Variable(name: String) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val declaration: DeclarationVariable = factory.declarationVariable
-    val reference: Reference = Reference(name)
+    val reference: Reference = Reference(name, this)
     Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, _type))
   }
 }
@@ -130,13 +131,13 @@ case class Add(left: Expression, right: Expression) extends Expression {
     right.constraints(factory, IntType, scope)
 }
 
-case class Access(target: Expression, field: String) extends Expression
+class Access(target: Expression, field: String) extends Expression
 {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val structDeclaration = factory.declarationVariable
     val fieldDeclaration = factory.declarationVariable
     val structScope = factory.freshScope
-    val fieldReference: Reference = Reference(field)
+    val fieldReference: Reference = Reference(field, this)
     val targetType = factory.typeVariable
     Seq(DeclarationOfType(fieldDeclaration, _type), TypesAreEqual(StructType(structDeclaration), targetType),
       DeclarationOfScope(structDeclaration, structScope),

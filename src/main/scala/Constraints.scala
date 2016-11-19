@@ -1,14 +1,5 @@
 import scala.collection.mutable
 
-trait Declaration
-case class DeclarationVariable(name: String) extends Declaration
-case class NamedDeclaration(name: String) extends Declaration
-
-trait Type
-
-case class TypeVariable(name: String) extends Type
-case class ConcreteType(constructor: String, arguments: Seq[Type]) extends Type
-case class StructType(declaration: Declaration) extends Type
 
 trait Constraint {
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {}
@@ -40,7 +31,6 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
   }
 }
 
-case class Reference(name: String)
 
 trait Scope
 case class ConcreteScope(number: Int) extends Scope
