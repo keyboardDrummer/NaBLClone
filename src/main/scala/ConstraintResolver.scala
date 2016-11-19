@@ -2,6 +2,7 @@ import scala.collection.mutable
 
 object ConstraintResolver
 {
+  //noinspection MatchToPartialFunction
   def resolve(input: Seq[Constraint]): Seq[Constraint] = {
     val scopeConstraints: Seq[ScopeConstraint] = input.collect({ case s:ScopeConstraint => s })
     val graph = createGraph(scopeConstraints)
@@ -62,6 +63,10 @@ object ConstraintResolver
             if (!unifyTypes(allConstraints, existingType, _type))
               constraintsForNextRun.enqueue(x)
           })
+        case DeclarationOfScope(declaration, scope) => declaration match {
+          case named:NamedDeclaration => graph.add(DeclarationNode(named), Declares(ScopeNode(scope)))
+          case _ => constraintsForNextRun.enqueue(x)
+        }
       })
       progress = constraintsForNextRun.size != startingSize
     }
@@ -73,10 +78,9 @@ object ConstraintResolver
     val result = new Graph()
     input.foreach {
       case ReferenceInScope(reference, scope) => result.add(ReferenceNode(reference), ReferenceEdge(ScopeNode(scope)))
-      case DeclarationInScope(declaration, scope) => result.add(ScopeNode(scope), DeclaredIn(DeclarationNode(declaration)))
+      case DeclarationInsideScope(declaration, scope) => result.add(ScopeNode(scope), DeclaredIn(DeclarationNode(declaration)))
       case ParentScope(child, parent) => result.add(ScopeNode(child), Parent(ScopeNode(parent)))
-      case DeclarationOfScope(declaration, scope) => result.add(DeclarationNode(declaration), Declares(ScopeNode(scope)))
-      case ScopeImport(scope, reference) => result.add(ScopeNode(scope), ImportEdge(ReferenceNode(reference)))
+      case ScopeImport(scope, importedScope) => result.add(ScopeNode(scope), ImportEdge(ScopeNode(importedScope)))
     }
     result
   }
@@ -84,15 +88,24 @@ object ConstraintResolver
 
 trait GraphNode
 case class ScopeNode(scope: Scope) extends GraphNode
+{
+  override def toString = scope.toString
+}
 case class ReferenceNode(reference: Reference) extends GraphNode
+{
+  override def toString = reference.toString
+}
 case class DeclarationNode(declaration: NamedDeclaration) extends GraphNode
+{
+  override def toString = declaration.toString
+}
 
 
 trait GraphEdge {
   def target: GraphNode
 }
 case class ReferenceEdge(target: ScopeNode) extends GraphEdge
-case class ImportEdge(target: ReferenceNode) extends GraphEdge
+case class ImportEdge(target: ScopeNode) extends GraphEdge
 case class DeclaredIn(target: DeclarationNode) extends GraphEdge
 case class Parent(target: ScopeNode) extends GraphEdge
 case class Declares(target: ScopeNode) extends GraphEdge

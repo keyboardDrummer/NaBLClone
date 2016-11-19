@@ -7,4 +7,11 @@ object StaticChecker {
     val remainingConstraints = ConstraintResolver.resolve(constraints)
     remainingConstraints.isEmpty
   }
+
+  def check(program: Program) : Boolean = {
+    val factory = new Factory()
+    val constraints = program.constraints(factory)
+    val remainingConstraints = ConstraintResolver.resolve(constraints)
+    remainingConstraints.isEmpty
+  }
 }
