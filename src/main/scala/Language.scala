@@ -36,7 +36,7 @@ class Binding(name: String, _type: LanguageType, body: Expression)
 }
 
 trait Expression {
-  def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
+  def constraints(factory: Factory, _type: Type, parentSocpe: Scope): Seq[Constraint]
 }
 
 class Field(val name: String, val _type: LanguageType)
@@ -94,6 +94,17 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
     Seq(TypesAreEqual(_type, Language.getFunctionType(inputType, outputType))) ++
       argument.constraints(factory, inputType, scope) ++
       result.constraints(factory, outputType, scope)
+  }
+}
+
+class Let(name: String, bindingValue: Expression, value: Expression) extends Expression {
+  override def constraints(factory: Factory, _type: Type, parentScope: Scope): Seq[Constraint] = {
+    val scope = factory.freshScope
+    val bindingType = factory.typeVariable
+    val declaration = NamedDeclaration(name, this)
+    Seq(DeclarationOfType(declaration, bindingType), DeclarationInsideScope(declaration, scope), ParentScope(scope, parentScope)) ++
+      bindingValue.constraints(factory, bindingType, parentScope) ++
+      value.constraints(factory, _type, scope)
   }
 }
 

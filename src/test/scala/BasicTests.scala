@@ -84,4 +84,19 @@ class BasicTests extends FunSuite {
     val program = Application(Application(new Lambda("x", innerLambda, Some(IntLanguageType)), Const(3)), Const(2))
     assert(StaticChecker.check(program))
   }
+
+  test("let") {
+    val program = new Let("x", Const(3), new Variable("x"))
+    assert(StaticChecker.check(program))
+  }
+
+  test("letTwice") {
+    val program = new Let("x", Const(3), Add(new Variable("x"), new Variable("x")))
+    assert(StaticChecker.check(program))
+  }
+
+  test("letFail") {
+    val program = new Let("x", Const(3), new Variable("y"))
+    assert(!StaticChecker.check(program))
+  }
 }
