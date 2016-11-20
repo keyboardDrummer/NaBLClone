@@ -5,7 +5,7 @@ trait Constraint {
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {}
   def instantiateType(variable: TypeVariable, instance: Type) = {}
   def instantiateScope(variable: ScopeVariable, instance: Scope) = {}
-  def types: Set[Type] = Set.empty
+  def boundTypes: Set[Type] = Set.empty
 }
 
 trait ScopeConstraint extends Constraint
@@ -26,7 +26,7 @@ case class TypesAreEqual(var left: Type, var right: Type) extends TypeConstraint
       right = instance
   }
 
-  override def types: Set[Type] = Set(left, right)
+  override def boundTypes: Set[Type] = Set(left, right)
 }
 
 case class Specialization(var specialized: Type, var template: Type) extends TypeConstraint
@@ -38,7 +38,7 @@ case class Specialization(var specialized: Type, var template: Type) extends Typ
       template = instance
   }
 
-  override def types: Set[Type] = Set(specialized, template)
+  override def boundTypes: Set[Type] = Set(specialized)
 }
 
 case class DeclarationOfType(var declaration: Declaration, var _type: Type) extends TypeConstraint {
@@ -53,7 +53,7 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
       _type = instance
   }
 
-  override def types: Set[Type] = Set(_type)
+  override def boundTypes: Set[Type] = Set(_type)
 }
 
 

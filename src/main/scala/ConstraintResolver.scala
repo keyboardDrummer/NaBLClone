@@ -94,7 +94,7 @@ object ConstraintResolver
             environment
           })
         case s@Specialization(specialization, template) =>
-          val constraintTypes = allConstraints.diff(Seq(x)).flatMap(c => c.types)
+          val constraintTypes = allConstraints.diff(Seq(x)).flatMap(c => c.boundTypes)
           val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
           if (constraintVariables.intersect(template.variables).isEmpty)
           {
