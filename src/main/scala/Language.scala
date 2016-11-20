@@ -97,7 +97,7 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
   }
 }
 
-class Lambda(name: String, argumentType: LanguageType, body: Expression) extends Expression {
+class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val bodyScope: ConcreteScope = factory.freshScope
     val argumentDeclaration: NamedDeclaration = NamedDeclaration(name, this)
@@ -108,7 +108,7 @@ class Lambda(name: String, argumentType: LanguageType, body: Expression) extends
       DeclarationOfType(argumentDeclaration, argumentConstraintType),
       TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
         body.constraints(factory, bodyType, bodyScope) ++
-        argumentType.constraints(factory, argumentConstraintType, scope)
+        argumentType.fold(Seq.empty[Constraint])(at => at.constraints(factory, argumentConstraintType, scope))
   }
 }
 
