@@ -36,7 +36,7 @@ class Binding(name: String, _type: LanguageType, body: Expression)
 }
 
 trait Expression {
-  def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint]
+  def constraints(factory: Factory, _type: Type, parentSocpe: Scope): Seq[Constraint]
 }
 
 class Field(val name: String, val _type: LanguageType)
@@ -97,7 +97,18 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
   }
 }
 
-class Lambda(name: String, argumentType: LanguageType, body: Expression) extends Expression {
+class Let(name: String, bindingValue: Expression, value: Expression) extends Expression {
+  override def constraints(factory: Factory, _type: Type, parentScope: Scope): Seq[Constraint] = {
+    val scope = factory.freshScope
+    val bindingType = factory.typeVariable
+    val declaration = NamedDeclaration(name, this)
+    Seq(DeclarationOfType(declaration, bindingType), DeclarationInsideScope(declaration, scope), ParentScope(scope, parentScope)) ++
+      bindingValue.constraints(factory, bindingType, parentScope) ++
+      value.constraints(factory, _type, scope)
+  }
+}
+
+class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val bodyScope: ConcreteScope = factory.freshScope
     val argumentDeclaration: NamedDeclaration = NamedDeclaration(name, this)
@@ -108,7 +119,7 @@ class Lambda(name: String, argumentType: LanguageType, body: Expression) extends
       DeclarationOfType(argumentDeclaration, argumentConstraintType),
       TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
         body.constraints(factory, bodyType, bodyScope) ++
-        argumentType.constraints(factory, argumentConstraintType, scope)
+        argumentType.fold(Seq.empty[Constraint])(at => at.constraints(factory, argumentConstraintType, scope))
   }
 }
 
@@ -116,7 +127,9 @@ class Variable(name: String) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val declaration: DeclarationVariable = factory.declarationVariable
     val reference: Reference = Reference(name, this)
-    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, _type))
+    val declarationType = factory.typeVariable
+    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, declarationType),
+      Specialization(_type, declarationType))
   }
 }
 
