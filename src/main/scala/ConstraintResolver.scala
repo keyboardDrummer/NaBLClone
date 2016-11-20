@@ -2,10 +2,8 @@ import scala.collection.mutable
 
 object ConstraintResolver
 {
-
-
   //noinspection MatchToPartialFunction
-  def resolve(input: Seq[Constraint]): Seq[Constraint] = {
+  def resolve(factory: Factory, input: Seq[Constraint]): Seq[Constraint] = {
     val graph = new Graph
     var environment = Map.empty[Declaration, Type]
     val constraintsForNextRun = new mutable.Queue[Constraint]()
@@ -95,6 +93,19 @@ object ConstraintResolver
             }
             environment
           })
+        case s@Specialization(specialization, template) =>
+          val constraintTypes = allConstraints.diff(Seq(x)).flatMap(c => c.types)
+          val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
+          if (constraintVariables.intersect(template.variables).isEmpty)
+          {
+            val specialized = template.specialize(factory)
+            if (!unifyTypes(specialization, specialized))
+              constraintsForNextRun.enqueue(x)
+          }
+          else
+          {
+            constraintsForNextRun.enqueue(x)
+          }
         case DeclarationOfScope(declaration: NamedDeclaration, scope) =>
             val edges = graph.getOrElseUpdate(DeclarationNode(declaration), mutable.Set.empty[GraphEdge])
             val declaredEdge = edges.find(e => e.isInstanceOf[Declares])

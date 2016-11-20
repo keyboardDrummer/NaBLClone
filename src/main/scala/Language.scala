@@ -116,7 +116,9 @@ class Variable(name: String) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val declaration: DeclarationVariable = factory.declarationVariable
     val reference: Reference = Reference(name, this)
-    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, _type))
+    val declarationType = factory.typeVariable
+    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, declarationType),
+      Specialization(_type, declarationType))
   }
 }
 
