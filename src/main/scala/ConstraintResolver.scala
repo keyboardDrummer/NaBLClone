@@ -86,9 +86,6 @@ object ConstraintResolver
         case TypesAreEqual(left, right) =>
           if (!unifyTypes(left, right))
             constraintsForNextRun.enqueue(x)
-//        case DeclarationOfType(declaration, StructType(_structDeclaration: DeclarationVariable)) =>
-//          unifyDeclarations(declaration, _structDeclaration)
-//          constraintsForNextRun.enqueue(x)
         case DeclarationOfType(declaration, _type) =>
           environment = environment.get(declaration).fold[Map[Declaration, Type]]({
             environment + (declaration -> _type)
