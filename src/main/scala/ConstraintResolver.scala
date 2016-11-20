@@ -22,8 +22,10 @@ object ConstraintResolver
     }
 
     def unifyScopes(left: Scope, right: Scope): Boolean = (left, right) match {
-      case (v: ScopeVariable, _) => instantiateScope(v, right); true
-      case (_, v: ScopeVariable) => instantiateScope(v, left); true
+      case (v: ScopeVariable, _) =>
+        instantiateScope(v, right); true
+      case (_, v: ScopeVariable) =>
+        instantiateScope(v, left); true
       case (ConcreteScope(x), ConcreteScope(y)) => if (x == y) true else false
       case _ => false
     }
@@ -31,6 +33,9 @@ object ConstraintResolver
     def unifyTypes(left: Type, right: Type): Boolean = (left,right) match {
       case (v: TypeVariable,_) => instantiateType(v,right); true
       case (_,v: TypeVariable) => instantiateType(v,left); true
+      case(StructType(leftDecl), StructType(rightDecl)) => {
+        unifyDeclarations(leftDecl, rightDecl)
+      }
       case (ConcreteType(leftName, leftArguments), ConcreteType(rightName, rightArguments)) =>
         if (leftName == rightName && leftArguments.size == rightArguments.size)
         {
@@ -41,6 +46,19 @@ object ConstraintResolver
           false
       case _ =>
         false
+    }
+
+    def instantiateDeclaration(v: DeclarationVariable, right: Declaration): Unit = {
+      allConstraints.foreach(x => x.instantiateDeclaration(v, right))
+      environment = environment.map(kv => if (kv._1 == v) (right, kv._2) else kv)
+    }
+
+    def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {
+      case (v:DeclarationVariable,_) =>
+        instantiateDeclaration(v, right); true
+      case (_, v:DeclarationVariable) =>
+        instantiateDeclaration(v, left); true
+      case _ => false
     }
 
     var progress = true
@@ -59,20 +77,18 @@ object ConstraintResolver
           val resolvedDeclaration = graph.resolve(reference)
           if (resolvedDeclaration != null)
           {
-            declaration match {
-              case NamedDeclaration(name, _) => if (name != resolvedDeclaration.name)
-                throw new IllegalStateException("collision!")
-              case v@DeclarationVariable(name) =>
-                allConstraints.foreach(x => x.instantiateDeclaration(v, resolvedDeclaration))
-                environment = environment.map(kv => if (kv._1 == v) (resolvedDeclaration, kv._2) else kv)
-            }
+            unifyDeclarations(declaration, resolvedDeclaration)
           }
           else
           {
             constraintsForNextRun.enqueue(x)
           }
-        case TypesAreEqual(left, right) => if (!unifyTypes(left, right))
-          constraintsForNextRun.enqueue(x)
+        case TypesAreEqual(left, right) =>
+          if (!unifyTypes(left, right))
+            constraintsForNextRun.enqueue(x)
+//        case DeclarationOfType(declaration, StructType(_structDeclaration: DeclarationVariable)) =>
+//          unifyDeclarations(declaration, _structDeclaration)
+//          constraintsForNextRun.enqueue(x)
         case DeclarationOfType(declaration, _type) =>
           environment = environment.get(declaration).fold[Map[Declaration, Type]]({
             environment + (declaration -> _type)

@@ -29,7 +29,7 @@ class Binding(name: String, _type: LanguageType, body: Expression)
   def constraints(factory: Factory, parentScope: Scope): Seq[Constraint] = {
     val typeVariable = factory.typeVariable
     val declaration = NamedDeclaration(name, this)
-    Seq(DeclarationInsideScope(declaration, parentScope)) ++
+    Seq(DeclarationOfType(declaration, typeVariable), DeclarationInsideScope(declaration, parentScope)) ++
       body.constraints(factory, typeVariable, parentScope) ++
       _type.constraints(factory, typeVariable, parentScope)
   }
@@ -75,6 +75,16 @@ object IntLanguageType extends LanguageType {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, IntType))
 }
 
+class LanguageStructType(name: String) extends LanguageType {
+  override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
+    val structDeclaration = factory.declarationVariable
+    val reference: Reference = Reference(name, this)
+    Seq(TypesAreEqual(_type, StructType(structDeclaration)),
+      ResolvesTo(reference, structDeclaration),
+      ReferenceInScope(reference, scope))
+  }
+}
+
 object IntType extends ConcreteType("Int", Seq.empty)
 
 case class FunctionLanguageType(argument: LanguageType, result: LanguageType) extends LanguageType {
@@ -86,7 +96,6 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
       result.constraints(factory, outputType, scope)
   }
 }
-
 
 class Lambda(name: String, argumentType: LanguageType, body: Expression) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
@@ -136,12 +145,35 @@ class Access(target: Expression, field: String) extends Expression
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
     val structDeclaration = factory.declarationVariable
     val fieldDeclaration = factory.declarationVariable
-    val structScope = factory.freshScope
+    val structScope = factory.scopeVariable
     val fieldReference: Reference = Reference(field, this)
     val targetType = factory.typeVariable
     Seq(DeclarationOfType(fieldDeclaration, _type), TypesAreEqual(StructType(structDeclaration), targetType),
       DeclarationOfScope(structDeclaration, structScope),
       ResolvesTo(fieldReference, fieldDeclaration), ReferenceInScope(fieldReference, structScope)) ++
       target.constraints(factory, targetType, scope)
+  }
+}
+
+class StructFieldInit(fieldName: String, value: Expression) {
+  def constraints(factory: Factory, structScope: Scope, parentScope: Scope): Seq[Constraint] = {
+    val reference = Reference(fieldName, this)
+    val fieldDeclaration = factory.declarationVariable
+    val fieldType = factory.typeVariable
+    Seq(ReferenceInScope(reference, structScope), ResolvesTo(reference, fieldDeclaration),
+      DeclarationOfType(fieldDeclaration, fieldType)) ++ value.constraints(factory, fieldType, parentScope)
+  }
+}
+
+class New(structName: String, values: Seq[StructFieldInit]) extends Expression
+{
+  override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
+    val structDeclaration = factory.declarationVariable
+    val reference: Reference = Reference(structName, this)
+    val structScope = factory.scopeVariable
+    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, structDeclaration),
+      TypesAreEqual(_type, StructType(structDeclaration)),
+      DeclarationOfScope(structDeclaration, structScope)) ++
+        values.flatMap(value => value.constraints(factory, structScope, scope))
   }
 }

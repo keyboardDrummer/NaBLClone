@@ -1,7 +1,7 @@
 import org.scalatest.FunSuite
 
 
-class Tests extends FunSuite {
+class BasicTests extends FunSuite {
 
   test("constant") {
     val program = Const(3)

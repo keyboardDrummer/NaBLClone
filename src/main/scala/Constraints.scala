@@ -12,6 +12,12 @@ trait TypeConstraint extends Constraint
 trait ResolutionConstraint extends Constraint
 
 case class TypesAreEqual(var left: Type, var right: Type) extends TypeConstraint {
+
+  override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    left.instantiateDeclaration(variable, instance)
+    right.instantiateDeclaration(variable, instance)
+  }
+
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
     if (left == variable)
       left = instance
@@ -22,6 +28,7 @@ case class TypesAreEqual(var left: Type, var right: Type) extends TypeConstraint
 
 case class DeclarationOfType(var declaration: Declaration, var _type: Type) extends TypeConstraint {
   override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    _type.instantiateDeclaration(variable, instance)
     if (declaration == variable)
       declaration = instance
   }
