@@ -24,4 +24,22 @@ class Imports extends FunSuite {
     val program: Program = Program(Seq(module))
     assert(StaticChecker.check(program))
   }
+
+  test("structFail") {
+    val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s2", Seq(new StructFieldInit("x", Const(3)))))
+    val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structUse = new Binding("structUse", IntLanguageType, new Access(new Variable("newStruct"), "x"))
+    val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
+    val program: Program = Program(Seq(module))
+    assert(!StaticChecker.check(program))
+  }
+
+  test("structFail2") {
+    val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s2", Seq(new StructFieldInit("x", Const(3)))))
+    val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structUse = new Binding("structUse", IntLanguageType, new Access(new Variable("newStruct2"), "x"))
+    val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
+    val program: Program = Program(Seq(module))
+    assert(!StaticChecker.check(program))
+  }
 }
