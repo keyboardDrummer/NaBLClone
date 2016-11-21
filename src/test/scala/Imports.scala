@@ -1,6 +1,6 @@
 import constraints.StaticChecker
 import language._
-import language.expressions.{Const, Variable}
+import language.expressions._
 import language.modules.{Binding, Module, ModuleImport}
 import language.structs._
 import language.types.IntLanguageType
@@ -47,5 +47,16 @@ class Imports extends FunSuite {
     val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
     assert(!StaticChecker.check(program))
+  }
+
+  test("lambdaTakingStruct") {
+    val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val newStruct = new Binding("newStruct", new LanguageStructType("s"), new New("s", Seq(new StructFieldInit("x", Const(3)))))
+    val takesStruct = new Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", IntLanguageType, new Let("takesStruct", takesStruct,
+      Application(new Variable("takesStruct"), new Variable("newStruct"))))
+    val module = new Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
+    val program: Program = Program(Seq(module))
+    assert(StaticChecker.check(program))
   }
 }
