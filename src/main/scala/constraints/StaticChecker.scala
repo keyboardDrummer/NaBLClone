@@ -1,6 +1,7 @@
 package constraints
 
-import language.{Expression, IntType, Program}
+import language.expressions.Expression
+import language.{IntType, Program}
 
 object StaticChecker {
 

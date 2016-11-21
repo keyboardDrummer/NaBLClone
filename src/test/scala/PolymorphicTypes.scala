@@ -1,5 +1,6 @@
 import constraints.StaticChecker
 import language._
+import language.expressions._
 import org.scalatest.FunSuite
 
 class PolymorphicTypes extends FunSuite {

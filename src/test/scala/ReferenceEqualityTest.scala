@@ -1,5 +1,8 @@
 import constraints.StaticChecker
 import language._
+import language.expressions.{Application, Const, Lambda, Variable}
+import language.modules.{Binding, Module}
+import language.types.{FunctionLanguageType, IntLanguageType}
 import org.scalatest.FunSuite
 
 class ReferenceEqualityTest extends FunSuite {

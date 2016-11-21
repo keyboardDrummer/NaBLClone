@@ -1,5 +1,7 @@
 import constraints.StaticChecker
 import language._
+import language.expressions._
+import language.types.{FunctionLanguageType, IntLanguageType}
 import org.scalatest.FunSuite
 
 
