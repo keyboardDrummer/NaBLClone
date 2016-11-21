@@ -69,6 +69,6 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       instantiateDeclaration(v, right); true
     case (_, v:DeclarationVariable) =>
       instantiateDeclaration(v, left); true
-    case _ => false
+    case _ => left == right
   }
 }

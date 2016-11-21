@@ -162,7 +162,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
     {
       if (!solver.unifyDeclarations(declaration, resolvedDeclaration))
       {
-        //throw new IllegalStateException("what?!")
+        throw new IllegalStateException("what?!")
       }
       true
     }
