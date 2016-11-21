@@ -1,4 +1,4 @@
-package constraints.scopeConstraints
+package constraints.scopes
 
 import constraints.Constraint
 

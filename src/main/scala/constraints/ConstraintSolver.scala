@@ -1,6 +1,9 @@
 package constraints
 
-import constraints.scopeConstraints._
+import constraints.objects.{Declaration, DeclarationVariable}
+import constraints.scopes._
+import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
+import constraints.types.objects.{ConcreteType, StructType, Type, TypeVariable}
 
 class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constraint])
 {

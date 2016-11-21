@@ -1,6 +1,8 @@
-package constraints.scopeConstraints
+package constraints.scopes
 
 import constraints._
+import constraints.objects.{NamedDeclaration, Reference}
+import constraints.scopes.objects.ConcreteScope
 
 import scala.collection.mutable
 

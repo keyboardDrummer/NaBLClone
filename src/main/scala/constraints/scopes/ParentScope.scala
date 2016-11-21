@@ -1,6 +1,7 @@
-package constraints.scopeConstraints
+package constraints.scopes
 
 import constraints.ConstraintSolver
+import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
 
 case class ParentScope(var child: Scope, var parent: Scope) extends ScopeConstraint {
   override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {

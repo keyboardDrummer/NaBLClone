@@ -1,6 +1,8 @@
 package constraints
 
-import constraints.scopeConstraints.{ConcreteScope, ScopeVariable}
+import constraints.objects.DeclarationVariable
+import constraints.scopes.objects.{ConcreteScope, ScopeVariable}
+import constraints.types.objects.TypeVariable
 
 /**
   * Created by RemyW on 18-11-2016.

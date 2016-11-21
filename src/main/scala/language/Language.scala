@@ -1,7 +1,12 @@
 package language
 
 import constraints._
-import constraints.scopeConstraints.{ConcreteScope, ParentScope, Scope, ScopeImport}
+import constraints.objects.{DeclarationVariable, NamedDeclaration, Reference}
+import constraints.scopes._
+import constraints.scopes.imports.{DeclarationOfScope, ScopeImport}
+import constraints.scopes.objects.{ConcreteScope, Scope}
+import constraints.types.objects.{ConcreteType, StructType, Type}
+import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 
 object Language {
   def getFunctionType(argument: Type, result: Type) = ConcreteType("Func", Seq(argument, result))
