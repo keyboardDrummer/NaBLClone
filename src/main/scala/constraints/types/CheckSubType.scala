@@ -14,6 +14,8 @@ case class CheckSubType(var subType: Type, var superType: Type) extends TypeCons
     if (variable == superType)
       superType = instance
   }
+
+  override def boundTypes: Set[Type] = Set(subType, superType)
 }
 
 case class AssignSubType(var subType: Type, var superType: Type) extends TypeConstraint {
@@ -28,4 +30,6 @@ case class AssignSubType(var subType: Type, var superType: Type) extends TypeCon
     if (variable == superType)
       superType = instance
   }
+
+  override def boundTypes: Set[Type] = Set(subType, superType)
 }
