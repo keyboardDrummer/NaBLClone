@@ -9,6 +9,16 @@ import constraints.types.DeclarationOfType
 import constraints.types.objects.Type
 
 class ConstraintBuilder(factory: Factory) {
+  def scopeVariable(parent: Option[Scope] = None) = {
+    val result = factory.scopeVariable
+    parent.foreach(p => constraints ::= ParentScope(result, p))
+    result
+  }
+
+  def newScope() = factory.freshScope
+
+  def typeVariable() = factory.typeVariable
+
   var constraints: List[Constraint] = List.empty
 
   def newScope(parent: Option[Scope]) : ConcreteScope = {
@@ -31,14 +41,18 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  def declarationVariable(): DeclarationVariable = {
+    factory.declarationVariable
+  }
+
   def declarationVariable(_type: Type): DeclarationVariable = {
     val result = factory.declarationVariable
     constraints ::= DeclarationOfType(result, _type)
     result
   }
 
-  def declaredScope(declaration: Declaration, parent: Option[Scope]): ConcreteScope = {
-    val result = newScope(parent)
+  def declaredScopeVariable(declaration: Declaration, parent: Option[Scope] = None): ScopeVariable = {
+    val result = scopeVariable(parent)
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }
