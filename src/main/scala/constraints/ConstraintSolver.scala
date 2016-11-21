@@ -62,9 +62,9 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       false
   }
 
-  def instantiateDeclaration(v: DeclarationVariable, right: Declaration): Unit = {
-    constraints.foreach(x => x.instantiateDeclaration(v, right))
-    environment = environment.map(kv => if (kv._1 == v) (right, kv._2) else kv)
+  def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    constraints.foreach(x => x.instantiateDeclaration(variable, instance))
+    environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
   }
 
   def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {

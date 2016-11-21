@@ -118,14 +118,12 @@ class Let(name: String, bindingValue: Expression, value: Expression) extends Exp
 
 class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
-    val bodyScope: ConcreteScope = factory.freshScope
-    val argumentDeclaration: NamedDeclaration = NamedDeclaration(name, this)
-    val bodyType = factory.typeVariable
+    val builder = new ConstraintBuilder(factory)
+    val bodyScope: ConcreteScope = builder.newScope(Some(scope))
     val argumentConstraintType = factory.typeVariable
-    Seq(ParentScope(bodyScope, scope),
-      DeclarationInsideScope(argumentDeclaration, bodyScope),
-      DeclarationOfType(argumentDeclaration, argumentConstraintType),
-      TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
+    builder.declaration(name, this, argumentConstraintType, bodyScope)
+    val bodyType = factory.typeVariable
+    builder.getConstraints ++ Seq(TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
         body.constraints(factory, bodyType, bodyScope) ++
         argumentType.fold(Seq.empty[Constraint])(at => at.constraints(factory, argumentConstraintType, scope))
   }
@@ -136,7 +134,7 @@ class Variable(name: String) extends Expression {
     val declaration: DeclarationVariable = factory.declarationVariable
     val reference: Reference = Reference(name, this)
     val declarationType = factory.typeVariable
-    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, declaration), DeclarationOfType(declaration, declarationType),
+    Seq(DeclarationOfType(declaration, declarationType), ReferenceInScope(reference, scope), ResolvesTo(reference, declaration),
       Specialization(_type, declarationType))
   }
 }
@@ -163,15 +161,17 @@ case class Add(left: Expression, right: Expression) extends Expression {
 
 class Access(target: Expression, field: String) extends Expression
 {
+  /* We don't need a scope import because we can directly use the struct scope to resolve the member.
+   */
   override def constraints(factory: Factory, _type: Type, scope: Scope): Seq[Constraint] = {
+    val builder = new ConstraintBuilder(factory)
     val structDeclaration = factory.declarationVariable
-    val fieldDeclaration = factory.declarationVariable
+    val fieldDeclaration = builder.declarationVariable(_type)
     val structScope = factory.scopeVariable
-    val fieldReference: Reference = Reference(field, this)
+    builder.reference(field, this, structScope, fieldDeclaration)
     val targetType = factory.typeVariable
-    Seq(DeclarationOfType(fieldDeclaration, _type), TypesAreEqual(StructType(structDeclaration), targetType),
-      DeclarationOfScope(structDeclaration, structScope),
-      ResolvesTo(fieldReference, fieldDeclaration), ReferenceInScope(fieldReference, structScope)) ++
+    builder.getConstraints ++ Seq(TypesAreEqual(StructType(structDeclaration), targetType),
+      DeclarationOfScope(structDeclaration, structScope)) ++
       target.constraints(factory, targetType, scope)
   }
 }

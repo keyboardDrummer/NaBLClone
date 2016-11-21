@@ -1,7 +1,7 @@
 package constraints.types
 
 import constraints._
-import constraints.objects.{Declaration, DeclarationVariable}
+import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import constraints.types.objects.{Type, TypeVariable}
 
 case class DeclarationOfType(var declaration: Declaration, var _type: Type) extends TypeConstraint {
@@ -18,16 +18,18 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
 
   override def boundTypes: Set[Type] = Set(_type)
 
-  override def apply(solver: ConstraintSolver): Boolean = {
-    var result = true
-    solver.environment = solver.environment.get(declaration).fold[Map[Declaration, Type]]({
-      solver.environment + (declaration -> _type)
-    })((existingType: Type) => {
-      if (!solver.unifyTypes(existingType, _type)) {
-        result = false
-      }
-      solver.environment
-    })
-    result
+  override def apply(solver: ConstraintSolver): Boolean = declaration match {
+    case named: NamedDeclaration =>
+      var result = true
+      solver.environment = solver.environment.get(declaration).fold[Map[Declaration, Type]]({
+        solver.environment + (declaration -> _type)
+      })((existingType: Type) => {
+        if (!solver.unifyTypes(existingType, _type)) {
+          result = false
+        }
+        solver.environment
+      })
+      result
+    case _ => false
   }
 }
