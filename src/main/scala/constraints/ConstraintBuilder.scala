@@ -45,6 +45,8 @@ class ConstraintBuilder(factory: Factory) {
     factory.declarationVariable
   }
 
+  def add(addition: Seq[Constraint]) = constraints ++= addition
+
   def declarationVariable(_type: Type): DeclarationVariable = {
     val result = factory.declarationVariable
     constraints ::= DeclarationOfType(result, _type)
