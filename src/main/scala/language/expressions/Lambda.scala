@@ -11,7 +11,7 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
     val bodyScope: ConcreteScope = builder.newScope(Some(scope))
     val argumentConstraintType = builder.typeVariable()
-    builder.declaration(name, this, argumentConstraintType, bodyScope)
+    builder.declaration(name, this, bodyScope, Some(argumentConstraintType))
     val bodyType = builder.typeVariable()
     builder.getConstraints ++ Seq(TypesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))) ++
         body.constraints(builder, bodyType, bodyScope) ++

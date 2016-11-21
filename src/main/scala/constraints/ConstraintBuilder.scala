@@ -34,10 +34,10 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def declaration(name: String, id: AnyRef, _type: Type, container: Scope): NamedDeclaration = {
-    val result = new NamedDeclaration(name, id)
+  def declaration(name: String, id: AnyRef, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
+    val result = NamedDeclaration(name, id)
     constraints ::= DeclarationInsideScope(result, container)
-    constraints ::= DeclarationOfType(result, _type)
+    _type.foreach(t => constraints ::= DeclarationOfType(result, t))
     result
   }
 
