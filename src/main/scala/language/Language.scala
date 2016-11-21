@@ -14,13 +14,6 @@ object Language {
   def getFunctionType(argument: Type, result: Type) = ConcreteType("Func", Seq(argument, result))
 }
 
-case class Program(modules: Seq[Module])
-{
-  def constraints(builder: ConstraintBuilder): Seq[Constraint] = {
-    val scope = builder.newScope()
-    modules.flatten(module => module.constraints(builder, scope))
-  }
-}
 
 
 
@@ -29,7 +22,8 @@ case class Program(modules: Seq[Module])
 
 
 
-object IntType extends ConcreteType("Int", Seq.empty)
+
+
 
 
 
