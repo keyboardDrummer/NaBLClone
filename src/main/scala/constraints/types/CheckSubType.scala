@@ -11,7 +11,7 @@ case class CheckSubType(var subType: Type, var superType: Type) extends TypeCons
 
 case class AssignSubType(var subType: Type, var superType: Type) extends TypeConstraint {
   override def apply(solver: ConstraintSolver): Boolean = (subType, superType) match {
-    case (ConcreteType(subName,_),ConcreteType(superName,_)) => solver.typeGraph.add(TypeNode(subName), SuperType(TypeNode(superName))); true
+    case (_:ConcreteType, _:ConcreteType) => solver.typeGraph.add(TypeNode(subType), SuperType(TypeNode(superType))); true
     case _ => false
   }
 }

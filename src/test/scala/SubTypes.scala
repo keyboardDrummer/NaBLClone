@@ -57,4 +57,26 @@ class SubTypes extends FunSuite {
     val program: Program = Program(Seq(module))
     assert(StaticChecker.check(program))
   }
+
+  test("structBiggerFail") {
+    val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
+    val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))))
+    val module = new Module("module", Seq(structNew), Seq(structParent, structChild))
+    val program: Program = Program(Seq(module))
+    assert(!StaticChecker.check(program))
+  }
+
+  test("lambdaTakingStruct") {
+    val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
+    val newChild = new Binding("newChild", new LanguageStructType("s2"), new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))))
+    val newParent = new Binding("newParent", new LanguageStructType("s"), new New("s", Seq(new StructFieldInit("x", Const(3)))))
+    val takesSuperStruct = new Lambda("struct", new Access(new Variable("struct"), "x"))
+    val structUse = new Binding("structUse", IntLanguageType, new Let("takesSuperStruct", takesSuperStruct,
+        Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))))
+    val module = new Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
+    val program: Program = Program(Seq(module))
+    assert(StaticChecker.check(program))
+  }
 }

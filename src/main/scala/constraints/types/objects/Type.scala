@@ -9,3 +9,5 @@ trait Type {
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {}
   def variables: Set[TypeVariable]
 }
+
+trait ConcreteType extends Type

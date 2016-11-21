@@ -9,9 +9,9 @@ import constraints.types.objects.Type
 import scala.collection.mutable
 
 trait TypeGraphNode
-case class TypeNode(name: String) extends TypeGraphNode
+case class TypeNode(_type: Type) extends TypeGraphNode
 {
-  override def toString = name.toString
+  override def toString = _type.toString
 }
 
 trait TypeGraphEdge {
@@ -24,13 +24,13 @@ case class SuperType(target: TypeGraphNode) extends TypeGraphEdge
 
 class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.Set[TypeGraphEdge]]
 {
-  def areCompatible(left: String, right: String): Boolean = {
+  def areCompatible(left: Type, right: Type): Boolean = {
     val rightNode: TypeNode = TypeNode(right)
     val leftNode: TypeNode = TypeNode(left)
     isSuperType(leftNode, rightNode) || isSuperType(rightNode, leftNode)
   }
 
-  def isSuperType(subType: TypeGraphNode, superType: TypeGraphNode): Boolean = {
+  def isSuperType(superType: TypeGraphNode, subType: TypeGraphNode): Boolean = {
     getSuperTypes(subType).contains(superType)
   }
 

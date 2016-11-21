@@ -1,6 +1,6 @@
 package language.types
 
-import constraints.types.objects.ConcreteType
+import constraints.types.objects.AppliedType
 
-object LongType extends ConcreteType("Long", Seq.empty)
-object IntType extends ConcreteType("Int", Seq.empty)
+object LongType extends AppliedType("Long", Seq.empty)
+object IntType extends AppliedType("Int", Seq.empty)
