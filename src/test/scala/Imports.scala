@@ -1,3 +1,5 @@
+import constraints.StaticChecker
+import language._
 import org.scalatest.FunSuite
 
 class Imports extends FunSuite {

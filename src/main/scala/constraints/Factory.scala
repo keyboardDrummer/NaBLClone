@@ -1,3 +1,7 @@
+package constraints
+
+import constraints.scopeConstraints.{ConcreteScope, ScopeVariable}
+
 /**
   * Created by RemyW on 18-11-2016.
   */

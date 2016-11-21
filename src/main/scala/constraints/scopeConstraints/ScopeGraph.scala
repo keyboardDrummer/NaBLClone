@@ -1,3 +1,7 @@
+package constraints.scopeConstraints
+
+import constraints._
+
 import scala.collection.mutable
 
 trait GraphNode

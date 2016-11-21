@@ -1,4 +1,7 @@
-import scala.collection.GenTraversableOnce
+package language
+
+import constraints._
+import constraints.scopeConstraints.{ConcreteScope, ParentScope, Scope, ScopeImport}
 
 object Language {
   def getFunctionType(argument: Type, result: Type) = ConcreteType("Func", Seq(argument, result))
