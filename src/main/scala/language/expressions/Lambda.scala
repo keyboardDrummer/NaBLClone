@@ -16,10 +16,9 @@ class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: 
     val bodyType = builder.typeVariable()
     builder.getConstraints ++ Seq(CheckSubType(argumentType, parameterType), TypesAreEqual(_type, Language.getFunctionType(argumentType, bodyType))) ++
       body.constraints(builder, bodyType, bodyScope) ++
-      parameterDefinedType.fold(Seq.empty[Constraint])(at => at.constraints(builder, argumentType, scope))
+      parameterDefinedType.fold(Seq.empty[Constraint])(at => at.constraints(builder, parameterType, scope))
   }
 }
-
 
 class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {

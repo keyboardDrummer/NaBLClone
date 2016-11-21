@@ -3,7 +3,7 @@ import language.Program
 import language.expressions._
 import language.modules.{Binding, Module}
 import language.structs._
-import language.types.{IntLanguageType, IntType, LongType}
+import language.types.{IntLanguageType, IntType, LongLanguageType, LongType}
 import org.scalatest.FunSuite
 
 class SubTypes extends FunSuite {
@@ -64,6 +64,16 @@ class SubTypes extends FunSuite {
     val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))))
     val module = new Module("module", Seq(structNew), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
+    assert(!StaticChecker.check(program))
+  }
+
+  test("longLambdaTakesInt") {
+    val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
+    assert(StaticChecker.check(program, LongType))
+  }
+
+  test("intLambdaTakesLong") {
+    val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(IntLanguageType)), LongConst(3))
     assert(!StaticChecker.check(program))
   }
 
