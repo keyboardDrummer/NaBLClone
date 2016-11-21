@@ -1,0 +1,59 @@
+package constraints.types
+
+import constraints._
+import constraints.objects.{NamedDeclaration, Reference}
+import constraints.scopes.ReferenceNode
+import constraints.scopes.objects.ConcreteScope
+import constraints.types.objects.Type
+
+import scala.collection.mutable
+
+trait TypeGraphNode
+case class TypeNode(name: String) extends TypeGraphNode
+{
+  override def toString = name.toString
+}
+
+trait TypeGraphEdge {
+  def target: TypeGraphNode
+}
+
+case class SuperType(target: TypeGraphNode) extends TypeGraphEdge
+{
+}
+
+class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.Set[TypeGraphEdge]]
+{
+  def areCompatible(left: String, right: String): Boolean = {
+    val rightNode: TypeNode = TypeNode(right)
+    val leftNode: TypeNode = TypeNode(left)
+    isSuperType(leftNode, rightNode) || isSuperType(rightNode, leftNode)
+  }
+
+  def isSuperType(subType: TypeGraphNode, superType: TypeGraphNode): Boolean = {
+    getSuperTypes(subType).contains(superType)
+  }
+
+  def getSuperTypes(_type: TypeGraphNode): Seq[TypeGraphNode] = {
+    var result = List.empty[TypeGraphNode]
+    val visited = mutable.Set.empty[TypeGraphNode]
+    val queue = new mutable.Queue[TypeGraphNode]
+    queue.enqueue(_type)
+    while(queue.nonEmpty)
+    {
+      val element = queue.dequeue()
+      if (visited.add(element))
+      {
+        result ::= element
+        this.get(element).foreach(x => x.foreach(c => queue.enqueue(c.target)))
+      }
+    }
+    result.reverse
+  }
+
+  def add(node: TypeGraphNode, edge: TypeGraphEdge): Unit =
+  {
+    val edges = this.getOrElseUpdate(node, mutable.Set.empty)
+    edges.add(edge)
+  }
+}

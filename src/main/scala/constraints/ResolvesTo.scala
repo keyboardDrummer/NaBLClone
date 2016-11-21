@@ -11,7 +11,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
   }
 
   override def apply(solver: ConstraintSolver): Boolean = {
-    val resolvedDeclaration = solver.graph.resolve(reference)
+    val resolvedDeclaration = solver.scopeGraph.resolve(reference)
     if (resolvedDeclaration != null)
     {
       if (!solver.unifyDeclarations(declaration, resolvedDeclaration))

@@ -3,11 +3,13 @@ package constraints
 import constraints.objects.{Declaration, DeclarationVariable}
 import constraints.scopes._
 import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
+import constraints.types.{TypeGraph, TypeNode}
 import constraints.types.objects.{ConcreteType, StructType, Type, TypeVariable}
 
 class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constraint])
 {
-  val graph = new Graph
+  val scopeGraph = new ScopeGraph
+  val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
   var constraints: Seq[Constraint] = startingConstraints
 
@@ -45,17 +47,28 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     case _ => false
   }
 
+  def canAssignTo(target: Type, value: Type): Boolean = (target, value) match {
+    case (v: TypeVariable,_) => false
+    case (_,v: TypeVariable) => false
+    case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
+      unifyDeclarations(leftDeclaration, rightDeclaration)
+    case (ConcreteType(leftName, leftArguments), ConcreteType(rightName, rightArguments)) =>
+      if (typeGraph.isSuperType(TypeNode(rightName), TypeNode(leftName)) && leftArguments.size == rightArguments.size)
+        leftArguments.zip(rightArguments).forall(t => unifyTypes(t._1, t._2))
+      else
+        false
+    case _ =>
+      false
+  }
+
   def unifyTypes(left: Type, right: Type): Boolean = (left,right) match {
     case (v: TypeVariable,_) => instantiateType(v,right); true
     case (_,v: TypeVariable) => instantiateType(v,left); true
-    case(StructType(left), StructType(right)) =>
-      unifyDeclarations(left, right)
+    case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
+      unifyDeclarations(leftDeclaration, rightDeclaration)
     case (ConcreteType(leftName, leftArguments), ConcreteType(rightName, rightArguments)) =>
       if (leftName == rightName && leftArguments.size == rightArguments.size)
-      {
-        leftArguments.zip(rightArguments).foreach(t => unifyTypes(t._1, t._2))
-        true
-      }
+        leftArguments.zip(rightArguments).forall(t => unifyTypes(t._1, t._2))
       else
         false
     case _ =>

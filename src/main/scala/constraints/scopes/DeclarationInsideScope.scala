@@ -11,7 +11,7 @@ case class DeclarationInsideScope(var declaration: NamedDeclaration, var scope: 
   }
 
   override def apply(solver: ConstraintSolver): Boolean = scope match {
-    case concrete: ConcreteScope => solver.graph.add(ScopeNode(concrete), DeclaredIn(DeclarationNode(declaration))); true
+    case concrete: ConcreteScope => solver.scopeGraph.add(ScopeNode(concrete), DeclaredIn(DeclarationNode(declaration))); true
     case _ => false
   }
 }

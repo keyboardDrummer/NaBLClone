@@ -42,7 +42,7 @@ case class Declares(target: ScopeNode) extends GraphEdge {
   override def traverse: Boolean = false
 }
 
-class Graph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
+class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
   def resolve(reference: Reference): NamedDeclaration = {
     val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).

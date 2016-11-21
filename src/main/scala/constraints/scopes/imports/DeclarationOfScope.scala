@@ -21,7 +21,7 @@ case class DeclarationOfScope(var declaration: Declaration, var scope: Scope) ex
 
   override def apply(solver: ConstraintSolver): Boolean = declaration match {
     case named: NamedDeclaration =>
-      val edges = solver.graph.getOrElseUpdate(DeclarationNode(named), mutable.Set.empty[GraphEdge])
+      val edges = solver.scopeGraph.getOrElseUpdate(DeclarationNode(named), mutable.Set.empty[GraphEdge])
       val declaredEdge = edges.find(e => e.isInstanceOf[Declares])
       if (declaredEdge.nonEmpty) {
         if (!solver.unifyScopes(declaredEdge.head.asInstanceOf[Declares].target.scope, scope)) {
