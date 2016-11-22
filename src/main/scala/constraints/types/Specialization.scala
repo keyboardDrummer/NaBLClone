@@ -12,7 +12,7 @@ case class Specialization(var specialized: Type, var template: Type, debugInfo: 
     template = template.instantiateType(variable, instance)
   }
 
-  override def boundTypes: Set[Type] = Set(specialized, template)
+  override def boundTypes: Set[Type] = Set(specialized)
 
   override def apply(solver: ConstraintSolver): Boolean = {
     template match {
@@ -22,7 +22,7 @@ case class Specialization(var specialized: Type, var template: Type, debugInfo: 
       case _: ConcreteType =>
         solver.unifyTypes(specialized, template)
       case _ =>
-        val constraintTypes = solver.constraints.diff(Seq(this)).flatMap(c => c.boundTypes)
+        val constraintTypes = solver.constraints.flatMap(c => c.boundTypes)
         val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
         if (constraintVariables.intersect(template.variables).isEmpty)
           solver.unifyTypes(specialized, template)
