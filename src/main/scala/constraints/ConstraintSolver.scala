@@ -23,7 +23,9 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def cycle() : Boolean = {
-    val remainingConstraints = constraints.filter(c => !c.apply(this))
+    val remainingConstraints = constraints.filter(c =>
+      !c.apply(this)
+    )
     val result = constraints.size > remainingConstraints.size
     constraints = remainingConstraints
     result
