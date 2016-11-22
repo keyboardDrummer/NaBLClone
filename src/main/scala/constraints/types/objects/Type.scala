@@ -4,7 +4,7 @@ import constraints.Factory
 import constraints.objects._
 
 trait Type {
-  def specialize(factory: Factory): Type
+  def specialize(mapping: Map[TypeVariable, TypeVariable]): Type
 
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {}
   def variables: Set[TypeVariable]

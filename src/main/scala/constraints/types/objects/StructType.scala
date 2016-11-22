@@ -12,7 +12,7 @@ case class StructType(var declaration: Declaration) extends ConcreteType
 
   override def variables: Set[TypeVariable] = Set.empty
 
-  override def specialize(factory: Factory): Type = this
+  override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = this
 
   override def instantiateType(variable: TypeVariable, instance: Type): Type = this
 

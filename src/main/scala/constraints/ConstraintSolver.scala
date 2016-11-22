@@ -68,7 +68,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (AppliedType(leftName, leftArguments), AppliedType(rightName, rightArguments)) =>
       if (leftName == rightName && leftArguments.size == rightArguments.size)
-        leftArguments.zip(rightArguments).forall(t => unifyTypes(t._1, t._2))
+        leftArguments.indices.forall(index =>
+          unifyTypes(left.asInstanceOf[AppliedType].arguments(index), right.asInstanceOf[AppliedType].arguments(index)))
       else
         false
     case _ =>

@@ -17,7 +17,8 @@ case class Specialization(var specialized: Type, var template: Type) extends Typ
     val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
     if (constraintVariables.intersect(template.variables).isEmpty) //TODO misschien kan dit bepalen of een type unconstrained is wel al wanneer het in de environment gestopt wordt. dan hoeft het maar een keer.
     {
-      val instantiatedTemplate = template.specialize(solver.factory)
+      val mapping = template.variables.map(v => (v,solver.factory.typeVariable)).toMap
+      val instantiatedTemplate = template.specialize(mapping)
       if (!solver.unifyTypes(specialized, instantiatedTemplate))
         return false
     }
