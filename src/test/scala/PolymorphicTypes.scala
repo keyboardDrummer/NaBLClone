@@ -56,6 +56,12 @@ class PolymorphicTypes extends FunSuite {
     assert(StaticChecker.check(program))
   }
 
+  test("referenceIdentityChangeType") {
+    val identity = new Lambda("x", new Variable("x"))
+    val program = new Let("identity", identity, Application(new Variable("identity"), BoolConst(true)))
+    assert(!StaticChecker.check(program))
+  }
+
   test("reuseIdentityWithoutSpecialization") {
     val identity = new Lambda("x", new NoSpecializeVariable("x"))
     val program = new Let("identity", identity, Application(Application(new NoSpecializeVariable("identity"), new NoSpecializeVariable("identity")), Const(3)))
