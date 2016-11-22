@@ -20,14 +20,15 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
   override def apply(solver: ConstraintSolver): Boolean = declaration match {
     case named: NamedDeclaration =>
       var result = true
-      solver.environment = solver.environment.get(declaration).fold[Map[Declaration, Type]]({
-        solver.environment + (declaration -> _type)
-      })((existingType: Type) => {
-        if (!solver.unifyTypes(existingType, _type)) {
-          result = false
-        }
-        solver.environment
-      })
+      val currentValue: Option[Type] = solver.environment.get(declaration)
+      solver.environment = currentValue match {
+        case Some(existingType) =>
+          if (!solver.unifyTypes(existingType, _type)) {
+            result = false
+          }
+          solver.environment
+        case _ => solver.environment + (declaration -> _type)
+      }
       result
     case _ => false
   }

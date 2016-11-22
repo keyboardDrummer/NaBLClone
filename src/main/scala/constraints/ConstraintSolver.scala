@@ -32,8 +32,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def instantiateType(v: TypeVariable, t: Type) = {
-    constraints.foreach(c => c.instantiateType(v, t))
-    environment = environment.mapValues(existingType => if (existingType == v) t else existingType)
+    startingConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
+    environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
   }
 
   def instantiateScope(v: ScopeVariable, s: Scope) = {

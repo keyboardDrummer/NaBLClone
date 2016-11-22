@@ -12,3 +12,7 @@ object LongLanguageType extends LanguageType {
 object IntLanguageType extends LanguageType {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, IntType))
 }
+
+object BoolLanguageType extends LanguageType {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, BoolType))
+}
