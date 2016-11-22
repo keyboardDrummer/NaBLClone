@@ -29,8 +29,8 @@ class ConstraintBuilder(factory: Factory) {
 
   def reference(name: String, id: AnyRef, scope: Scope, declaration: Declaration) : Reference = {
     val result = Reference(name, id)
+    constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
     constraints ::= ResolvesTo(result, declaration)
-    constraints ::= ReferenceInScope(result, scope)
     result
   }
 
