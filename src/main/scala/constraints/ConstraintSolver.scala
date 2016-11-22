@@ -96,4 +96,9 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       instantiateDeclaration(v, left); true
     case _ => left == right
   }
+
+  def boundVariables : Set[TypeVariable] = {
+    val constraintTypes = constraints.flatMap(c => c.boundTypes)
+    constraintTypes.flatMap(t => t.variables).toSet
+  }
 }

@@ -22,9 +22,7 @@ case class Specialization(var specialized: Type, var template: Type, debugInfo: 
       case _: ConcreteType =>
         solver.unifyTypes(specialized, template)
       case _ =>
-        val constraintTypes = solver.constraints.flatMap(c => c.boundTypes)
-        val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
-        if (constraintVariables.intersect(template.variables).isEmpty)
+        if (solver.boundVariables.intersect(template.variables).isEmpty)
           solver.unifyTypes(specialized, template)
         else
           false

@@ -6,9 +6,7 @@ import constraints.types.objects._
 case class Generalization(var generalized: Type, var template: Type) extends TypeConstraint
 {
   override def apply(solver: ConstraintSolver): Boolean = {
-    val constraintTypes = solver.constraints.flatMap(c => c.boundTypes)
-    val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
-    if (constraintVariables.intersect(template.variables).isEmpty)
+    if (solver.boundVariables.intersect(template.variables).isEmpty)
     {
       val instantiatedTemplate = Poly(template.variables.toSeq, template)
       return solver.unifyTypes(generalized, instantiatedTemplate)
