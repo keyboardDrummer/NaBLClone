@@ -12,6 +12,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
   var constraints: Seq[Constraint] = startingConstraints
+  var recording: Map[TypeVariable, Type] = Map.empty
 
   def run() : Boolean = {
     var progress = true
@@ -32,6 +33,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def instantiateType(v: TypeVariable, t: Type) = {
+    recording += v -> t
     startingConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
   }

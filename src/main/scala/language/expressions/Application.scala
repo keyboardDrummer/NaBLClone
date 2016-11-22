@@ -21,8 +21,7 @@ case class Application(function: Expression, value: Expression) extends Expressi
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
     val functionType = builder.typeVariable()
     val argumentType = builder.typeVariable()
-    Seq(TypesAreEqual(functionType, Language.getFunctionType(argumentType, _type))) ++
-      function.constraints(builder, functionType, scope) ++
+    function.constraints(builder, functionType, scope) ++ Seq(TypesAreEqual(functionType, Language.getFunctionType(argumentType, _type))) ++
       value.constraints(builder, argumentType, scope)
   }
 }
