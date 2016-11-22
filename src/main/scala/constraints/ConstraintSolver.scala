@@ -32,10 +32,14 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     result
   }
 
-  def instantiateType(v: TypeVariable, t: Type) = {
+  def instantiateType(v: TypeVariable, t: Type): Boolean = {
+    if (t.variables.contains(v))
+      return false
+
     recording += v -> t
     startingConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
+    true
   }
 
   def instantiateScope(v: ScopeVariable, s: Scope) = {
@@ -58,8 +62,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def unifyTypes(left: Type, right: Type): Boolean = (left,right) match {
-    case (v: TypeVariable,_) => instantiateType(v,right); true
-    case (_,v: TypeVariable) => instantiateType(v,left); true
+    case (v: TypeVariable,_) => instantiateType(v,right)
+    case (_,v: TypeVariable) => instantiateType(v,left)
     case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (AppliedType(leftName, leftArguments), AppliedType(rightName, rightArguments)) =>
