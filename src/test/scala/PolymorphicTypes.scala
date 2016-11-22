@@ -18,7 +18,7 @@ class PolymorphicTypes extends FunSuite {
 
   test("lambda2") {
     val program = new Lambda("x", new Variable("x"))
-    assert(StaticChecker.check(program, new TypeVariable("jo")))
+    assert(StaticChecker.check(program, TypeVariable("jo")))
   }
 
   test("letIdentity") {

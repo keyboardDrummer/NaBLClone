@@ -29,6 +29,5 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
     builder.typesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))
     body.constraints(builder, bodyType, bodyScope)
     argumentType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
-    Console.out.append("jo")
   }
 }

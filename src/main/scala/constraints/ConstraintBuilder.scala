@@ -42,7 +42,7 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def specialization(first: Type, second: Type): Unit = add(Specialization(first, second))
+  def specialization(first: Type, second: Type, debugInfo: Any = null): Unit = add(new Specialization(first, second, debugInfo))
   def typesAreEqual(first: Type, second: Type) = add(TypesAreEqual(first, second))
 
   def add(addition: Constraint) = constraints ++= Seq(addition)

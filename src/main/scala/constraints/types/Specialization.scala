@@ -1,31 +1,52 @@
 package constraints.types
 
-import constraints.types.objects.{Type, TypeVariable}
+import constraints.types.objects.{ConcreteType, Poly, Type, TypeVariable}
 import constraints.ConstraintSolver
 
-case class Specialization(var specialized: Type, var template: Type) extends TypeConstraint
+case class Generalization(var generalized: Type, var template: Type) extends TypeConstraint
+{
+  override def apply(solver: ConstraintSolver): Boolean = {
+    val constraintTypes = solver.constraints.diff(Seq(this)).flatMap(c => c.boundTypes)
+    val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
+    if (constraintVariables.intersect(template.variables).isEmpty)
+    {
+      val instantiatedTemplate = Poly(template.variables.toSeq, template)
+      return solver.unifyTypes(generalized, instantiatedTemplate)
+    }
+    false
+  }
+
+  override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
+    generalized = generalized.instantiateType(variable, instance)
+    template = template.instantiateType(variable, instance)
+  }
+
+  override def boundTypes: Set[Type] = Set(generalized)
+}
+
+case class Specialization(var specialized: Type, var template: Type, debugInfo: Any = null) extends TypeConstraint
 {
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
     specialized = specialized.instantiateType(variable, instance)
     template = template.instantiateType(variable, instance)
   }
 
-  override def boundTypes: Set[Type] = Set(specialized)
+  override def boundTypes: Set[Type] = Set(specialized, template)
 
   override def apply(solver: ConstraintSolver): Boolean = {
-    val constraintTypes = solver.constraints.diff(Seq(this)).flatMap(c => c.boundTypes) //TODO kan deze diff niet weg?
-    val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
-    if (constraintVariables.intersect(template.variables).isEmpty) //TODO misschien kan dit bepalen of een type unconstrained is wel al wanneer het in de environment gestopt wordt. dan hoeft het maar een keer.
-    {
-      val mapping = template.variables.map(v => (v,solver.factory.typeVariable)).toMap
-      val instantiatedTemplate = template.specialize(mapping)
-      if (!solver.unifyTypes(specialized, instantiatedTemplate))
-        return false
+    template match {
+      case poly: Poly =>
+        val instantiatedTemplate = poly.specialize(poly.arguments.map(v => (v, solver.factory.typeVariable)).toMap)
+        solver.unifyTypes(specialized, instantiatedTemplate)
+      case _: ConcreteType =>
+        solver.unifyTypes(specialized, template)
+      case _ =>
+        val constraintTypes = solver.constraints.diff(Seq(this)).flatMap(c => c.boundTypes)
+        val constraintVariables: Set[TypeVariable] = constraintTypes.flatMap(t => t.variables).toSet
+        if (constraintVariables.intersect(template.variables).isEmpty)
+          solver.unifyTypes(specialized, template)
+        else
+          false
     }
-    else
-    {
-      return false
-    }
-    true
   }
 }
