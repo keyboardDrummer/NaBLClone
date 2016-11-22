@@ -77,6 +77,17 @@ class SubTypes extends FunSuite {
     assert(!StaticChecker.check(program))
   }
 
+  test("lambdaTakingChildStructSimple") {
+    val structParent = new Struct("s", Seq())
+    val structChild = new Struct("s2", Seq(), Some("s"))
+    val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", IntLanguageType, new Let("takesSuperStruct", takesSuperStruct,
+      Application(new NoSpecializeVariable("takesSuperStruct"), new New("s2", Seq.empty))))
+    val module = new Module("module", Seq(structUse), Seq(structParent, structChild))
+    val program: Program = Program(Seq(module))
+    assert(StaticChecker.check(program))
+  }
+
   test("lambdaTakingChildStruct") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))

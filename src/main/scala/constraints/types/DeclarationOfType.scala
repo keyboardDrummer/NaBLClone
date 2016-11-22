@@ -12,8 +12,7 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
   }
 
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
-    if (_type == variable)
-      _type = instance
+    _type = _type.instantiateType(variable, instance)
   }
 
   override def boundTypes: Set[Type] = Set(_type)

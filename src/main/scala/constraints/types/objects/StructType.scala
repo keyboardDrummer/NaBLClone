@@ -1,7 +1,7 @@
 package constraints.types.objects
 
 import constraints.Factory
-import constraints.objects.{Declaration, DeclarationVariable}
+import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 
 case class StructType(var declaration: Declaration) extends ConcreteType
 {
@@ -13,4 +13,8 @@ case class StructType(var declaration: Declaration) extends ConcreteType
   override def variables: Set[TypeVariable] = Set.empty
 
   override def specialize(factory: Factory): Type = this
+
+  override def instantiateType(variable: TypeVariable, instance: Type): Type = this
+
+  override def fullyApplied: Boolean = declaration.isInstanceOf[NamedDeclaration]
 }

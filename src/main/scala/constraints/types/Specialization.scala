@@ -6,10 +6,8 @@ import constraints.ConstraintSolver
 case class Specialization(var specialized: Type, var template: Type) extends TypeConstraint
 {
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
-    if (specialized == variable)
-      specialized = instance
-    if (template == variable)
-      template = instance
+    specialized = specialized.instantiateType(variable, instance)
+    template = template.instantiateType(variable, instance)
   }
 
   override def boundTypes: Set[Type] = Set(specialized)

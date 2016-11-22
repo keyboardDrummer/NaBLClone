@@ -15,6 +15,6 @@ class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.em
     Seq(DeclarationInsideScope(moduleDeclaration, parentScope), DeclarationOfScope(moduleDeclaration, scope), ParentScope(scope, parentScope)) ++
       structs.flatMap(struct => struct.constraints(builder, scope)) ++
       bindings.flatMap(binding => binding.constraints(builder, scope)) ++
-      imports.flatMap(_import => _import.constraints(builder, scope))
+      imports.flatMap(_import => _import.constraints(builder, scope)) //TODO moet bovenaan
   }
 }

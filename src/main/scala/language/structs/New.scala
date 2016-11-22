@@ -15,7 +15,8 @@ class New(structName: String, values: Seq[StructFieldInit]) extends Expression
     val structDeclaration = builder.declarationVariable()
     val reference: Reference = Reference(structName, this)
     val structScope = builder.scopeVariable()
-    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, structDeclaration),
+    Seq(ReferenceInScope(reference, scope),
+      ResolvesTo(reference, structDeclaration),
       TypesAreEqual(_type, StructType(structDeclaration)),
       DeclarationOfScope(structDeclaration, structScope)) ++
         values.flatMap(value => value.constraints(builder, structScope, scope))

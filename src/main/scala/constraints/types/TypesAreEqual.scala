@@ -12,10 +12,8 @@ case class TypesAreEqual(var left: Type, var right: Type) extends TypeConstraint
   }
 
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {
-    if (left == variable)
-      left = instance
-    if (right == variable)
-      right = instance
+    left = left.instantiateType(variable, instance)
+    right = right.instantiateType(variable, instance)
   }
 
   override def boundTypes: Set[Type] = Set(left, right)
