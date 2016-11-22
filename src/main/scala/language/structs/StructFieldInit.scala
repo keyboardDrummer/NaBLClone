@@ -8,11 +8,10 @@ import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 import language.expressions.Expression
 
 class StructFieldInit(fieldName: String, value: Expression) {
-  def constraints(builder: ConstraintBuilder, structScope: Scope, parentScope: Scope): Seq[Constraint] = {
-    val reference = Reference(fieldName, this)
-    val fieldDeclaration = builder.declarationVariable()
+  def constraints(builder: ConstraintBuilder, structScope: Scope, parentScope: Scope) = {
     val fieldType = builder.typeVariable()
-    Seq(ReferenceInScope(reference, structScope), ResolvesTo(reference, fieldDeclaration),
-      DeclarationOfType(fieldDeclaration, fieldType)) ++ value.constraints(builder, fieldType, parentScope)
+    val fieldDeclaration = builder.declarationVariable(fieldType)
+    builder.reference(fieldName, this, structScope, fieldDeclaration)
+    value.constraints(builder, fieldType, parentScope)
   }
 }

@@ -5,10 +5,11 @@ import constraints.scopes.imports.DeclarationOfScope
 import constraints.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
 import constraints.scopes.objects._
 import constraints.scopes.objects.ConcreteScope
-import constraints.types.DeclarationOfType
-import constraints.types.objects.Type
+import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
+import constraints.types.objects.{Type, TypeVariable}
 
 class ConstraintBuilder(factory: Factory) {
+
   def scopeVariable(parent: Option[Scope] = None) = {
     val result = factory.scopeVariable
     parent.foreach(p => constraints ::= ParentScope(result, p))
@@ -41,6 +42,10 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  def specialization(first: Type, second: Type): Unit = add(Specialization(first, second))
+  def typesAreEqual(first: Type, second: Type) = add(TypesAreEqual(first, second))
+
+  def add(addition: Constraint) = constraints ++= Seq(addition)
   def add(addition: Seq[Constraint]) = constraints ++= addition
 
   def declarationVariable(): DeclarationVariable = {
@@ -59,8 +64,14 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  def declaredNewScope(declaration: Declaration, parent: Option[Scope] = None): ConcreteScope = {
+    val result = newScope(parent)
+    constraints ::= DeclarationOfScope(declaration, result)
+    result
+  }
+
   def getConstraints: Seq[Constraint] = {
-    val result = constraints.reverse.toSeq
+    val result = constraints.reverse
     constraints = List.empty
     result
   }

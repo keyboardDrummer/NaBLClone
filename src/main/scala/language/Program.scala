@@ -7,7 +7,6 @@ import language.types.{IntType, LongType}
 
 object Program
 {
-
   def libraryConstraints: Seq[Constraint] = {
     Seq(AssignSubType(IntType, LongType))
   }
@@ -15,8 +14,9 @@ object Program
 
 case class Program(modules: Seq[Module])
 {
-  def constraints(builder: ConstraintBuilder): Seq[Constraint] = {
+  def constraints(builder: ConstraintBuilder) = {
+    builder.add(Program.libraryConstraints)
     val scope = builder.newScope()
-    Program.libraryConstraints ++ modules.flatten(module => module.constraints(builder, scope))
+    modules.foreach(module => module.constraints(builder, scope))
   }
 }

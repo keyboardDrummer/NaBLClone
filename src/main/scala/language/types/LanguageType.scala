@@ -6,5 +6,5 @@ import constraints.{Constraint, ConstraintBuilder}
 
 trait LanguageType
 {
-  def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint]
+  def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope)
 }

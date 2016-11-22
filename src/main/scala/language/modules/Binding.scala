@@ -10,11 +10,10 @@ import language.types.LanguageType
 
 class Binding(name: String, _type: LanguageType, body: Expression)
 {
-  def constraints(builder: ConstraintBuilder, parentScope: Scope): Seq[Constraint] = {
+  def constraints(builder: ConstraintBuilder, parentScope: Scope) = {
     val typeVariable = builder.typeVariable()
-    val declaration = NamedDeclaration(name, this)
-    Seq(DeclarationOfType(declaration, typeVariable), DeclarationInsideScope(declaration, parentScope)) ++
-      body.constraints(builder, typeVariable, parentScope) ++
-      _type.constraints(builder, typeVariable, parentScope)
+    builder.declaration(name, this, parentScope, Some(typeVariable))
+    body.constraints(builder, typeVariable, parentScope)
+    _type.constraints(builder, typeVariable, parentScope)
   }
 }

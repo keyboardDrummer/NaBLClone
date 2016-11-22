@@ -11,14 +11,11 @@ class Access(target: Expression, field: String) extends Expression
 {
   /* We don't need a scope import because we can directly use the struct scope to resolve the member.
    */
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
     val fieldDeclaration = builder.declarationVariable(_type)
-    val structScope = builder.scopeVariable()
+    val structScope = builder.declaredScopeVariable(structDeclaration)
     builder.reference(field, this, structScope, fieldDeclaration)
-    val targetType = builder.typeVariable()
-    builder.getConstraints ++ Seq(TypesAreEqual(StructType(structDeclaration), targetType),
-      DeclarationOfScope(structDeclaration, structScope)) ++
-      target.constraints(builder, targetType, scope)
+    target.constraints(builder, StructType(structDeclaration), scope)
   }
 }

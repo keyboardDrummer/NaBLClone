@@ -8,19 +8,19 @@ import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 
 class NoSpecializeVariable(name: String) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val declarationType = builder.typeVariable()
     val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
     builder.reference(name, this, scope, declaration)
-    builder.getConstraints ++ Seq(TypesAreEqual(_type, declarationType))
+    builder.typesAreEqual(_type, declarationType)
   }
 }
 
 class Variable(name: String) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val declarationType = builder.typeVariable()
     val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
     builder.reference(name, this, scope, declaration)
-    builder.getConstraints ++ Seq(Specialization(_type, declarationType))
+    builder.specialization(_type, declarationType)
   }
 }

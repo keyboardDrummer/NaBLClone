@@ -9,13 +9,18 @@ object StaticChecker {
 
   def check(program: Expression, _type: Type = IntType) : Boolean = {
     val factory = new Factory()
-    val constraints = Program.libraryConstraints ++ program.constraints(new ConstraintBuilder(factory), _type, factory.freshScope)
+    val builder: ConstraintBuilder = new ConstraintBuilder(factory)
+    builder.add(Program.libraryConstraints)
+    program.constraints(builder, _type, factory.freshScope)
+    val constraints = builder.getConstraints
     new ConstraintSolver(factory, constraints).run()
   }
 
   def check(program: Program) : Boolean = {
     val factory = new Factory()
-    val constraints = program.constraints(new ConstraintBuilder(factory))
+    val builder: ConstraintBuilder = new ConstraintBuilder(factory)
+    program.constraints(builder)
+    val constraints = builder.getConstraints
     new ConstraintSolver(factory, constraints).run()
   }
 }

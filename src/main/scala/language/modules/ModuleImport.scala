@@ -7,10 +7,10 @@ import constraints.scopes.objects.Scope
 import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 
 class ModuleImport(name: String) {
-  def constraints(builder: ConstraintBuilder, scope: Scope): Seq[Constraint] = {
+  def constraints(builder: ConstraintBuilder, scope: Scope) = {
     val importedDeclaration = builder.declarationVariable()
     val importedScope = builder.declaredScopeVariable(importedDeclaration)
-    val reference: Reference = Reference(name, this)
-    Seq(ReferenceInScope(reference, scope), ResolvesTo(reference, importedDeclaration)) ++ builder.getConstraints ++  Seq(ScopeImport(scope, importedScope))
+    builder.reference(name, this, scope, importedDeclaration)
+    builder.add(ScopeImport(scope, importedScope))
   }
 }

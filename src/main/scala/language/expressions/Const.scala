@@ -7,13 +7,13 @@ import constraints.{Constraint, ConstraintBuilder}
 import language.types.{BoolType, IntType, LongType}
 
 case class LongConst(value: Long) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, LongType))
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = builder.typesAreEqual(_type, LongType)
 }
 
 case class Const(value: Int) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, IntType))
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = builder.typesAreEqual(_type, IntType)
 }
 
 case class BoolConst(value: Boolean) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = Seq(TypesAreEqual(_type, BoolType))
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = builder.typesAreEqual(_type, BoolType)
 }

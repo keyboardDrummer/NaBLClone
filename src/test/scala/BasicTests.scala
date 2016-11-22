@@ -78,6 +78,12 @@ class BasicTests extends FunSuite {
   }
 
   test("Shadowing2")  {
+    val innerLambda: Lambda = new Lambda("x", new NoSpecializeVariable("x"), Some(IntLanguageType))
+    val program = Application(Application(new Lambda("x", innerLambda, Some(FunctionLanguageType(IntLanguageType, IntLanguageType))), Const(3)), Const(2))
+    assert(!StaticChecker.check(program))
+  }
+
+  test("Shadowing3")  {
     val innerLambda: Lambda = new Lambda("x", new Variable("x"), Some(IntLanguageType))
     val program = Application(Application(new Lambda("x", innerLambda, Some(FunctionLanguageType(IntLanguageType, IntLanguageType))), Const(3)), Const(2))
     assert(!StaticChecker.check(program))

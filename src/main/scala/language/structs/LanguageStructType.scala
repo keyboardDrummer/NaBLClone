@@ -9,11 +9,9 @@ import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 import language.types.LanguageType
 
 class LanguageStructType(name: String) extends LanguageType {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Seq[Constraint] = {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope) = {
     val structDeclaration = builder.declarationVariable()
-    val reference: Reference = Reference(name, this)
-    Seq(TypesAreEqual(_type, StructType(structDeclaration)),
-      ResolvesTo(reference, structDeclaration),
-      ReferenceInScope(reference, scope))
+    builder.reference(name, this, scope, structDeclaration)
+    builder.typesAreEqual(_type, StructType(structDeclaration))
   }
 }
