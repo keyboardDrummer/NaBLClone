@@ -12,7 +12,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
   var constraints: Seq[Constraint] = startingConstraints
-  var recording: Map[TypeVariable, Type] = Map.empty
+  var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
 
   def run() : Boolean = {
     var progress = true
@@ -36,7 +36,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     if (t.variables.contains(v))
       return false
 
-    recording += v -> t
+    mappedTypeVariables += v -> t
     startingConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
     true
@@ -62,8 +62,16 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def unifyTypes(left: Type, right: Type): Boolean = (left,right) match {
-    case (v: TypeVariable,_) => instantiateType(v,right)
-    case (_,v: TypeVariable) => instantiateType(v,left)
+    case (v: TypeVariable,_) => mappedTypeVariables.get(v) match
+    {
+      case Some(newLeft) => unifyTypes(newLeft, right)
+      case _ => instantiateType(v,right)
+    }
+    case (_,v: TypeVariable) =>  mappedTypeVariables.get(v) match
+    {
+      case Some(newRight) => unifyTypes(left, newRight)
+      case _ => instantiateType(v,left)
+    }
     case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (AppliedType(leftName, leftArguments), AppliedType(rightName, rightArguments)) =>
