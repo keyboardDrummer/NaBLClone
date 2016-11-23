@@ -2,6 +2,7 @@ import constraints.StaticChecker
 import constraints.types.objects.TypeVariable
 import language._
 import language.expressions._
+import language.types.IntType
 import org.scalatest.FunSuite
 
 class PolymorphicTypes extends FunSuite {
@@ -53,7 +54,19 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), Const(3)))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.check(program, IntType))
+  }
+
+  test("reuseIdentityFail") {
+    val identity = new Lambda("x", new Variable("x"))
+    val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), BoolConst(true)))
+    assert(!StaticChecker.check(program, IntType))
+  }
+
+  test("labmdaDoesNotGeneralize") {
+    val identity = new Lambda("x", new Variable("x"))
+    val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
+    assert(!StaticChecker.check(program))
   }
 
   test("referenceIdentityChangeType") {

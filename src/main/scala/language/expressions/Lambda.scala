@@ -14,7 +14,8 @@ class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: 
     val parameterType = builder.typeVariable()
     builder.declaration(name, this, bodyScope, Some(parameterType))
     val bodyType = builder.typeVariable()
-    builder.add(Seq(CheckSubType(argumentType, parameterType), TypesAreEqual(_type, Language.getFunctionType(argumentType, bodyType))))
+    builder.add(CheckSubType(argumentType, parameterType))
+    builder.typesAreEqual(_type, Language.getFunctionType(argumentType, bodyType))
     body.constraints(builder, bodyType, bodyScope)
     parameterDefinedType.foreach(at => at.constraints(builder, parameterType, scope))
   }

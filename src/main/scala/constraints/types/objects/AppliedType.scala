@@ -12,4 +12,6 @@ case class AppliedType(constructor: String, var arguments: Seq[Type]) extends Co
   }
 
   override def fullyApplied: Boolean = arguments.forall(a => a.fullyApplied)
+
+  override def toString: String = constructor + (if (arguments.nonEmpty) "(" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ")" else "")
 }

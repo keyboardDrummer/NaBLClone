@@ -2,6 +2,11 @@ package language.types
 
 import constraints.types.objects.AppliedType
 
-object LongType extends AppliedType("Long", Seq.empty)
-object IntType extends AppliedType("Int", Seq.empty)
-object BoolType extends AppliedType("Bool", Seq.empty)
+class PrimitiveType(name: String) extends AppliedType(name, Seq.empty)
+{
+  override def toString: String = name
+}
+
+object LongType extends PrimitiveType("Long")
+object IntType extends PrimitiveType("Int")
+object BoolType extends PrimitiveType("Bool")
