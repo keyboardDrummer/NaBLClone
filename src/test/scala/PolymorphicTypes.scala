@@ -63,7 +63,7 @@ class PolymorphicTypes extends FunSuite {
     assert(!StaticChecker.check(program, IntType))
   }
 
-  test("labmdaDoesNotGeneralize") {
+  test("lambdaDoesNotGeneralize") {
     val identity = new Lambda("x", new Variable("x"))
     val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
     assert(!StaticChecker.check(program))
