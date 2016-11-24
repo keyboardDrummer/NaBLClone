@@ -1,5 +1,6 @@
 package language.expressions
 
+import bindingTypeMachine.{Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.Generalization
@@ -13,6 +14,8 @@ class NoGeneralizeLet(name: String, bindingValue: Expression, value: Expression)
     bindingValue.constraints(builder, bindingType, parentScope)
     value.constraints(builder, _type, scope)
   }
+
+  override def evaluate(machine: Machine): MachineType = ???
 }
 
 class Let(name: String, bindingValue: Expression, value: Expression) extends Expression {
@@ -24,5 +27,14 @@ class Let(name: String, bindingValue: Expression, value: Expression) extends Exp
     builder.declaration(name, this, scope, Some(generalizedType))
     bindingValue.constraints(builder, bindingType, parentScope)
     value.constraints(builder, _type, scope)
+  }
+
+  override def evaluate(machine: Machine): MachineType = {
+    val bindingType = bindingValue.evaluate(machine)
+    machine.enterScope()
+    machine.declare(name, bindingType)
+    val result = value.evaluate(machine)
+    machine.exitScope()
+    result
   }
 }

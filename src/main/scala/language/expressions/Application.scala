@@ -1,6 +1,6 @@
 package language.expressions
 
-import bindingTypeMachine.Machine
+import bindingTypeMachine.{ClosureType, Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.{AppliedType, ConcreteType, Type}
@@ -17,7 +17,7 @@ case class ContraVariantApplication(function: Expression, value: Expression) ext
     value.constraints(builder, argumentType, scope)
   }
 
-  override def evaluate(machine: Machine): ConcreteType = ???
+  override def evaluate(machine: Machine): MachineType = ???
 }
 
 case class Application(function: Expression, value: Expression) extends Expression {
@@ -29,14 +29,17 @@ case class Application(function: Expression, value: Expression) extends Expressi
     value.constraints(builder, argumentType, scope)
   }
 
-  override def evaluate(machine: Machine): ConcreteType = {
+  override def evaluate(machine: Machine): MachineType = {
     val functionType = function.evaluate(machine)
     functionType match
     {
-      case AppliedType("Func", Seq(input: ConcreteType, output: ConcreteType)) =>
+      case ClosureType(environment, name, getType) =>
+        machine.enterScope()
         val argumentType = value.evaluate(machine)
-        machine.assertEqual(input, argumentType)
-        output
+        machine.declare(name, argumentType)
+        val result = getType(machine)
+        machine.exitScope()
+        result
       case _ => throw new IllegalStateException()
     }
   }

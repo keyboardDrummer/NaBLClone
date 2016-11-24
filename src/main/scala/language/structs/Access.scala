@@ -1,5 +1,6 @@
 package language.structs
 
+import bindingTypeMachine.{Machine, MachineType, StructMachineType}
 import constraints.scopes.imports.DeclarationOfScope
 import constraints.scopes.objects.Scope
 import constraints.types.TypesAreEqual
@@ -17,5 +18,10 @@ class Access(target: Expression, field: String) extends Expression
     val structScope = builder.declaredScopeVariable(structDeclaration)
     builder.reference(field, this, structScope, fieldDeclaration)
     target.constraints(builder, StructType(structDeclaration), scope)
+  }
+
+  override def evaluate(machine: Machine): MachineType = {
+    val structType = target.evaluate(machine).asInstanceOf[StructMachineType]
+    structType.fields(field)
   }
 }

@@ -1,5 +1,6 @@
 package language.structs
 
+import bindingTypeMachine.{Machine, MachineType}
 import constraints.objects.Reference
 import constraints.scopes.ReferenceInScope
 import constraints.scopes.imports.DeclarationOfScope
@@ -17,5 +18,12 @@ class New(structName: String, values: Seq[StructFieldInit]) extends Expression
     builder.reference(structName, this, scope, structDeclaration)
     builder.typesAreEqual(_type, StructType(structDeclaration))
     values.foreach(value => value.constraints(builder, structScope, scope))
+  }
+
+  override def evaluate(machine: Machine): MachineType = {
+    values.foreach(value => {
+      //TODO
+    })
+    machine.resolveStruct(structName)
   }
 }

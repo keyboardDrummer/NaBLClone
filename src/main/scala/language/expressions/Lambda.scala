@@ -1,6 +1,6 @@
 package language.expressions
 
-import bindingTypeMachine.Machine
+import bindingTypeMachine.{ClosureType, ExpressionScope, Machine, MachineType}
 import constraints.scopes.objects.{ConcreteScope, Scope}
 import constraints.types.{CheckSubType, TypesAreEqual}
 import constraints.types.objects.{ConcreteType, Type}
@@ -20,6 +20,8 @@ class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: 
     body.constraints(builder, bodyType, bodyScope)
     parameterDefinedType.foreach(at => at.constraints(builder, parameterType, scope))
   }
+
+  override def evaluate(machine: Machine): MachineType = ???
 }
 
 class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
@@ -33,7 +35,17 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
     argumentType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
   }
 
-  override def evaluate(machine: Machine): ConcreteType = {
-    //machine.
+  override def evaluate(machine: Machine): MachineType = {
+    argumentType.foreach(t => {
+      machine.enterScope()
+      machine.declare(name, t.evaluate(machine))
+      body.evaluate(machine)
+      machine.exitScope()
+    })
+    ClosureType(machine.currentScope.asInstanceOf[ExpressionScope], name, (m: Machine) => {
+      val actualArgumentType = m.resolve(name)
+      argumentType.foreach(a => m.assertEqual(a.evaluate(machine), actualArgumentType))
+      body.evaluate(m)
+    })
   }
 }

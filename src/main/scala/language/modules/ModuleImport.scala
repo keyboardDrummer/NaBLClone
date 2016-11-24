@@ -10,8 +10,8 @@ import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 class ModuleImport(name: String) {
 
   def evaluate(machine: Machine) = {
-    val importedModule = machine.resolve(name, this)
-    machine.importScope(importedModule)
+    val importedModule = machine.resolveModule(name)
+    machine.currentModule.imports ::= importedModule
   }
 
   def constraints(builder: ConstraintBuilder, scope: Scope) = {

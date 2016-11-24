@@ -1,4 +1,4 @@
-package constraints.types
+package bindingTypeMachine
 
 import constraints._
 import constraints.objects.{NamedDeclaration, Reference}
@@ -9,7 +9,7 @@ import constraints.types.objects.{ConcreteType, Type}
 import scala.collection.mutable
 
 trait TypeGraphNode
-case class TypeNode(_type: Type) extends TypeGraphNode
+case class TypeNode(_type: MachineType) extends TypeGraphNode
 {
   override def toString = _type.toString
 }
@@ -24,7 +24,7 @@ case class SuperType(target: TypeGraphNode) extends TypeGraphEdge
 
 class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.Set[TypeGraphEdge]]
 {
-  def areCompatible(left: Type, right: Type): Boolean = {
+  def areCompatible(left: MachineType, right: MachineType): Boolean = {
     val rightNode: TypeNode = TypeNode(right)
     val leftNode: TypeNode = TypeNode(left)
     isSuperType(leftNode, rightNode) || isSuperType(rightNode, leftNode)
@@ -51,7 +51,7 @@ class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.
     result.reverse
   }
 
-  def add(subType: ConcreteType, superType: ConcreteType): Unit =
+  def add(subType: MachineType, superType: MachineType): Unit =
   {
     add(TypeNode(subType), SuperType(TypeNode(superType)))
   }

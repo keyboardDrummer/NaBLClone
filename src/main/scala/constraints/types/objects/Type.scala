@@ -2,6 +2,7 @@ package constraints.types.objects
 
 import constraints.Factory
 import constraints.objects._
+import language.expressions.Expression
 
 trait Type {
   def specialize(mapping: Map[TypeVariable, TypeVariable]): Type

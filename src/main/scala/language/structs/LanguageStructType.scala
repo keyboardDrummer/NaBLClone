@@ -1,11 +1,9 @@
 package language.structs
 
-import constraints.objects.Reference
-import constraints.scopes.ReferenceInScope
+import bindingTypeMachine.{Machine, MachineType}
+import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.TypesAreEqual
 import constraints.types.objects.{StructType, Type}
-import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 import language.types.LanguageType
 
 class LanguageStructType(name: String) extends LanguageType {
@@ -14,4 +12,6 @@ class LanguageStructType(name: String) extends LanguageType {
     builder.reference(name, this, scope, structDeclaration)
     builder.typesAreEqual(_type, StructType(structDeclaration))
   }
+
+  override def evaluate(machine: Machine): MachineType = machine.resolveStruct(name)
 }

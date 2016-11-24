@@ -1,9 +1,9 @@
 package language.types
 
+import bindingTypeMachine.{FunctionType, Machine, MachineType}
+import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.TypesAreEqual
 import constraints.types.objects.Type
-import constraints.{Constraint, ConstraintBuilder}
 import language.Language
 
 case class FunctionLanguageType(argument: LanguageType, result: LanguageType) extends LanguageType {
@@ -14,4 +14,6 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
     argument.constraints(builder, inputType, scope)
     result.constraints(builder, outputType, scope)
   }
+
+  override def evaluate(machine: Machine): MachineType = FunctionType(argument.evaluate(machine), result.evaluate(machine))
 }

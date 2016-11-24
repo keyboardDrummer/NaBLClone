@@ -1,5 +1,6 @@
 package language.expressions
 
+import bindingTypeMachine.{Machine, MachineType}
 import constraints.objects.{DeclarationVariable, Reference}
 import constraints.scopes.ReferenceInScope
 import constraints.scopes.objects.Scope
@@ -16,6 +17,8 @@ class NoSpecializeVariable(val name: String) extends Expression {
   }
 
   override def toString = s"Variable($name)"
+
+  override def evaluate(machine: Machine): MachineType = machine.resolve(name)
 }
 
 class Variable(val name: String) extends Expression {
@@ -27,4 +30,6 @@ class Variable(val name: String) extends Expression {
   }
 
   override def toString = s"Variable($name)"
+
+  override def evaluate(machine: Machine): MachineType = machine.resolve(name)
 }

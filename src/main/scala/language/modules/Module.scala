@@ -20,7 +20,7 @@ class Module(name: String, bindings: Seq[Binding], structs: Seq[Struct] = Seq.em
   }
 
   def evaluate(machine: Machine) = {
-    machine.declareNestedScope(name, this)
+    machine.newModule(name)
     imports.foreach(_import => _import.evaluate(machine))
     structs.foreach(struct => struct.evaluate(machine))
     bindings.foreach(binding => binding.evaluate(machine))
