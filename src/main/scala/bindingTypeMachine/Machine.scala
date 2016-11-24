@@ -73,9 +73,26 @@ class Machine {
 
   }
 
-  def assertEqual(realType: MachineType, evaluatedType: MachineType) =
+  def assertEqual(realType: MachineType, evaluatedType: MachineType): Unit =
     if (realType != evaluatedType)
-      throw new IllegalStateException()
+    {
+      (realType, evaluatedType) match {
+        case (c: ClosureType, f: FunctionType) =>
+          assertFunctionAndClosureAreEqual(f, c)
+        case (f: FunctionType, c: ClosureType) =>
+          assertFunctionAndClosureAreEqual(f, c)
+        case _ => throw new IllegalStateException()
+      }
+    }
+
+  def assertFunctionAndClosureAreEqual(f: FunctionType, c: ClosureType): Unit = {
+    val current = currentScope
+    currentScope = c.scope
+    declare(c.name, f.input)
+    val realOutput = c.getType(this)
+    assertEqual(f.output, realOutput)
+    currentScope = current
+  }
 
   def subType(subType: StructMachineType, superType: StructMachineType) = {
 

@@ -1,6 +1,6 @@
 package constraints
 
-import bindingTypeMachine.Machine
+import bindingTypeMachine.{Machine, MachineType}
 import constraints.types.objects.Type
 import language.expressions.Expression
 import language.Program
@@ -11,11 +11,27 @@ import scala.util.Try
 object StaticChecker {
 
   def both(program: Expression, languageType: LanguageType = IntLanguageType): Boolean = {
-    val machineResult = Try(program.evaluate(Machine.expressionMachine)).map(_ => true).getOrElse(false)
+    val machineResult: Boolean = checkMachine(program, languageType)
     val constraintResult = check(program, languageType)
     if (machineResult != constraintResult)
-      throw new IllegalStateException()
+      throw new IllegalStateException("machine and constraints don't agree")
     machineResult
+  }
+
+  def checkMachine(program: Expression, languageType: LanguageType = IntLanguageType): Boolean = {
+    val expressionMachine: Machine = Machine.expressionMachine
+    try
+    {
+      val machineType = program.evaluate(expressionMachine)
+      val expectedMachineType: MachineType = languageType.evaluate(expressionMachine)
+      expectedMachineType == machineType
+    } catch
+    {
+      case e: Throwable =>
+        val f = e
+        Console.out.append(f.toString)
+        false
+    }
   }
 
   def check(program: Expression, languageType: LanguageType): Boolean = {

@@ -34,11 +34,14 @@ case class Application(function: Expression, value: Expression) extends Expressi
     functionType match
     {
       case ClosureType(environment, name, getType) =>
+        val currentScope = machine.currentScope
+        machine.currentScope = environment
         machine.enterScope()
         val argumentType = value.evaluate(machine)
         machine.declare(name, argumentType)
         val result = getType(machine)
         machine.exitScope()
+        machine.currentScope = currentScope
         result
       case _ => throw new IllegalStateException()
     }
