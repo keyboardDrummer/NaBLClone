@@ -2,19 +2,19 @@ import constraints.StaticChecker
 import constraints.types.objects.TypeVariable
 import language._
 import language.expressions._
-import language.types.IntType
+import language.types.{IntLanguageType, IntType}
 import org.scalatest.FunSuite
 
 class PolymorphicTypes extends FunSuite {
 
   test("boolIntoIdentity") {
     val program = Application(new Lambda("x", new Variable("x")), BoolConst(true))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("lambda") {
     val program = new Lambda("x", new Variable("x"))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("lambda2") {
@@ -24,37 +24,37 @@ class PolymorphicTypes extends FunSuite {
 
   test("letIdentity") {
     val program = new Let("identity", new Lambda("x", new Variable("x")), Const(3))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("letIdentity2") {
     val program = new Let("identity", new Lambda("x", new NoSpecializeVariable("x")), Const(3))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("identitySquareIsNoInt") {
     val identity = new Lambda("x", new Variable("x"))
     val identity2 = new Lambda("x", new Variable("x"))
     val program = Application(identity, identity2)
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("identitySquareIsNoInt2") {
     val identity = new Lambda("x", new Variable("x"))
     val identity2 = new Lambda("x", new Variable("x"))
     val program = Add(Application(identity, identity2), Const(2))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("lambdaApplication") {
     val program = Application(new Lambda("x", new Variable("x")), Const(3))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("reuseIdentity") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), Const(3)))
-    assert(StaticChecker.check(program, IntType))
+    assert(StaticChecker.both(program, IntLanguageType))
   }
 
   test("reuseIdentityFail") {
