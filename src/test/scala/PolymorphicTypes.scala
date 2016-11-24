@@ -60,7 +60,7 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentityFail") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), BoolConst(true)))
-    assert(!StaticChecker.check(program, IntType))
+    assert(!StaticChecker.both(program, IntLanguageType))
   }
 
   test("lambdaDoesNotGeneralize") {
@@ -69,22 +69,28 @@ class PolymorphicTypes extends FunSuite {
     assert(!StaticChecker.check(program))
   }
 
+  test("lambdaDoesNotGeneralizeMachine") {
+    val identity = new Lambda("x", new Variable("x"))
+    val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
+    assert(StaticChecker.checkMachine(program))
+  }
+
   test("referenceIdentityChangeType") {
     val identity = new Lambda("x", new NoSpecializeVariable("x"))
     val program = new Let("identity", identity, Application(new NoSpecializeVariable("identity"), BoolConst(true)))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("referenceIdentityChangeType2") {
     val identity = new Lambda("x", new NoSpecializeVariable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), BoolConst(true)))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("referenceIdentityChangeType3") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), BoolConst(true)))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("reuseIdentityWithoutSpecialization") {
@@ -96,13 +102,13 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity2") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), Application(new Variable("identity"), Const(3))))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("const" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
-      Application(new Variable("constSquare"), Application(new Variable("const"), Const(3)))))
-    assert(StaticChecker.check(program))
+      Application(Application(new Variable("constSquare"), Const(2)), Const(3))))
+    assert(StaticChecker.both(program))
   }
 }
