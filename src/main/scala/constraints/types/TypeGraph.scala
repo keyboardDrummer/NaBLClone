@@ -51,6 +51,11 @@ class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.
     result.reverse
   }
 
+  def add(subType: ConcreteType, superType: ConcreteType): Unit =
+  {
+    add(TypeNode(subType), SuperType(TypeNode(superType)))
+  }
+
   def add(node: TypeGraphNode, edge: TypeGraphEdge): Unit =
   {
     val edges = this.getOrElseUpdate(node, mutable.Set.empty)

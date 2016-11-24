@@ -1,5 +1,6 @@
 package language
 
+import bindingTypeMachine.Machine
 import constraints.types.{AssignSubType, CheckSubType}
 import constraints.{Constraint, ConstraintBuilder}
 import language.modules.Module
@@ -18,5 +19,12 @@ case class Program(modules: Seq[Module])
     builder.add(Program.libraryConstraints)
     val scope = builder.newScope()
     modules.foreach(module => module.constraints(builder, scope))
+  }
+
+  def evaluate(machine: Machine): Unit =
+  {
+    machine.addSubType(IntType, LongType)
+    val scope = machine.newScope()
+    modules.foreach(module => module.evaluate(machine))
   }
 }

@@ -2,7 +2,7 @@ package constraints.scopes
 
 import constraints._
 import constraints.objects.{NamedDeclaration, Reference}
-import constraints.scopes.objects.ConcreteScope
+import constraints.scopes.objects.{ConcreteScope, Scope}
 
 import scala.collection.mutable
 
@@ -32,18 +32,31 @@ case class ReferenceEdge(target: ScopeNode) extends GraphEdge
 case class ImportEdge(target: ScopeNode) extends GraphEdge {
   override def traverse: Boolean = true
 }
-case class DeclaredIn(target: DeclarationNode) extends GraphEdge {
+case class DeclaresDeclaration(target: DeclarationNode) extends GraphEdge {
   override def traverse: Boolean = true
 }
 case class Parent(target: ScopeNode) extends GraphEdge {
   override def traverse: Boolean = true
 }
-case class Declares(target: ScopeNode) extends GraphEdge {
+case class DeclaresScope(target: ScopeNode) extends GraphEdge {
   override def traverse: Boolean = false
 }
 
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
+  def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope) = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
+
+  def resolveScope(importedModule: NamedDeclaration): ConcreteScope = {
+    val reachableNodes = depthFirst(DeclarationNode(importedModule)).collect({case d:ScopeNode => d})
+    if (reachableNodes.nonEmpty)
+    {
+      return reachableNodes.head.scope
+    }
+    null
+  }
+
+  def addReference(reference: Reference, currentScope: ConcreteScope) = add(ReferenceNode(reference), ReferenceEdge(ScopeNode(currentScope)))
+
   def resolve(reference: Reference): NamedDeclaration = {
     val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).
       filter(d => d.declaration.name == reference.name)
@@ -70,6 +83,10 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
     }
     result.reverse
   }
+
+  def parent(child: ConcreteScope, parent: ConcreteScope) = add(ScopeNode(child), Parent(ScopeNode(parent)))
+  def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration) = add(ScopeNode(inside), DeclaresDeclaration(DeclarationNode(declaration)))
+  def declareScope(declaration: NamedDeclaration, scope: ConcreteScope) = add(DeclarationNode(declaration), DeclaresScope(ScopeNode(scope)))
 
   def add(node: GraphNode, edge: GraphEdge): Unit =
   {

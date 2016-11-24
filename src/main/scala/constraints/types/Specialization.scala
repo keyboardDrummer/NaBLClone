@@ -3,8 +3,6 @@ package constraints.types
 import constraints.types.objects.{ConcreteType, Poly, Type, TypeVariable}
 import constraints.ConstraintSolver
 
-
-
 case class Specialization(var specialized: Type, var template: Type, debugInfo: Any = null) extends TypeConstraint
 {
   override def instantiateType(variable: TypeVariable, instance: Type): Unit = {

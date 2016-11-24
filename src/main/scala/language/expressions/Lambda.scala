@@ -1,8 +1,9 @@
 package language.expressions
 
+import bindingTypeMachine.Machine
 import constraints.scopes.objects.{ConcreteScope, Scope}
 import constraints.types.{CheckSubType, TypesAreEqual}
-import constraints.types.objects.Type
+import constraints.types.objects.{ConcreteType, Type}
 import constraints.{Constraint, ConstraintBuilder}
 import language.Language
 import language.types.LanguageType
@@ -30,5 +31,9 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
     builder.typesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))
     body.constraints(builder, bodyType, bodyScope)
     argumentType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
+  }
+
+  override def evaluate(machine: Machine): ConcreteType = {
+    //machine.
   }
 }
