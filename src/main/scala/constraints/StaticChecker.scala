@@ -14,7 +14,7 @@ object StaticChecker {
     val machineResult: Boolean = checkMachine(program, languageType)
     val constraintResult = check(program, languageType)
     if (machineResult != constraintResult)
-      throw new IllegalStateException("machine and constraints don't agree")
+      throw new IllegalStateException(s"machine says $machineResult while constraints says $constraintResult")
     machineResult
   }
 

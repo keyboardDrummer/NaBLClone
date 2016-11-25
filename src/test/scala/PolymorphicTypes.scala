@@ -107,8 +107,21 @@ class PolymorphicTypes extends FunSuite {
 
   test("const" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
+    val program = new Let("const", const, Application(Application(new Variable("const"), Const(3)), BoolConst(true)))
+    assert(StaticChecker.both(program))
+  }
+
+  test("const2" ) {
+    val const = new Lambda("x" , new Lambda("y", new Variable("x")))
+    val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
+      Application(Application(Application(new Variable("constSquare"), Const(2)), Const(3)), Const(4))))
+    assert(StaticChecker.both(program))
+  }
+
+  test("constFail" ) {
+    val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
       Application(Application(new Variable("constSquare"), Const(2)), Const(3))))
-    assert(StaticChecker.both(program))
+    assert(!StaticChecker.both(program))
   }
 }
