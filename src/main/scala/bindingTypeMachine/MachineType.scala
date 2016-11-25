@@ -1,9 +1,5 @@
 package bindingTypeMachine
 
-import constraints.Factory
-import constraints.objects._
-import language.expressions.Expression
-
 trait MachineType {
 }
 

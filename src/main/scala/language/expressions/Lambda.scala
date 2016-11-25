@@ -42,7 +42,7 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
       body.evaluate(machine)
       machine.exitScope()
     })
-    ClosureType(machine.currentScope.asInstanceOf[ExpressionScope], name, (m: Machine) => {
+    ClosureType(machine.currentScope, name, (m: Machine) => {
       val actualArgumentType = m.resolve(name)
       argumentType.foreach(a => m.assertEqual(a.evaluate(machine), actualArgumentType))
       body.evaluate(m)

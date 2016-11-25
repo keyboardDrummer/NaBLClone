@@ -29,7 +29,6 @@ object StaticChecker {
     {
       case e: Throwable =>
         val f = e
-        Console.out.append(f.toString)
         false
     }
   }
@@ -53,6 +52,29 @@ object StaticChecker {
     program.constraints(builder, _type, factory.freshScope)
     val constraints = builder.getConstraints
     new ConstraintSolver(factory, constraints).run()
+  }
+
+  def both(program: Program): Boolean = {
+    val machineResult: Boolean = checkMachine(program)
+    val constraintResult = check(program)
+    if (machineResult != constraintResult)
+      throw new IllegalStateException(s"machine says $machineResult while constraints says $constraintResult")
+    machineResult
+  }
+
+  def checkMachine(program: Program): Boolean = {
+    val machine: Machine = new Machine()
+    try
+    {
+      program.evaluate(machine)
+      true
+    } catch
+      {
+        case e: Throwable =>
+          val f = e
+          Console.out.append("jo")
+          false
+      }
   }
 
   def check(program: Program) : Boolean = {

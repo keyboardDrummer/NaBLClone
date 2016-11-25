@@ -1,6 +1,6 @@
 package bindingTypeMachine
 
-import constraints.Factory
+import language.modules.Module
 
 trait VariableScope
 {
@@ -8,19 +8,31 @@ trait VariableScope
   def currentModule : ModuleScope
 }
 
-class ModuleScope(machine: Machine, name: String) extends VariableScope
+class ModuleScope(machine: Machine, module: Module) extends VariableScope
 {
+  private var initialized: Boolean = false
+  def initialize(): Unit = {
+    if (!initialized)
+    {
+      initialized = true
+      machine.currentScope = this
+      module.imports.foreach(_import => _import.evaluate(machine))
+      module.structs.foreach(struct => struct.evaluate(machine))
+      module.bindings.foreach(binding => binding.evaluate(machine))
+    }
+  }
+
   def resolveStruct(name: String): StructMachineType = structDefinitions(name)
 
   var structDefinitions: Map[String, StructMachineType] = Map.empty
   var imports: List[ModuleScope] = List.empty
   var bindings: Map[String, MachineType] = Map.empty
 
-  def addBinding(name: String, _type: MachineType) = {
+  def addBinding(name: String, _type: MachineType): Unit = {
     bindings += name -> _type
   }
 
-  override def resolve(name: String): MachineType = bindings(name)
+  override def resolve(name: String): MachineType = bindings.getOrElse(name, imports.map(i => i.resolve(name)).head)
 
   override def currentModule: ModuleScope = this
 }
@@ -42,16 +54,17 @@ object Machine
 {
   def expressionMachine: Machine = {
     val result = new Machine()
-    result.newModule("empty")
+    val module = new Module("empty",Seq.empty, Seq.empty, Seq.empty)
+    result.newModule(module)
     result.enterScope()
     result
   }
 }
 
 class Machine {
-  def newModule(name: String) = {
-    currentScope = new ModuleScope(this, name)
-    modules += name -> currentScope.currentModule
+  def newModule(module: Module): Unit = {
+    currentScope = new ModuleScope(this, module)
+    modules += module.name -> currentScope.currentModule
   }
 
   def currentModule: ModuleScope = currentScope.currentModule

@@ -9,4 +9,6 @@ trait Expression {
   def evaluate(machine: Machine): MachineType
 
   def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit
+
+  def apply(argument: Expression) = Application(this, argument)
 }

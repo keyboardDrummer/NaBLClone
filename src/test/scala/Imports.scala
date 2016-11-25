@@ -12,14 +12,14 @@ class Imports extends FunSuite {
     val moduleWithX = new Module("hasX", Seq(new Binding("x", IntLanguageType, Const(3))))
     val moduleThatImportsHasX = new Module("importsHasX", Seq(new Binding("y", IntLanguageType, new Variable("x"))), imports = Seq(new ModuleImport("hasX")))
     val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("moduleFail") {
     val moduleWithX = new Module("hasX", Seq(new Binding("x", IntLanguageType, Const(3))))
     val moduleThatImportsHasX = new Module("importsHasX", Seq(new Binding("y", IntLanguageType, new Variable("x"))), imports = Seq(new ModuleImport("hasY")))
     val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("struct") {
@@ -28,7 +28,7 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", IntLanguageType, new Access(new Variable("newStruct"), "x"))
     val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 
   test("structFail") {
@@ -37,16 +37,16 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", IntLanguageType, new Access(new Variable("newStruct"), "x"))
     val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("structFail2") {
     val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s2", Seq(new StructFieldInit("x", Const(3)))))
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structUse = new Binding("structUse", IntLanguageType, new Access(new Variable("newStruct2"), "x"))
-    val module = new Module("module", Seq(structNew, structUse), Seq(structDeclaration))
+    val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    assert(!StaticChecker.both(program))
   }
 
   test("lambdaTakingStruct") {
@@ -55,8 +55,8 @@ class Imports extends FunSuite {
     val takesStruct = new Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", IntLanguageType, new Let("takesStruct", takesStruct,
       Application(new Variable("takesStruct"), new Variable("newStruct"))))
-    val module = new Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
+    val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    assert(StaticChecker.both(program))
   }
 }

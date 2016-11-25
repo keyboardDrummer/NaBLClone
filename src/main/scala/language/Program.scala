@@ -15,7 +15,7 @@ object Program
 
 case class Program(modules: Seq[Module])
 {
-  def constraints(builder: ConstraintBuilder) = {
+  def constraints(builder: ConstraintBuilder): Unit = {
     builder.add(Program.libraryConstraints)
     val scope = builder.newScope()
     modules.foreach(module => module.constraints(builder, scope))
@@ -24,6 +24,7 @@ case class Program(modules: Seq[Module])
   def evaluate(machine: Machine): Unit =
   {
     machine.addSubType(IntMachineType, LongMachineType)
+    modules.foreach(module => module.bind(machine))
     modules.foreach(module => module.evaluate(machine))
   }
 }

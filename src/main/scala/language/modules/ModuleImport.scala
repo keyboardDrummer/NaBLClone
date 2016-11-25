@@ -9,12 +9,13 @@ import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 
 class ModuleImport(name: String) {
 
-  def evaluate(machine: Machine) = {
+  def evaluate(machine: Machine): Unit = {
     val importedModule = machine.resolveModule(name)
+    importedModule.initialize()
     machine.currentModule.imports ::= importedModule
   }
 
-  def constraints(builder: ConstraintBuilder, scope: Scope) = {
+  def constraints(builder: ConstraintBuilder, scope: Scope): Unit = {
     val importedDeclaration = builder.declarationVariable()
     val importedScope = builder.declaredScopeVariable(importedDeclaration)
     builder.reference(name, this, scope, importedDeclaration)
