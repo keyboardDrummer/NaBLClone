@@ -9,19 +9,18 @@ import constraints.types.objects.StructType
 
 class Struct(name: String, fields: Seq[Field], parent: Option[String] = None)
 {
-  def evaluate(machine: Machine) = {
+  def evaluate(machine: Machine): Unit = {
+    val parentType = parent.map(p => machine.resolveStruct(p))
+
     val structType: StructMachineType = StructMachineType(name, fields.map(field => {
       (field.name, field._type.evaluate(machine))
-    }).toMap)
-    machine.declareStruct(structType)
+    }).toMap, parentType)
 
-    parent.foreach(p => {
-      val parentType = machine.resolveStruct(p)
-      machine.subType(structType, parentType)
-    })
+    parentType.foreach(p => machine.addSubType(structType, p))
+    machine.declareStruct(structType)
   }
 
-  def constraints(builder: ConstraintBuilder, parentScope: Scope) =
+  def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
     val structDeclaration: NamedDeclaration = builder.declaration(name, this, parentScope)
     val scopeOfParent: Option[Scope] = parent.map(p => {

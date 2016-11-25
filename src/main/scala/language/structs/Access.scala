@@ -22,6 +22,6 @@ class Access(target: Expression, field: String) extends Expression
 
   override def evaluate(machine: Machine): MachineType = {
     val structType = target.evaluate(machine).asInstanceOf[StructMachineType]
-    structType.fields(field)
+    structType.resolve(field)
   }
 }

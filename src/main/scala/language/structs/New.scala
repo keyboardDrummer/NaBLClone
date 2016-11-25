@@ -10,20 +10,22 @@ import constraints.types.objects.{StructType, Type}
 import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 import language.expressions.Expression
 
-class New(structName: String, values: Seq[StructFieldInit]) extends Expression
+class New(structName: String, fieldInitializers: Seq[StructFieldInit]) extends Expression
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
     val structScope = builder.declaredScopeVariable(structDeclaration)
     builder.reference(structName, this, scope, structDeclaration)
     builder.typesAreEqual(_type, StructType(structDeclaration))
-    values.foreach(value => value.constraints(builder, structScope, scope))
+    fieldInitializers.foreach(value => value.constraints(builder, structScope, scope))
   }
 
   override def evaluate(machine: Machine): MachineType = {
-    values.foreach(value => {
-      //TODO
+    val structType = machine.resolveStruct(structName)
+    fieldInitializers.foreach(fieldInit => {
+      val fieldType = structType.resolve(fieldInit.fieldName)
+      machine.assertSubType(fieldInit.value.evaluate(machine), fieldType)
     })
-    machine.resolveStruct(structName)
+    structType
   }
 }

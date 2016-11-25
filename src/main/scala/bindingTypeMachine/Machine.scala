@@ -54,8 +54,9 @@ object Machine
 {
   def expressionMachine: Machine = {
     val result = new Machine()
-    val module = new Module("empty",Seq.empty, Seq.empty, Seq.empty)
+    val module = Module("empty", Seq.empty, Seq.empty, Seq.empty)
     result.newModule(module)
+    result.addSubType(IntMachineType, LongMachineType)
     result.enterScope()
     result
   }
@@ -74,48 +75,60 @@ class Machine {
 
   var currentScope: VariableScope = _
   var modules: Map[String, ModuleScope] = Map.empty
-  def declareStruct(structType: StructMachineType) = currentModule.structDefinitions += (structType.name -> structType)
+  def declareStruct(structType: StructMachineType): Unit = currentModule.structDefinitions += (structType.name -> structType)
 
-  def enterScope() = currentScope = ExpressionScope(currentScope)
-  def exitScope() = currentScope = currentScope.asInstanceOf[ExpressionScope].parent
+  def enterScope(): Unit = currentScope = ExpressionScope(currentScope)
+  def exitScope(): Unit = currentScope = currentScope.asInstanceOf[ExpressionScope].parent
   def resolveStruct(name: String): StructMachineType = currentModule.resolveStruct(name)
 
   val typeGraph = new TypeGraph
 
-  def assertSubType(subType: MachineType, superType: MachineType) = {
-
+  def assertSubType(subType: MachineType, superType: MachineType): Unit = {
+    if (!isSubType(subType, superType))
+      throw new IllegalStateException()
   }
 
-  def assertEqual(realType: MachineType, evaluatedType: MachineType): Unit =
-    if (realType != evaluatedType)
-    {
+  def isSubType(subType: MachineType, superType: MachineType): Boolean = {
+    if (areEqual(subType, superType)) {
+      return true
+    }
+    typeGraph.isSuperType(superType, subType)
+  }
+
+  def areEqual(realType: MachineType, evaluatedType: MachineType): Boolean = {
+    if (realType != evaluatedType) {
       (realType, evaluatedType) match {
         case (c: ClosureType, f: FunctionType) =>
-          assertFunctionAndClosureAreEqual(f, c)
+          areFunctionAndClosureEqual(f, c)
         case (f: FunctionType, c: ClosureType) =>
-          assertFunctionAndClosureAreEqual(f, c)
-        case _ => throw new IllegalStateException()
+          areFunctionAndClosureEqual(f, c)
+        case _ => false
       }
     }
+    else
+      true
+  }
 
-  def assertFunctionAndClosureAreEqual(f: FunctionType, c: ClosureType): Unit = {
+  def assertEqual(realType: MachineType, evaluatedType: MachineType): Unit = {
+    if (!areEqual(realType, evaluatedType))
+      throw new IllegalStateException()
+  }
+
+  def areFunctionAndClosureEqual(f: FunctionType, c: ClosureType): Boolean = {
     val current = currentScope
     currentScope = c.scope
     declare(c.name, f.input)
     val realOutput = c.getType(this)
-    assertEqual(f.output, realOutput)
+    val result = areEqual(f.output, realOutput)
     currentScope = current
-  }
-
-  def subType(subType: StructMachineType, superType: StructMachineType) = {
-
+    result
   }
 
   def declare(name: String, _type: MachineType): Unit = {
     currentScope.asInstanceOf[ExpressionScope].declare(name, _type)
   }
 
-  def addSubType(subType: MachineType, superType: MachineType) = {
+  def addSubType(subType: MachineType, superType: MachineType): Any = {
     typeGraph.add(subType, superType)
   }
 }

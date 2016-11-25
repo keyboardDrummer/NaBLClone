@@ -1,17 +1,11 @@
 package bindingTypeMachine
 
-import constraints._
-import constraints.objects.{NamedDeclaration, Reference}
-import constraints.scopes.ReferenceNode
-import constraints.scopes.objects.ConcreteScope
-import constraints.types.objects.{ConcreteType, Type}
-
 import scala.collection.mutable
 
 trait TypeGraphNode
 case class TypeNode(_type: MachineType) extends TypeGraphNode
 {
-  override def toString = _type.toString
+  override def toString: String = _type.toString
 }
 
 trait TypeGraphEdge {
@@ -25,13 +19,11 @@ case class SuperType(target: TypeGraphNode) extends TypeGraphEdge
 class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.Set[TypeGraphEdge]]
 {
   def areCompatible(left: MachineType, right: MachineType): Boolean = {
-    val rightNode: TypeNode = TypeNode(right)
-    val leftNode: TypeNode = TypeNode(left)
-    isSuperType(leftNode, rightNode) || isSuperType(rightNode, leftNode)
+    isSuperType(left, right) || isSuperType(right, left)
   }
 
-  def isSuperType(superType: TypeGraphNode, subType: TypeGraphNode): Boolean = {
-    getSuperTypes(subType).contains(superType)
+  def isSuperType(superType: MachineType, subType: MachineType): Boolean = {
+    getSuperTypes(TypeNode(subType)).contains(TypeNode(superType))
   }
 
   def getSuperTypes(_type: TypeGraphNode): Seq[TypeGraphNode] = {
