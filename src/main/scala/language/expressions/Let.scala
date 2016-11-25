@@ -15,7 +15,7 @@ class NoGeneralizeLet(name: String, bindingValue: Expression, value: Expression)
     value.constraints(builder, _type, scope)
   }
 
-  override def evaluate(machine: Machine): MachineType = ???
+  override def evaluate(machine: Machine): MachineType = new Let(name, bindingValue, value).evaluate(machine)
 }
 
 class Let(name: String, bindingValue: Expression, value: Expression) extends Expression {

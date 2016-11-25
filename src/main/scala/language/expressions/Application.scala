@@ -17,7 +17,7 @@ case class ContraVariantApplication(function: Expression, value: Expression) ext
     value.constraints(builder, argumentType, scope)
   }
 
-  override def evaluate(machine: Machine): MachineType = ???
+  override def evaluate(machine: Machine): MachineType = Application(function, value).evaluate(machine)
 }
 
 case class Application(function: Expression, value: Expression) extends Expression {

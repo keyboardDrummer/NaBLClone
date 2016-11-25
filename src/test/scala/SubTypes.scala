@@ -123,7 +123,7 @@ class SubTypes extends FunSuite {
       ContraVariantApplication(new NoSpecializeVariable("takesSuperStruct"), new New("s2", Seq.empty))))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    assert(StaticChecker.check(program))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {
