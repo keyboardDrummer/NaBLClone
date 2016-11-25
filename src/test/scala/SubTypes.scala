@@ -61,7 +61,7 @@ class SubTypes extends FunSuite {
   test("structBiggerFail") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))))
+    val structNew = new Binding("newStruct", new LanguageStructType("s"), new New("s", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))))
     val module = Module("module", Seq(structNew), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     assert(!StaticChecker.both(program))
@@ -69,7 +69,12 @@ class SubTypes extends FunSuite {
 
   test("longLambdaTakesInt") {
     val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
-    assert(StaticChecker.both(program, LongLanguageType))
+    assert(StaticChecker.both(program, IntLanguageType))
+  }
+
+  test("longLambdaTakesIntFail") {
+    val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
+    assert(!StaticChecker.both(program, LongLanguageType))
   }
 
   test("intLambdaTakesLong") {

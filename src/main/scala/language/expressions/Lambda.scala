@@ -12,31 +12,19 @@ class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: 
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val bodyScope: ConcreteScope = builder.newScope(Some(scope))
     val argumentType = builder.typeVariable()
-    val parameterType = builder.typeVariable()
-    builder.declaration(name, this, bodyScope, Some(parameterType))
+    builder.declaration(name, this, bodyScope, Some(argumentType))
     val bodyType = builder.typeVariable()
-    builder.add(CheckSubType(argumentType, parameterType))
     builder.typesAreEqual(_type, Language.getFunctionType(argumentType, bodyType))
     body.constraints(builder, bodyType, bodyScope)
-    parameterDefinedType.foreach(at => at.constraints(builder, parameterType, scope))
-  }
-
-  override def evaluate(machine: Machine): MachineType = ???
-}
-
-class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] = None) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    val bodyScope: ConcreteScope = builder.newScope(Some(scope))
-    val argumentConstraintType = builder.typeVariable()
-    builder.declaration(name, this, bodyScope, Some(argumentConstraintType))
-    val bodyType = builder.typeVariable()
-    builder.typesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))
-    body.constraints(builder, bodyType, bodyScope)
-    argumentType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
+    parameterDefinedType.foreach(at => {
+      val parameterType = builder.typeVariable()
+      at.constraints(builder, parameterType, scope)
+      builder.add(CheckSubType(argumentType, parameterType))
+    })
   }
 
   override def evaluate(machine: Machine): MachineType = {
-    argumentType.foreach(t => {
+    parameterDefinedType.foreach(t => {
       machine.enterScope()
       machine.declare(name, t.evaluate(machine))
       body.evaluate(machine)
@@ -44,7 +32,33 @@ class Lambda(name: String, body: Expression, argumentType: Option[LanguageType] 
     })
     ClosureType(machine.currentScope, name, (m: Machine) => {
       val actualArgumentType = m.resolve(name)
-      argumentType.foreach(a => m.assertEqual(a.evaluate(machine), actualArgumentType))
+      parameterDefinedType.foreach(a => m.assertSubType(actualArgumentType, a.evaluate(machine)))
+      body.evaluate(m)
+    })
+  }
+}
+
+class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
+    val bodyScope: ConcreteScope = builder.newScope(Some(scope))
+    val argumentConstraintType = builder.typeVariable()
+    builder.declaration(name, this, bodyScope, Some(argumentConstraintType))
+    val bodyType = builder.typeVariable()
+    builder.typesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))
+    body.constraints(builder, bodyType, bodyScope)
+    parameterDefinedType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
+  }
+
+  override def evaluate(machine: Machine): MachineType = {
+    parameterDefinedType.foreach(t => {
+      machine.enterScope()
+      machine.declare(name, t.evaluate(machine))
+      body.evaluate(machine)
+      machine.exitScope()
+    })
+    ClosureType(machine.currentScope, name, (m: Machine) => {
+      val actualArgumentType = m.resolve(name)
+      parameterDefinedType.foreach(a => m.assertEqual(a.evaluate(machine), actualArgumentType))
       body.evaluate(m)
     })
   }
