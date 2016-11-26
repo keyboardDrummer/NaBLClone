@@ -6,8 +6,6 @@ import constraints.scopes.objects.Scope
 import constraints.types.objects.{StructType, Type}
 import language.types.{LanguageType, LanguageTypeVariable}
 
-
-
 class LanguageStructType(name: String) extends LanguageType {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope) = {
     val structDeclaration = builder.declarationVariable()

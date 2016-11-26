@@ -8,7 +8,7 @@ import constraints.types.objects.{Type, TypeVariable}
 
 case class Copy(original: AnyRef, id: Int)
 
-case class InstantiateDeclarationConstraint(instantiated: Declaration, template: Declaration) extends TypeConstraint {
+case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: Declaration, var template: Declaration) extends TypeConstraint {
   override def apply(solver: ConstraintSolver): Boolean = template match {
     case named:NamedDeclaration =>
       val scopeGraph = solver.scopeGraph
@@ -18,7 +18,7 @@ case class InstantiateDeclarationConstraint(instantiated: Declaration, template:
       def copy(d: NamedDeclaration): NamedDeclaration = NamedDeclaration(d.name, solver.copy(d.id))
 
       val declarationCopy = copy(named)
-      solver.declare(declarationCopy, solver.environment(named))
+      //solver.declare(declarationCopy, solver.environment(named)) //TODO de type variables moeten hier ook gekopieerd worden.
 
       val declaredScopeCopy = ScopeNode(solver.factory.freshScope)
       scopeGraph.add(DeclarationNode(declarationCopy), DeclaresScope(declaredScopeCopy))
@@ -26,18 +26,24 @@ case class InstantiateDeclarationConstraint(instantiated: Declaration, template:
         val originalDeclaration: NamedDeclaration = d.target.declaration
         val fieldDeclarationCopy: NamedDeclaration = copy(originalDeclaration)
         scopeGraph.add(declaredScopeCopy, DeclaresDeclaration(DeclarationNode(fieldDeclarationCopy)))
-        solver.declare(fieldDeclarationCopy, solver.environment(originalDeclaration))
+        solver.declare(fieldDeclarationCopy, solver.environment(originalDeclaration)) //TODO de type variables moeten hier ook gekopieerd worden.
       })
 
-      solver.unifyDeclarations(instantiated, declarationCopy)
+      var result = solver.unifyDeclarations(instantiated, declarationCopy)
+      result
     case _ => false
   }
 
-  override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = super.instantiateDeclaration(variable, instance)
+  override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    if (variable == instantiated)
+      instantiated = instance
+    if (variable == template)
+      template = instance
+  }
 
-  override def instantiateType(variable: TypeVariable, instance: Type): Unit = super.instantiateType(variable, instance)
+  override def instantiateType(variable: TypeVariable, instance: Type): Unit =  {}
 
-  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = super.instantiateScope(variable, instance)
+  override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {}
 
-  override def boundTypes: Set[Type] = super.boundTypes
+  override def boundTypes: Set[Type] = Set.empty
 }

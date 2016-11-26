@@ -10,11 +10,11 @@ class ReferenceEqualityTest extends FunSuite {
   test("duplicateReference") {
     val identityType = FunctionLanguageType(IntLanguageType, IntLanguageType)
     val moduleX = new Module("moduleX", Seq(
-      new Binding("x", Const(3), IntLanguageType),
-      new Binding("y", new Variable("x"), IntLanguageType)))
+      new Binding("x", Const(3), Some(IntLanguageType)),
+      new Binding("y", new Variable("x"), Some(IntLanguageType))))
     val moduleY = new Module("moduleY", Seq(
-      new Binding("x", new Lambda("y", Const(3), Some(IntLanguageType)), identityType),
-      new Binding("z", Application(new Variable("x"), Const(2)), IntLanguageType)))
+      new Binding("x", new Lambda("y", Const(3), Some(IntLanguageType)), Some(identityType)),
+      new Binding("z", Application(new Variable("x"), Const(2)), Some(IntLanguageType))))
 
     val program = Program(Seq(moduleX, moduleY))
     assert(StaticChecker.check(program))

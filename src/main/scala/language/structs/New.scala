@@ -17,8 +17,8 @@ class New(structName: String, fieldInitializers: Seq[StructFieldInit], languageT
     val structType: Type = languageTypeArgument.fold[Type](StructType(structDeclaration))((t: LanguageType) => {
       val typeArgument = t.constraints(builder, parentScope)
       val instantiatedStruct = builder.declarationVariable()
-      builder.add(InstantiateDeclarationConstraint(instantiatedStruct, structDeclaration))
-      TypeApplication(StructType(instantiatedStruct), Seq(typeArgument))
+      builder.add(InstantiateDeclarationConstraint(typeArgument, instantiatedStruct, structDeclaration))
+      StructType(instantiatedStruct) //TypeApplication(StructType(instantiatedStruct), Seq(typeArgument))
     })
     val instantiatedStructDeclaration: Declaration = structType.function.asInstanceOf[StructType].declaration
     val structScope = builder.declaredScopeVariable(instantiatedStructDeclaration)

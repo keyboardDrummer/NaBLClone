@@ -16,10 +16,10 @@ case class TypeApplication(override val function: Type, var arguments: Seq[Type]
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = TypeApplication(function, arguments.map(a => a.specialize(mapping)))
 
   override def instantiateType(variable: TypeVariable, instance: Type): Type = {
-    TypeApplication(function, arguments.map(argument => argument.instantiateType(variable, instance)))
+    TypeApplication(function.instantiateType(variable, instance), arguments.map(argument => argument.instantiateType(variable, instance)))
   }
 
   override def fullyApplied: Boolean = arguments.forall(a => a.fullyApplied)
 
-  override def toString: String = function + (if (arguments.nonEmpty) "(" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ")" else "")
+  override def toString: String = function + (if (arguments.nonEmpty) "<" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ">" else "")
 }

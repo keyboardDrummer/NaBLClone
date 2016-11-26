@@ -19,6 +19,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   var environment = Map.empty[Declaration, Type]
   var constraints: Seq[Constraint] = startingConstraints
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
+  var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
 
   def declare(declaration: NamedDeclaration, _type: Type) = {
     var result = true
@@ -108,6 +109,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
     constraints.foreach(x => x.instantiateDeclaration(variable, instance))
     environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
+    environment.values.foreach(t => t.instantiateDeclaration(variable, instance))
+    mappedDeclarationVariables += variable -> instance
   }
 
   def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {
