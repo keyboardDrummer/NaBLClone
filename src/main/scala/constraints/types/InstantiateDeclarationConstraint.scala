@@ -18,18 +18,22 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
       def copy(d: NamedDeclaration): NamedDeclaration = NamedDeclaration(d.name, solver.copy(d.id))
 
       val declarationCopy = copy(named)
-      //solver.declare(declarationCopy, solver.environment(named)) //TODO de type variables moeten hier ook gekopieerd worden.
 
+      val freeVariables: Set[TypeVariable] = fieldDeclarations.flatMap(d => solver.environment(d.target.declaration).variables).toSet
+      if (freeVariables.size != 1)
+        return false
+
+      val typeParameter = freeVariables.head
       val declaredScopeCopy = ScopeNode(solver.factory.freshScope)
       scopeGraph.add(DeclarationNode(declarationCopy), DeclaresScope(declaredScopeCopy))
       fieldDeclarations.foreach(d => {
         val originalDeclaration: NamedDeclaration = d.target.declaration
         val fieldDeclarationCopy: NamedDeclaration = copy(originalDeclaration)
         scopeGraph.add(declaredScopeCopy, DeclaresDeclaration(DeclarationNode(fieldDeclarationCopy)))
-        solver.declare(fieldDeclarationCopy, solver.environment(originalDeclaration)) //TODO de type variables moeten hier ook gekopieerd worden.
+        solver.declare(fieldDeclarationCopy, solver.environment(originalDeclaration).instantiateType(typeParameter, _type))
       })
 
-      var result = solver.unifyDeclarations(instantiated, declarationCopy)
+      val result = solver.unifyDeclarations(instantiated, declarationCopy)
       result
     case _ => false
   }
