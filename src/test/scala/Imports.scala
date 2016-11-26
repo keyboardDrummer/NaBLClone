@@ -23,8 +23,8 @@ class Imports extends FunSuite {
   }
 
   test("struct") {
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -32,8 +32,8 @@ class Imports extends FunSuite {
   }
 
   test("structFail") {
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -41,8 +41,17 @@ class Imports extends FunSuite {
   }
 
   test("structFail2") {
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
+    val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
+    val program: Program = Program(Seq(module))
+    assert(!StaticChecker.both(program))
+  }
+
+  test("structFailBadFieldInit") {
+    val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", BoolConst(true)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
