@@ -3,7 +3,7 @@ import language.Program
 import language.expressions._
 import language.modules.{Binding, Module}
 import language.structs._
-import language.types.{IntLanguageType, IntType, LongLanguageType, LongType}
+import language.types.{IntLanguageType, LongLanguageType}
 import org.scalatest.FunSuite
 
 class SubTypes extends FunSuite {

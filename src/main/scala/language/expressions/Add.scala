@@ -3,9 +3,8 @@ package language.expressions
 import bindingTypeMachine.{IntMachineType, LongMachineType, Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.objects.{ConcreteType, Type}
+import constraints.types.objects.{ConcreteType, IntType, LongType, Type}
 import constraints.types.{CheckSubType, TypesAreEqual}
-import language.types.{IntType, LongType}
 
 case class OverloadedAdd(left: Expression, right: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {

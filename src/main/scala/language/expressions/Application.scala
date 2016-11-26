@@ -3,7 +3,7 @@ package language.expressions
 import bindingTypeMachine.{ClosureType, Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.objects.{AppliedType, ConcreteType, Type}
+import constraints.types.objects.{TypeApplication, ConcreteType, Type}
 import constraints.types.{CheckSubType, TypesAreEqual}
 import language.Language
 

@@ -1,10 +1,10 @@
 package language
 
 import bindingTypeMachine.{IntMachineType, LongMachineType, Machine}
+import constraints.types.objects.{IntType, LongType}
 import constraints.types.{AssignSubType, CheckSubType}
 import constraints.{Constraint, ConstraintBuilder}
 import language.modules.Module
-import language.types.{IntType, LongType}
 
 object Program
 {

@@ -1,11 +1,9 @@
 package language.expressions
 
 import bindingTypeMachine._
+import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.TypesAreEqual
-import constraints.types.objects.{ConcreteType, Type}
-import constraints.{Constraint, ConstraintBuilder}
-import language.types.{BoolType, IntType, LongType}
+import constraints.types.objects._
 
 case class LongConst(value: Long) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = builder.typesAreEqual(_type, LongType)

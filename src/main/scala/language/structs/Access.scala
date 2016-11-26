@@ -1,6 +1,6 @@
 package language.structs
 
-import bindingTypeMachine.{Machine, MachineType, MachineStructType}
+import bindingTypeMachine.{Machine, MachineType, StructMachineType}
 import constraints.scopes.imports.DeclarationOfScope
 import constraints.scopes.objects.Scope
 import constraints.types.TypesAreEqual
@@ -21,7 +21,7 @@ class Access(target: Expression, field: String) extends Expression
   }
 
   override def evaluate(machine: Machine): MachineType = {
-    val structType = target.evaluate(machine).asInstanceOf[MachineStructType]
+    val structType = target.evaluate(machine).asInstanceOf[StructMachineType]
     structType.resolve(field)
   }
 }

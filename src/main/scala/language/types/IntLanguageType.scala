@@ -3,7 +3,7 @@ package language.types
 import bindingTypeMachine._
 import constraints.scopes.objects.Scope
 import constraints.types.TypesAreEqual
-import constraints.types.objects.Type
+import constraints.types.objects.{BoolType, IntType, LongType, Type}
 import constraints.{Constraint, ConstraintBuilder}
 
 object LongLanguageType extends LanguageType {

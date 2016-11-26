@@ -4,7 +4,7 @@ import constraints.objects.{Declaration, DeclarationVariable}
 import constraints.scopes._
 import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
 import constraints.types.{TypeGraph, TypeNode}
-import constraints.types.objects.{AppliedType, StructType, Type, TypeVariable}
+import constraints.types.objects._
 
 class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constraint])
 {
@@ -74,10 +74,11 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     }
     case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
-    case (AppliedType(leftName, leftArguments), AppliedType(rightName, rightArguments)) =>
-      if (leftName == rightName && leftArguments.size == rightArguments.size)
+    case (PrimitiveType(leftName), PrimitiveType(rightName)) => leftName == rightName
+    case (TypeApplication(leftFunction, leftArguments), TypeApplication(rightFunction, rightArguments)) =>
+      if (leftArguments.size == rightArguments.size && unifyTypes(leftFunction, rightFunction))
         leftArguments.indices.forall(index =>
-          unifyTypes(left.asInstanceOf[AppliedType].arguments(index), right.asInstanceOf[AppliedType].arguments(index)))
+          unifyTypes(left.asInstanceOf[TypeApplication].arguments(index), right.asInstanceOf[TypeApplication].arguments(index)))
       else
         false
     case _ =>

@@ -8,26 +8,26 @@ import constraints.types.objects.{StructType, Type}
 import language.expressions.Expression
 import language.types.LanguageType
 
-class New(structName: String, fieldInitializers: Seq[StructFieldInit], typeArgument: Option[LanguageType] = None) extends Expression
+class New(structName: String, fieldInitializers: Seq[StructFieldInit], languageTypeArgument: Option[LanguageType] = None) extends Expression
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
-    val structScope = builder.declaredScopeVariable(structDeclaration)
-    builder.reference(structName, this, parentScope, structDeclaration)
-    builder.typesAreEqual(_type, StructType(structDeclaration))
-    val fieldStructType = typeArgument.fold(structScope)(t => {
-        val instance = builder.typeVariable()
-        t.constraints(builder, instance, parentScope)
-        val instantiatedScope = builder.scopeVariable()
-        builder.add(InstantiateScopeConstraint(instantiatedScope, structScope))
-        instantiatedScope
+    val instantiatedStructDeclaration = languageTypeArgument.fold(structDeclaration)(t => {
+      val typeArgument = builder.typeVariable()
+      t.constraints(builder, typeArgument, parentScope)
+      val instantiatedStruct = builder.declarationVariable()
+      builder.add(InstantiateScopeConstraint(instantiatedStruct, structDeclaration))//TODO hier mist nog een koppeling van typeArgument aan de structType
+      instantiatedStruct
     })
-    fieldInitializers.foreach(value => value.constraints(builder, fieldStructType, parentScope))
+    val structScope = builder.declaredScopeVariable(instantiatedStructDeclaration)
+    builder.reference(structName, this, parentScope, instantiatedStructDeclaration)
+    builder.typesAreEqual(_type, StructType(instantiatedStructDeclaration))
+    fieldInitializers.foreach(value => value.constraints(builder, structScope, parentScope))
   }
 
   override def evaluate(machine: Machine): MachineType = {
     val structType = machine.resolveStruct(structName)
-    val instantiatedStructType = typeArgument.fold(structType)(t => structType.instantiate(structType.parameterType.get, t.evaluate(machine)))
+    val instantiatedStructType = languageTypeArgument.fold(structType)(t => structType.instantiate(structType.parameterType.get, t.evaluate(machine)))
 
     fieldInitializers.foreach(fieldInit => {
       val fieldType = instantiatedStructType.resolve(fieldInit.fieldName)

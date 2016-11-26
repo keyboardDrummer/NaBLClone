@@ -1,10 +1,10 @@
 package constraints
 
 import bindingTypeMachine.{Machine, MachineType}
-import constraints.types.objects.Type
+import constraints.types.objects.{IntType, Type}
 import language.expressions.Expression
 import language.Program
-import language.types.{IntLanguageType, IntType, LanguageType}
+import language.types.{IntLanguageType, LanguageType}
 
 import scala.util.Try
 

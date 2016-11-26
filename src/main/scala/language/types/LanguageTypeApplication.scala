@@ -5,7 +5,7 @@ import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.Type
 
-case class TypeApplication(function: LanguageType, argument: LanguageType) extends LanguageType {
+case class LanguageTypeApplication(function: LanguageType, argument: LanguageType) extends LanguageType {
   override def variables: Set[LanguageTypeVariable] = function.variables ++ argument.variables
 
   override def evaluate(machine: Machine): MachineType = {

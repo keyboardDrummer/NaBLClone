@@ -5,15 +5,15 @@ trait MachineType {
   def variables: Set[MachineTypeVariable]
 }
 
-case class PrimitiveType(name: String) extends MachineType {
+case class PrimitiveMachineType(name: String) extends MachineType {
   override def instantiate(name: String, value: MachineType): MachineType = this
 
   override def variables: Set[MachineTypeVariable] = Set.empty
 }
 
-object IntMachineType extends PrimitiveType("Int")
-object LongMachineType extends PrimitiveType("Long")
-object BoolMachineType extends PrimitiveType("Bool")
+object IntMachineType extends PrimitiveMachineType("Int")
+object LongMachineType extends PrimitiveMachineType("Long")
+object BoolMachineType extends PrimitiveMachineType("Bool")
 
 //case class Poly(arguments: Seq[TypeVariable], body: Type) extends Type {
 //  override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = body.specialize(mapping)

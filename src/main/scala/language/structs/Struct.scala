@@ -1,6 +1,6 @@
 package language.structs
 
-import bindingTypeMachine.{Machine, MachineType, MachineStructType, TypeCheckException}
+import bindingTypeMachine.{Machine, MachineType, StructMachineType, TypeCheckException}
 import constraints.ConstraintBuilder
 import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.Scope
@@ -22,7 +22,7 @@ class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, ty
 
     val parentType = parent.map(p => machine.resolveStruct(p))
 
-    val structType: MachineStructType = MachineStructType(name, fields.map(field => {
+    val structType: StructMachineType = StructMachineType(name, fields.map(field => {
       (field.name, field._type.evaluate(machine))
     }).toMap, parentType, typeParameter)
 

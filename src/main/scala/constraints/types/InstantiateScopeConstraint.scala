@@ -5,8 +5,10 @@ import constraints.objects.{Declaration, DeclarationVariable}
 import constraints.scopes.objects.{Scope, ScopeVariable}
 import constraints.types.objects.{Type, TypeVariable}
 
-case class InstantiateScopeConstraint(instantiated: ScopeVariable, template: Scope) extends TypeConstraint {
+case class InstantiateScopeConstraint(instantiated: Declaration, template: Declaration) extends TypeConstraint {
   override def apply(solver: ConstraintSolver): Boolean = {
+    true
+
 
   }
 
