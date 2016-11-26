@@ -13,6 +13,8 @@ trait Type {
   def instantiateType(variable: TypeVariable, instance: Type) : Type
 
   def fullyApplied: Boolean
+
+  def function: Type = this
 }
 
 case class Poly(arguments: Seq[TypeVariable], body: Type) extends Type {

@@ -10,7 +10,7 @@ case class PrimitiveType(name: String) extends ConcreteType {
   override def fullyApplied: Boolean = true
 }
 
-case class TypeApplication(function: Type, var arguments: Seq[Type]) extends ConcreteType {
+case class TypeApplication(override val function: Type, var arguments: Seq[Type]) extends ConcreteType {
   override def variables: Set[TypeVariable] = arguments.flatMap(t => t.variables).toSet
 
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = TypeApplication(function, arguments.map(a => a.specialize(mapping)))
