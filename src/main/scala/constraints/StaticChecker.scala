@@ -37,9 +37,8 @@ object StaticChecker {
     val factory = new Factory()
     val builder: ConstraintBuilder = new ConstraintBuilder(factory)
     builder.add(Program.libraryConstraints)
-    val _type = builder.typeVariable()
     val scope = factory.freshScope
-    languageType.constraints(builder, _type, scope)
+    val _type = languageType.constraints(builder, scope)
     program.constraints(builder, _type, scope)
     val constraints = builder.getConstraints
     new ConstraintSolver(factory, constraints).run()

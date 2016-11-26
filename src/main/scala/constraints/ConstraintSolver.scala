@@ -1,18 +1,38 @@
 package constraints
 
-import constraints.objects.{Declaration, DeclarationVariable}
+import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import constraints.scopes._
 import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
-import constraints.types.{TypeGraph, TypeNode}
+import constraints.types.{Copy, TypeGraph, TypeNode}
 import constraints.types.objects._
 
 class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constraint])
 {
+  var copyCounter = 0
+  def copy(id: AnyRef): Copy = {
+    copyCounter += 1
+    Copy(id, copyCounter)
+  }
+
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
   var constraints: Seq[Constraint] = startingConstraints
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
+
+  def declare(declaration: NamedDeclaration, _type: Type) = {
+    var result = true
+    val currentValue: Option[Type] = environment.get(declaration)
+    environment = currentValue match {
+      case Some(existingType) =>
+        if (!unifyTypes(existingType, _type)) {
+          result = false
+        }
+        environment
+      case _ => environment + (declaration -> _type)
+    }
+    result
+  }
 
   def run() : Boolean = {
     var progress = true

@@ -18,18 +18,7 @@ case class DeclarationOfType(var declaration: Declaration, var _type: Type) exte
   override def boundTypes: Set[Type] = Set(_type)
 
   override def apply(solver: ConstraintSolver): Boolean = declaration match {
-    case named: NamedDeclaration =>
-      var result = true
-      val currentValue: Option[Type] = solver.environment.get(declaration)
-      solver.environment = currentValue match {
-        case Some(existingType) =>
-          if (!solver.unifyTypes(existingType, _type)) {
-            result = false
-          }
-          solver.environment
-        case _ => solver.environment + (declaration -> _type)
-      }
-      result
+    case named: NamedDeclaration => solver.declare(named, _type)
     case _ => false
   }
 }

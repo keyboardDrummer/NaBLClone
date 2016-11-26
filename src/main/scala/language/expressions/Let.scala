@@ -28,8 +28,7 @@ class Let(name: String, bindingValue: Expression, value: Expression, bindingLang
     builder.declaration(name, this, scope, Some(generalizedType))
     bindingValue.constraints(builder, bindingType, parentScope)
     bindingLanguageType.foreach(t => {
-      val bindingConstraintType = builder.typeVariable()
-      t.constraints(builder, bindingConstraintType, parentScope)
+      val bindingConstraintType = t.constraints(builder, parentScope)
       builder.typesAreEqual(bindingConstraintType, bindingType)
     })
     value.constraints(builder, _type, scope)

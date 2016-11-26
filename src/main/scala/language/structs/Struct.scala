@@ -42,9 +42,8 @@ class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, ty
     })
     val structScope = builder.declaredNewScope(structDeclaration, scopeOfParent)
     fields.foreach(field => {
-      val _type = builder.typeVariable()
+      val _type = field._type.constraints(builder, parentScope)
       builder.declaration(field.name, field, structScope, Some(_type))
-      field._type.constraints(builder, _type, parentScope)
     })
   }
 }

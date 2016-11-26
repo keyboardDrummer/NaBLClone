@@ -8,7 +8,11 @@ import constraints.scopes.objects.ConcreteScope
 import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import constraints.types.objects.{Type, TypeVariable}
 
+import scala.collection.mutable
+
 class ConstraintBuilder(factory: Factory) {
+
+  val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
 
   def scopeVariable(parent: Option[Scope] = None) = {
     val result = factory.scopeVariable

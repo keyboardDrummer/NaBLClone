@@ -4,7 +4,7 @@ import bindingTypeMachine.{Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.objects.{Declaration, NamedDeclaration}
 import constraints.scopes.objects.Scope
-import constraints.types.InstantiateScopeConstraint
+import constraints.types.InstantiateDeclarationConstraint
 import constraints.types.objects.{StructType, Type, TypeApplication}
 import language.expressions.Expression
 import language.types.LanguageType
@@ -13,16 +13,15 @@ class New(structName: String, fieldInitializers: Seq[StructFieldInit], languageT
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
+    builder.reference(structName, this, parentScope, structDeclaration)
     val structType: Type = languageTypeArgument.fold[Type](StructType(structDeclaration))((t: LanguageType) => {
-      val typeArgument = builder.typeVariable()
-      t.constraints(builder, typeArgument, parentScope)
+      val typeArgument = t.constraints(builder, parentScope)
       val instantiatedStruct = builder.declarationVariable()
-      builder.add(InstantiateScopeConstraint(instantiatedStruct, structDeclaration))
+      builder.add(InstantiateDeclarationConstraint(instantiatedStruct, structDeclaration))
       TypeApplication(StructType(instantiatedStruct), Seq(typeArgument))
     })
     val instantiatedStructDeclaration: Declaration = structType.function.asInstanceOf[StructType].declaration
     val structScope = builder.declaredScopeVariable(instantiatedStructDeclaration)
-    builder.reference(structName, this, parentScope, instantiatedStructDeclaration)
     builder.typesAreEqual(_type, structType)
     fieldInitializers.foreach(value => value.constraints(builder, structScope, parentScope))
   }

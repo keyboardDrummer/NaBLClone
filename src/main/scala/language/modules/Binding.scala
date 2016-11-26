@@ -16,9 +16,9 @@ class Binding(name: String, body: Expression, _type: LanguageType)
   }
 
   def constraints(builder: ConstraintBuilder, parentScope: Scope) = {
-    val typeVariable = builder.typeVariable()
+    val typeVariable = _type.constraints(builder, parentScope)
     builder.declaration(name, this, parentScope, Some(typeVariable))
     body.constraints(builder, typeVariable, parentScope)
-    _type.constraints(builder, typeVariable, parentScope)
+
   }
 }
