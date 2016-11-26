@@ -4,7 +4,9 @@ import bindingTypeMachine.{Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.{StructType, Type}
-import language.types.LanguageType
+import language.types.{LanguageType, LanguageTypeVariable}
+
+
 
 class LanguageStructType(name: String) extends LanguageType {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope) = {
@@ -14,4 +16,6 @@ class LanguageStructType(name: String) extends LanguageType {
   }
 
   override def evaluate(machine: Machine): MachineType = machine.resolveStruct(name)
+
+  override def variables: Set[LanguageTypeVariable] = Set.empty
 }

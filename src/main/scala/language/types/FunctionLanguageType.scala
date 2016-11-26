@@ -16,4 +16,6 @@ case class FunctionLanguageType(argument: LanguageType, result: LanguageType) ex
   }
 
   override def evaluate(machine: Machine): MachineType = FunctionType(argument.evaluate(machine), result.evaluate(machine))
+
+  override def variables: Set[LanguageTypeVariable] = argument.variables ++ result.variables
 }

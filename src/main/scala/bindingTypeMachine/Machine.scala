@@ -2,6 +2,8 @@ package bindingTypeMachine
 
 import language.modules.Module
 
+case class TypeCheckException(message: String) extends RuntimeException(message)
+
 trait VariableScope
 {
   def resolve(name: String): MachineType
@@ -22,9 +24,9 @@ class ModuleScope(machine: Machine, module: Module) extends VariableScope
     }
   }
 
-  def resolveStruct(name: String): StructMachineType = structDefinitions(name)
+  def resolveStruct(name: String): MachineStructType = structDefinitions(name)
 
-  var structDefinitions: Map[String, StructMachineType] = Map.empty
+  var structDefinitions: Map[String, MachineStructType] = Map.empty
   var imports: List[ModuleScope] = List.empty
   var bindings: Map[String, MachineType] = Map.empty
 
@@ -75,11 +77,11 @@ class Machine {
 
   var currentScope: VariableScope = _
   var modules: Map[String, ModuleScope] = Map.empty
-  def declareStruct(structType: StructMachineType): Unit = currentModule.structDefinitions += (structType.name -> structType)
+  def declareStruct(structType: MachineStructType): Unit = currentModule.structDefinitions += (structType.name -> structType)
 
   def enterScope(): Unit = currentScope = ExpressionScope(currentScope)
   def exitScope(): Unit = currentScope = currentScope.asInstanceOf[ExpressionScope].parent
-  def resolveStruct(name: String): StructMachineType = currentModule.resolveStruct(name)
+  def resolveStruct(name: String): MachineStructType = currentModule.resolveStruct(name)
 
   val typeGraph = new TypeGraph
 

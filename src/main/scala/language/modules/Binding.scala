@@ -6,7 +6,7 @@ import constraints.scopes.objects.Scope
 import language.expressions.Expression
 import language.types.LanguageType
 
-class Binding(name: String, _type: LanguageType, body: Expression)
+class Binding(name: String, body: Expression, _type: LanguageType)
 {
   def evaluate(machine: Machine) = {
     val realType: MachineType = _type.evaluate(machine)

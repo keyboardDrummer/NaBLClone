@@ -72,7 +72,7 @@ object StaticChecker {
       {
         case e: Throwable =>
           val f = e
-          Console.out.append("jo")
+          Console.out.append("")
           false
       }
   }

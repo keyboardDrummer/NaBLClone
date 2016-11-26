@@ -1,20 +1,30 @@
 package language.structs
 
-import bindingTypeMachine.{Machine, MachineType, StructMachineType}
+import bindingTypeMachine.{Machine, MachineType, MachineStructType, TypeCheckException}
 import constraints.ConstraintBuilder
 import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.Scope
 import constraints.types.AssignSubType
 import constraints.types.objects.StructType
+import language.types.LanguageTypeVariable
 
-class Struct(name: String, fields: Seq[Field], parent: Option[String] = None)
+class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
 {
   def evaluate(machine: Machine): Unit = {
+
+    val expectedVariables = typeParameter.fold(Set.empty[LanguageTypeVariable])(p => Set(LanguageTypeVariable(p)))
+
+    val variables = fields.flatMap(field => field._type.variables).toSet
+    if (variables != expectedVariables)
+    {
+      throw TypeCheckException("struct type variables don't add up")
+    }
+
     val parentType = parent.map(p => machine.resolveStruct(p))
 
-    val structType: StructMachineType = StructMachineType(name, fields.map(field => {
+    val structType: MachineStructType = MachineStructType(name, fields.map(field => {
       (field.name, field._type.evaluate(machine))
-    }).toMap, parentType)
+    }).toMap, parentType, typeParameter)
 
     parentType.foreach(p => machine.addSubType(structType, p))
     machine.declareStruct(structType)

@@ -1,8 +1,9 @@
+import bindingTypeMachine.{ForAllType, FunctionType, MachineTypeVariable}
 import constraints.StaticChecker
 import constraints.types.objects.TypeVariable
 import language._
 import language.expressions._
-import language.types.{IntLanguageType, IntType}
+import language.types._
 import org.scalatest.FunSuite
 
 class PolymorphicTypes extends FunSuite {
@@ -118,10 +119,18 @@ class PolymorphicTypes extends FunSuite {
     assert(StaticChecker.both(program))
   }
 
-  ignore("constFail" ) { //TODO turn on.
+  ignore("constFail" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
       Application(Application(new Variable("constSquare"), Const(2)), Const(3))))
     assert(!StaticChecker.both(program))
+  }
+
+  test("poly")
+  {
+    val identity = new Lambda("x", new Variable("x"))
+    val program = new Let("identity", identity, Application(new Variable("identity"), Const(3)),
+      Some(LanguageForAllType("a", FunctionLanguageType(LanguageTypeVariable("a"), LanguageTypeVariable("a")))))
+    assert(StaticChecker.checkMachine(program))
   }
 }

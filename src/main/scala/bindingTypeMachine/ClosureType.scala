@@ -1,11 +1,11 @@
 package bindingTypeMachine
 
 case class ClosureType(scope: VariableScope, name: String, getType: Machine => MachineType) extends MachineType {
+  override def instantiate(target: String, value: MachineType): MachineType = ClosureType(scope, name, m => getType(m).instantiate(target, value))
+
+  override def variables: Set[MachineTypeVariable] = Set.empty
 }
 
-case class StructMachineType(name: String, fields: Map[String, MachineType], parent: Option[StructMachineType] = None) extends MachineType
-{
-  def resolve(field: String): MachineType = fields.get(field).orElse(parent.map(p => p.resolve(field))).get
-}
 
-case class FunctionType(input: MachineType, output: MachineType) extends MachineType
+
+
