@@ -1,11 +1,11 @@
 package language.expressions
 
-import bindingTypeMachine.{MachineClosureType, ExpressionScope, Machine, MachineType}
+import bindingTypeMachine.{Machine, MachineClosureType, MachineType}
+import constraints.ConstraintBuilder
 import constraints.objects.Reference
 import constraints.scopes.objects.{ConcreteScope, Scope}
+import constraints.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
 import constraints.types.{CheckSubType, TypesAreEqual}
-import constraints.types.objects.{ConcreteType, ConstraintClosureType, ConstraintExpression, Type}
-import constraints.{Constraint, ConstraintBuilder}
 import language.Language
 import language.types.LanguageType
 
