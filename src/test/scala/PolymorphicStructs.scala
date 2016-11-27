@@ -109,7 +109,7 @@ class PolymorphicStructs extends FunSuite {
     assert(!StaticChecker.check(program))
   }
 
-  test("structNewWithStaticType") {
+  ignore("structNewWithStaticType") {
     val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)),
       Some(LanguageTypeApplication(new LanguageStructType("s"), IntLanguageType)))
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
