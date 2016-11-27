@@ -1,21 +1,22 @@
-import constraints.StaticChecker
+
 import language.Program
 import language.expressions._
 import language.modules.{Binding, Module}
 import language.structs._
 import language.types.{IntLanguageType, LongLanguageType}
+import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineMode}
 import org.scalatest.FunSuite
 
 class SubTypes extends FunSuite {
 
   test("intAddition") {
     val program = OverloadedAdd(Const(3), Const(2))
-    assert(StaticChecker.bothExpression(program, IntLanguageType))
+    StaticChecker.checkExpression(program, IntLanguageType)
   }
 
   test("longAddition") {
     val program = OverloadedAdd(LongConst(3), LongConst(2))
-    assert(StaticChecker.bothExpression(program, LongLanguageType))
+    StaticChecker.checkExpression(program, LongLanguageType)
   }
 
   test("struct") {
@@ -25,7 +26,7 @@ class SubTypes extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program)
   }
 
   test("structFail") {
@@ -35,7 +36,7 @@ class SubTypes extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.both(program))
+    StaticChecker.fail(program)
   }
 
   test("structFail2") {
@@ -45,7 +46,7 @@ class SubTypes extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   test("structBigger") {
@@ -55,7 +56,7 @@ class SubTypes extends FunSuite {
     val structUse = new Binding("structUse", Add(new Access(new Variable("newStruct"), "x"), new Access(new Variable("newStruct"), "y")), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program)
   }
 
   test("structBiggerFail") {
@@ -64,44 +65,44 @@ class SubTypes extends FunSuite {
     val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s")))
     val module = Module("module", Seq(structNew), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.both(program))
+    StaticChecker.fail(program)
   }
 
   test("longLambdaTakesInt") {
     val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
-    assert(StaticChecker.bothExpression(program, IntLanguageType))
+    StaticChecker.checkExpression(program, IntLanguageType)
   }
 
   test("longLambdaTakesIntFail") {
     val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
-    assert(!StaticChecker.bothExpression(program, LongLanguageType))
+    StaticChecker.failExpression(program, LongLanguageType)
   }
 
   test("intLambdaTakesLong") {
     val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(IntLanguageType)), LongConst(3))
-    assert(!StaticChecker.bothExpression(program))
+    StaticChecker.failExpression(program)
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantLambda") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq(), Some("s"))
     val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new NoGeneralizeLet("takesSuperStruct", takesSuperStruct,
+    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program, modes = Set(MachineMode, ConstraintClosure))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantLambdaFail") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq())
     val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new NoGeneralizeLet("takesSuperStruct", takesSuperStruct,
+    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.both(program))
+    StaticChecker.fail(program)
   }
 
   ignore("lambdaTakingChildStructSimpleContraVariantLambda") {
@@ -112,29 +113,29 @@ class SubTypes extends FunSuite {
           Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program, modes = Set(MachineMode, ConstraintClosure))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplication") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq(), Some("s"))
     val takesSuperStruct = new Lambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new NoGeneralizeLet("takesSuperStruct", takesSuperStruct,
+    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           ContraVariantApplication(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    StaticChecker.check(program, modes = Set(ConstraintClosure, ConstraintHindleyMilner))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq())
     val takesSuperStruct = new Lambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new NoGeneralizeLet("takesSuperStruct", takesSuperStruct,
+    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           ContraVariantApplication(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.both(program))
+    StaticChecker.fail(program)
   }
 
   ignore("lambdaTakingChildStructContraVariantLambda") {
@@ -146,7 +147,7 @@ class SubTypes extends FunSuite {
           Application(new Variable("takesSuperStruct"), new Variable("newChild"))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program)
   }
 
   ignore("lambdaTakingParentAndChildStructContraVariantLambda") {
@@ -159,7 +160,7 @@ class SubTypes extends FunSuite {
             Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program)
   }
 
   ignore("genericLambdaTakingParentAndChildStruct") {
@@ -172,6 +173,6 @@ class SubTypes extends FunSuite {
           Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    StaticChecker.check(program)
   }
 }

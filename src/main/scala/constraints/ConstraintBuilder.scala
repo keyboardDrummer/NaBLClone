@@ -10,6 +10,7 @@ import constraints.types.objects.{Type, TypeVariable}
 import language.Program
 import language.expressions.Expression
 import language.types.LanguageType
+import modes.ConstraintMode
 
 import scala.collection.mutable
 

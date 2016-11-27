@@ -1,9 +1,10 @@
-import constraints.{MachineMode, StaticChecker}
+
 import language.Program
 import language.expressions.{BoolConst, Const, Variable}
 import language.modules.{Binding, Module}
 import language.structs._
 import language.types._
+import modes.MachineMode
 import org.scalatest.FunSuite
 
 class PolymorphicStructs extends FunSuite {
@@ -14,7 +15,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Variable("newStruct").access("x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    StaticChecker.check(program)
   }
 
   test("structFail") {
@@ -24,7 +25,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program, Set(MachineMode)))
+    StaticChecker.fail(program)
   }
 
   test("structFailWrongAccessType") {
@@ -34,7 +35,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.checkMachine(program))
+    StaticChecker.fail(program)
   }
 
   test("structFailMixedTypeVariablesInDeclaration") {
@@ -44,7 +45,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.checkMachine(program))
+    StaticChecker.fail(program)
   }
 
   test("structFailBadFieldInit") {
@@ -53,7 +54,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   test("reuseStruct") {
@@ -64,7 +65,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse2 = new Binding("structUse2", new Access(new Variable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    StaticChecker.check(program)
   }
 
   test("reuseStructFail") {
@@ -75,7 +76,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse2 = new Binding("structUse2", new Access(new Variable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   test("reuseStructFail2") {
@@ -86,7 +87,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse2 = new Binding("structUse2", new Access(new Variable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   test("structFailBadFieldInit2") {
@@ -95,7 +96,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   test("reuseStructFailBadFieldInit") {
@@ -106,7 +107,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse2 = new Binding("structUse2", new Access(new Variable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.check(program))
+    StaticChecker.fail(program)
   }
 
   ignore("structNewWithStaticType") {
@@ -116,6 +117,6 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.check(program))
+    StaticChecker.check(program)
   }
 }

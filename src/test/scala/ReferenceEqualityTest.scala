@@ -1,4 +1,4 @@
-import constraints.StaticChecker
+
 import language._
 import language.expressions.{Application, Const, Lambda, Variable}
 import language.modules.{Binding, Module}
@@ -17,6 +17,6 @@ class ReferenceEqualityTest extends FunSuite {
       new Binding("z", Application(new Variable("x"), Const(2)), Some(IntLanguageType))))
 
     val program = Program(Seq(moduleX, moduleY))
-    assert(StaticChecker.check(program))
+    StaticChecker.check(program)
   }
 }

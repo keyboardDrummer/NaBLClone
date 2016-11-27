@@ -5,6 +5,7 @@ import constraints._
 import constraints.objects.DeclarationVariable
 import constraints.scopes.objects.Scope
 import constraints.types.objects.Type
+import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
 class Variable(val name: String) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit =  builder.mode match {
@@ -13,6 +14,7 @@ class Variable(val name: String) extends Expression {
       val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
       builder.reference(name, this, scope, declaration)
       builder.specialization(_type, declarationType, this)
+
     case ConstraintClosure =>
       val declarationType = builder.typeVariable()
       val declaration: DeclarationVariable = builder.declarationVariable(declarationType)

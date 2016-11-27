@@ -1,9 +1,9 @@
 package language.expressions
 
-import bindingTypeMachine.{ClosureType, Machine, MachineType}
+import bindingTypeMachine._
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
-import constraints.types.objects.{TypeApplication, ConcreteType, Type}
+import constraints.types.objects.Type
 import constraints.types.{CheckSubType, TypesAreEqual}
 import language.Language
 
@@ -43,7 +43,13 @@ case class Application(function: Expression, value: Expression) extends Expressi
         machine.exitScope()
         machine.currentScope = currentScope
         result
-      case _ => throw new IllegalStateException()
+
+      case FunctionType(input, output) =>
+        machine.assertEqual(input, argumentType)
+        output
+
+      case _ =>
+        throw TypeCheckException(s"cannot apply $argumentType to non function type $functionType")
     }
   }
 }
