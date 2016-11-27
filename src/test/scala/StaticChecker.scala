@@ -5,16 +5,16 @@ import modes._
 
 object StaticChecker {
   def checkMachine(program: Program) = check(program, Set(MachineMode)) //TODO inline
-  def checkMachine(program: Expression) = checkExpression(program, success = Set(MachineMode)) //TODO inline
+  def checkMachine(program: Expression) = checkExpression(program, modes = Set(MachineMode)) //TODO inline
 
   def failExpression(program: Expression, languageType: LanguageType = IntLanguageType): Unit =
   {
-    checkExpression(program, languageType, success = Set.empty)
+    checkExpression(program, languageType, modes = Set.empty)
   }
   
-  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, success: Set[Mode] = allModes): Unit = {
+  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, modes: Set[Mode] = allModes): Unit = {
     val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
-    processAnswers(answers, success)
+    processAnswers(answers, modes)
   }
   
   def processAnswers(answers: Map[Mode, Boolean], successModes: Set[Mode]): Unit = {

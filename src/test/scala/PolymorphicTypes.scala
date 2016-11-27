@@ -18,7 +18,7 @@ class PolymorphicTypes extends FunSuite {
 
   test("lambda2") {
     val program = new Lambda("x", new Variable("x"))
-    StaticChecker.checkExpression(program, LanguageTypeVariable("jo"), success = Set(ConstraintHindleyMilner, ConstraintClosure))
+    StaticChecker.checkExpression(program, LanguageTypeVariable("jo"), modes = Set(ConstraintHindleyMilner, ConstraintClosure))
   }
 
   test("letIdentity") {
@@ -53,7 +53,7 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), Const(3)))
-    StaticChecker.checkExpression(program, IntLanguageType, success = Set(MachineMode, ConstraintHindleyMilner))
+    StaticChecker.checkExpression(program, IntLanguageType, modes = Set(MachineMode, ConstraintHindleyMilner))
   }
 
   test("reuseIdentityFail") {
@@ -65,7 +65,7 @@ class PolymorphicTypes extends FunSuite {
   test("lambdaDoesNotGeneralize") {
     val identity = new Lambda("x", new Variable("x"))
     val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
-    StaticChecker.checkExpression(program, success = Set(MachineMode))
+    StaticChecker.checkExpression(program, modes = Set(MachineMode))
   }
 
   test("lambdaDoesNotGeneralizeMachine") {
@@ -108,7 +108,7 @@ class PolymorphicTypes extends FunSuite {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
       Application(Application(Application(new Variable("constSquare"), Const(2)), Const(3)), Const(4))))
-    StaticChecker.checkExpression(program, success = Set(MachineMode, ConstraintHindleyMilner))
+    StaticChecker.checkExpression(program, modes = Set(MachineMode, ConstraintHindleyMilner))
   }
 
   ignore("constFail" ) {
@@ -123,6 +123,6 @@ class PolymorphicTypes extends FunSuite {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), Const(3)),
       Some(LanguageForAllType("a", FunctionLanguageType(LanguageTypeVariable("a"), LanguageTypeVariable("a")))))
-    StaticChecker.checkExpression(program, success = Set(MachineMode, ConstraintClosure))
+    StaticChecker.checkExpression(program, modes = Set(MachineMode, ConstraintClosure))
   }
 }
