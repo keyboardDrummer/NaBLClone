@@ -10,19 +10,23 @@ import constraints.types.objects.{Type, TypeVariable}
 
 import scala.collection.mutable
 
-class ConstraintBuilder(factory: Factory) {
+trait Mode
+object HindlerMilner extends Mode
+object AbstractMachine extends Mode
+
+class ConstraintBuilder(factory: Factory, val mode: Mode) {
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
 
-  def scopeVariable(parent: Option[Scope] = None) = {
+  def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
     val result = factory.scopeVariable
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
 
-  def newScope() = factory.freshScope
+  def newScope(): ConcreteScope = factory.freshScope
 
-  def typeVariable() = factory.typeVariable
+  def typeVariable(): TypeVariable = factory.typeVariable
 
   var constraints: List[Constraint] = List.empty
 

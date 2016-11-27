@@ -10,9 +10,9 @@ import scala.util.Try
 
 object StaticChecker {
 
-  def both(program: Expression, languageType: LanguageType = IntLanguageType): Boolean = {
+  def bothExpression(program: Expression, languageType: LanguageType = IntLanguageType, mode: Mode = AbstractMachine): Boolean = {
     val machineResult: Boolean = checkMachine(program, languageType)
-    val constraintResult = check(program, languageType)
+    val constraintResult = checkExpression(program, languageType, mode)
     if (machineResult != constraintResult)
       throw new IllegalStateException(s"machine says $machineResult while constraints says $constraintResult")
     machineResult
@@ -33,9 +33,9 @@ object StaticChecker {
     }
   }
 
-  def check(program: Expression, languageType: LanguageType): Boolean = {
+  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, mode: Mode = AbstractMachine): Boolean = {
     val factory = new Factory()
-    val builder: ConstraintBuilder = new ConstraintBuilder(factory)
+    val builder: ConstraintBuilder = new ConstraintBuilder(factory, mode)
     builder.add(Program.libraryConstraints)
     val scope = factory.freshScope
     val _type = languageType.constraints(builder, scope)
@@ -44,18 +44,9 @@ object StaticChecker {
     new ConstraintSolver(factory, constraints).run()
   }
 
-  def check(program: Expression, _type: Type = IntType) : Boolean = {
-    val factory = new Factory()
-    val builder: ConstraintBuilder = new ConstraintBuilder(factory)
-    builder.add(Program.libraryConstraints)
-    program.constraints(builder, _type, factory.freshScope)
-    val constraints = builder.getConstraints
-    new ConstraintSolver(factory, constraints).run()
-  }
-
-  def both(program: Program): Boolean = {
+  def both(program: Program, mode: Mode = AbstractMachine): Boolean = {
     val machineResult: Boolean = checkMachine(program)
-    val constraintResult = check(program)
+    val constraintResult = check(program, mode)
     if (machineResult != constraintResult)
       throw new IllegalStateException(s"machine says $machineResult while constraints says $constraintResult")
     machineResult
@@ -76,9 +67,9 @@ object StaticChecker {
       }
   }
 
-  def check(program: Program) : Boolean = {
+  def check(program: Program, mode: Mode = AbstractMachine) : Boolean = {
     val factory = new Factory()
-    val builder: ConstraintBuilder = new ConstraintBuilder(factory)
+    val builder: ConstraintBuilder = new ConstraintBuilder(factory, mode)
     program.constraints(builder)
     val constraints = builder.getConstraints
     new ConstraintSolver(factory, constraints).run()

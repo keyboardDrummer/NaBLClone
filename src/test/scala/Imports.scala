@@ -1,4 +1,4 @@
-import constraints.StaticChecker
+import constraints.{HindlerMilner, StaticChecker}
 import language._
 import language.expressions._
 import language.modules.{Binding, Module, ModuleImport}
@@ -66,6 +66,6 @@ class Imports extends FunSuite {
           Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
     val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(StaticChecker.both(program))
+    assert(StaticChecker.both(program, mode = HindlerMilner))
   }
 }
