@@ -1,9 +1,10 @@
 package language.expressions
 
-import bindingTypeMachine.{ClosureType, ExpressionScope, Machine, MachineType}
+import bindingTypeMachine.{MachineClosureType, ExpressionScope, Machine, MachineType}
+import constraints.objects.Reference
 import constraints.scopes.objects.{ConcreteScope, Scope}
 import constraints.types.{CheckSubType, TypesAreEqual}
-import constraints.types.objects.{ConcreteType, Type}
+import constraints.types.objects.{ConcreteType, ConstraintClosureType, ConstraintExpression, Type}
 import constraints.{Constraint, ConstraintBuilder}
 import language.Language
 import language.types.LanguageType
@@ -29,11 +30,31 @@ class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: 
       body.evaluate(machine)
       machine.exitScope()
     })
-    ClosureType(machine.currentScope, name, (m: Machine) => {
+    MachineClosureType(machine.currentScope, name, (m: Machine) => {
       val actualArgumentType = m.resolve(name)
       parameterDefinedType.foreach(a => m.assertSubType(actualArgumentType, a.evaluate(machine)))
       body.evaluate(m)
     })
+  }
+}
+
+class ClosureLambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
+
+  override def evaluate(machine: Machine): MachineType = new Lambda(name, body, parameterDefinedType).evaluate(machine)
+
+  override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
+    val reference = Reference(name, this)
+    val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(reference, body, t.constraints(builder, parentScope)))
+    builder.add(TypesAreEqual(_type, ConstraintClosureType(parentScope, reference, wrappedBody)))
+  }
+
+  class TypeCheckWrapper(name: Reference, original: ConstraintExpression, parameterType: Type) extends ConstraintExpression
+  {
+    override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
+      val declaration = builder.declarationVariable(parameterType)
+      builder.reference(name.name, name.id, parentScope, declaration)
+      original.constraints(builder, _type, parentScope)
+    }
   }
 }
 
@@ -55,7 +76,7 @@ class Lambda(name: String, body: Expression, parameterDefinedType: Option[Langua
       body.evaluate(machine)
       machine.exitScope()
     })
-    ClosureType(machine.currentScope, name, (m: Machine) => {
+    MachineClosureType(machine.currentScope, name, (m: Machine) => {
       val actualArgumentType = m.resolve(name)
       parameterDefinedType.foreach(a => m.assertEqual(a.evaluate(machine), actualArgumentType))
       body.evaluate(m)

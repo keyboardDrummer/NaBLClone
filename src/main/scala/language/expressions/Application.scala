@@ -1,6 +1,6 @@
 package language.expressions
 
-import bindingTypeMachine.{ClosureType, Machine, MachineType}
+import bindingTypeMachine.{MachineClosureType, Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.{TypeApplication, ConcreteType, Type}
@@ -34,7 +34,7 @@ case class Application(function: Expression, value: Expression) extends Expressi
     val argumentType = value.evaluate(machine)
     functionType match
     {
-      case ClosureType(environment, name, getType) =>
+      case MachineClosureType(environment, name, getType) =>
         val currentScope = machine.currentScope
         machine.currentScope = environment
         machine.enterScope()

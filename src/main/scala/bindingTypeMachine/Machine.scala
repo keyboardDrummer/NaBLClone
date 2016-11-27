@@ -100,9 +100,9 @@ class Machine {
   def areEqual(realType: MachineType, evaluatedType: MachineType): Boolean = {
     if (realType != evaluatedType) {
       (realType, evaluatedType) match {
-        case (c: ClosureType, f: FunctionType) =>
+        case (c: MachineClosureType, f: FunctionType) =>
           areFunctionAndClosureEqual(f, c)
-        case (f: FunctionType, c: ClosureType) =>
+        case (f: FunctionType, c: MachineClosureType) =>
           areFunctionAndClosureEqual(f, c)
         case _ => false
       }
@@ -116,7 +116,7 @@ class Machine {
       throw new IllegalStateException()
   }
 
-  def areFunctionAndClosureEqual(f: FunctionType, c: ClosureType): Boolean = {
+  def areFunctionAndClosureEqual(f: FunctionType, c: MachineClosureType): Boolean = {
     val current = currentScope
     currentScope = c.scope
     declare(c.name, f.input)
