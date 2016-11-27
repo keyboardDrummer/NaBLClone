@@ -7,14 +7,13 @@ import constraints.scopes.objects._
 import constraints.scopes.objects.ConcreteScope
 import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import constraints.types.objects.{Type, TypeVariable}
+import language.Program
+import language.expressions.Expression
+import language.types.LanguageType
 
 import scala.collection.mutable
 
-trait Mode
-object HindlerMilner extends Mode
-object AbstractMachine extends Mode
-
-class ConstraintBuilder(factory: Factory, val mode: Mode) {
+class ConstraintBuilder(factory: Factory, val mode: ConstraintMode) {
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
 

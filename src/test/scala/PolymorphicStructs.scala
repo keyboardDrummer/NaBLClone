@@ -1,4 +1,4 @@
-import constraints.StaticChecker
+import constraints.{MachineMode, StaticChecker}
 import language.Program
 import language.expressions.{BoolConst, Const, Variable}
 import language.modules.{Binding, Module}
@@ -24,7 +24,7 @@ class PolymorphicStructs extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    assert(!StaticChecker.checkMachine(program))
+    assert(!StaticChecker.check(program, Set(MachineMode)))
   }
 
   test("structFailWrongAccessType") {

@@ -8,12 +8,12 @@ import constraints.types.objects.Type
 
 class Variable(val name: String) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit =  builder.mode match {
-    case HindlerMilner =>
+    case ConstraintHindleyMilner =>
       val declarationType = builder.typeVariable()
       val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
       builder.reference(name, this, scope, declaration)
       builder.specialization(_type, declarationType, this)
-    case AbstractMachine =>
+    case ConstraintClosure =>
       val declarationType = builder.typeVariable()
       val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
       builder.reference(name, this, scope, declaration)

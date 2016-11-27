@@ -1,4 +1,4 @@
-import constraints.{HindlerMilner, StaticChecker}
+import constraints.{ConstraintHindleyMilner, StaticChecker}
 import language._
 import language.expressions._
 import language.types.{FunctionLanguageType, IntLanguageType}
@@ -97,12 +97,12 @@ class BasicTests extends FunSuite {
 
   test("let") {
     val program = new Let("x", Const(3), new Variable("x"))
-    assert(StaticChecker.bothExpression(program, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, mode = ConstraintHindleyMilner))
   }
 
   test("letTwice") {
     val program = new Let("x", Const(3), Add(new Variable("x"), new Variable("x")))
-    assert(StaticChecker.bothExpression(program, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, mode = ConstraintHindleyMilner))
   }
 
   test("letFail") {

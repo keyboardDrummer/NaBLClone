@@ -1,4 +1,4 @@
-import constraints.{HindlerMilner, StaticChecker}
+import constraints.{ConstraintHindleyMilner, StaticChecker}
 import constraints.types.objects.TypeVariable
 import language.expressions._
 import language.types._
@@ -53,7 +53,7 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), Const(3)))
-    assert(StaticChecker.bothExpression(program, IntLanguageType, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, IntLanguageType, mode = ConstraintHindleyMilner))
   }
 
   test("reuseIdentityFail") {
@@ -101,20 +101,20 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity2") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), Application(new Variable("identity"), Const(3))))
-    assert(StaticChecker.bothExpression(program, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, mode = ConstraintHindleyMilner))
   }
 
   test("const" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, Application(Application(new Variable("const"), Const(3)), BoolConst(true)))
-    assert(StaticChecker.bothExpression(program, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, mode = ConstraintHindleyMilner))
   }
 
   test("const2" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
       Application(Application(Application(new Variable("constSquare"), Const(2)), Const(3)), Const(4))))
-    assert(StaticChecker.bothExpression(program, mode = HindlerMilner))
+    assert(StaticChecker.bothExpression(program, mode = ConstraintHindleyMilner))
   }
 
   ignore("constFail" ) {
