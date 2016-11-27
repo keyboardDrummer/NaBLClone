@@ -1,7 +1,5 @@
-import bindingTypeMachine.{ForAllType, FunctionType, MachineTypeVariable}
 import constraints.StaticChecker
 import constraints.types.objects.TypeVariable
-import language._
 import language.expressions._
 import language.types._
 import org.scalatest.FunSuite

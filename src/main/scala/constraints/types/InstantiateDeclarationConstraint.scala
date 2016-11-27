@@ -45,7 +45,10 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
       template = instance
   }
 
-  override def instantiateType(variable: TypeVariable, instance: Type): Unit =  {}
+  override def instantiateType(variable: TypeVariable, instance: Type): Unit =  {
+    if (variable == _type)
+      _type = instance
+  }
 
   override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {}
 
