@@ -21,7 +21,7 @@ class SubTypes extends FunSuite {
   test("struct") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(), Some("s"))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
@@ -31,7 +31,7 @@ class SubTypes extends FunSuite {
   test("structFail") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(), Some("s3"))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
@@ -41,7 +41,7 @@ class SubTypes extends FunSuite {
   test("structFail2") {
     val structParent = new Struct("s", Seq(new Field("y", IntLanguageType)))
     val structChild = new Struct("s2", Seq(), Some("s"))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s2")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
@@ -51,7 +51,7 @@ class SubTypes extends FunSuite {
   test("structBigger") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
     val structUse = new Binding("structUse", Add(new Access(new Variable("newStruct"), "x"), new Access(new Variable("newStruct"), "y")), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
@@ -61,7 +61,7 @@ class SubTypes extends FunSuite {
   test("structBiggerFail") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s")))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s")))
     val module = Module("module", Seq(structNew), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     assert(!StaticChecker.both(program))
@@ -140,7 +140,7 @@ class SubTypes extends FunSuite {
   ignore("lambdaTakingChildStructContraVariantLambda") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val newChild = new Binding("newChild", new New("s2", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
+    val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
     val takesSuperStruct = new ContraVariantLambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           Application(new Variable("takesSuperStruct"), new Variable("newChild"))), Some(IntLanguageType))
@@ -152,8 +152,8 @@ class SubTypes extends FunSuite {
   ignore("lambdaTakingParentAndChildStructContraVariantLambda") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val newChild = new Binding("newChild", new New("s2", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
-    val newParent = new Binding("newParent", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
+    val newParent = new Binding("newParent", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val takesSuperStruct = new ContraVariantLambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
             Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
@@ -165,8 +165,8 @@ class SubTypes extends FunSuite {
   ignore("genericLambdaTakingParentAndChildStruct") {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val newChild = new Binding("newChild", new New("s2", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
-    val newParent = new Binding("newParent", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
+    val newParent = new Binding("newParent", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val takesSuperStruct = new Lambda("struct", new Access(new Variable("struct"), "x"))
     val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
           Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))

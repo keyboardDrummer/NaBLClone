@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 class PolymorphicStructs extends FunSuite {
 
   test("struct") {
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)))
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
     val structUse = new Binding("structUse", new NoSpecializeVariable("newStruct").access("x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
@@ -19,7 +19,7 @@ class PolymorphicStructs extends FunSuite {
 
   test("structFail") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(BoolLanguageType)),
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(BoolLanguageType)),
       Some(LanguageTypeApplication(new LanguageStructType("s"), IntLanguageType)))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
@@ -29,7 +29,7 @@ class PolymorphicStructs extends FunSuite {
 
   test("structFailWrongAccessType") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)),
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)),
       Some(LanguageTypeApplication(new LanguageStructType("s"), IntLanguageType)))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
@@ -39,7 +39,7 @@ class PolymorphicStructs extends FunSuite {
 
   test("structFailMixedTypeVariablesInDeclaration") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("b"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)),
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)),
       Some(LanguageTypeApplication(new LanguageStructType("s"), IntLanguageType)))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
@@ -49,7 +49,7 @@ class PolymorphicStructs extends FunSuite {
 
   test("structFailBadFieldInit") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", BoolConst(true))), Some(IntLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", BoolConst(true))), Some(IntLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -58,8 +58,8 @@ class PolymorphicStructs extends FunSuite {
 
   test("reuseStruct") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)))
-    val structNew2 = new Binding("newStruct2", new New("s", Seq(StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)))
+    val structNew2 = new Binding("newStruct2", new New("s", Seq(new StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(IntLanguageType))
     val structUse2 = new Binding("structUse2", new Access(new NoSpecializeVariable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
@@ -69,8 +69,8 @@ class PolymorphicStructs extends FunSuite {
 
   test("reuseStructFail") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)))
-    val structNew2 = new Binding("newStruct2", new New("s", Seq(StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)))
+    val structNew2 = new Binding("newStruct2", new New("s", Seq(new StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(BoolLanguageType))
     val structUse2 = new Binding("structUse2", new Access(new NoSpecializeVariable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
@@ -80,8 +80,8 @@ class PolymorphicStructs extends FunSuite {
 
   test("reuseStructFail2") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
-    val structNew2 = new Binding("newStruct2", new New("s", Seq(StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
+    val structNew2 = new Binding("newStruct2", new New("s", Seq(new StructFieldInit("x", BoolConst(true))), Some(BoolLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(IntLanguageType))
     val structUse2 = new Binding("structUse2", new Access(new NoSpecializeVariable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
@@ -91,7 +91,7 @@ class PolymorphicStructs extends FunSuite {
 
   test("structFailBadFieldInit2") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -100,8 +100,8 @@ class PolymorphicStructs extends FunSuite {
 
   test("reuseStructFailBadFieldInit") {
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)))
-    val structNew2 = new Binding("newStruct2", new New("s", Seq(StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)))
+    val structNew2 = new Binding("newStruct2", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(BoolLanguageType)))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(IntLanguageType))
     val structUse2 = new Binding("structUse2", new Access(new NoSpecializeVariable("newStruct2"), "x"), Some(BoolLanguageType))
     val module = Module("module", Seq(structNew, structNew2, structUse2, structUse), Seq(structDeclaration))
@@ -110,7 +110,7 @@ class PolymorphicStructs extends FunSuite {
   }
 
   test("structNewWithStaticType") {
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3))), Some(IntLanguageType)),
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3))), Some(IntLanguageType)),
       Some(LanguageTypeApplication(new LanguageStructType("s"), IntLanguageType)))
     val structDeclaration = new Struct("s", Seq(new Field("x", LanguageTypeVariable("a"))), typeParameter = Some("a"))
     val structUse = new Binding("structUse", new Access(new NoSpecializeVariable("newStruct"), "x"), Some(IntLanguageType))

@@ -24,7 +24,7 @@ class Imports extends FunSuite {
 
   test("struct") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val structNew = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val structNew = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -33,7 +33,7 @@ class Imports extends FunSuite {
 
   test("structFail") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -42,7 +42,7 @@ class Imports extends FunSuite {
 
   test("structFail2") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -51,7 +51,7 @@ class Imports extends FunSuite {
 
   test("structFailBadFieldInit") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val structNew = new Binding("newStruct", new New("s2", Seq(StructFieldInit("x", BoolConst(true)))), Some(new LanguageStructType("s")))
+    val structNew = new Binding("newStruct", new New("s2", Seq(new StructFieldInit("x", BoolConst(true)))), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
@@ -60,7 +60,7 @@ class Imports extends FunSuite {
 
   test("lambdaTakingStruct") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val newStruct = new Binding("newStruct", new New("s", Seq(StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
+    val newStruct = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
     val takesStruct = new Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Let("takesStruct", takesStruct,
           Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
