@@ -5,7 +5,7 @@ import language.Program
 import language.expressions.Expression
 import language.types.LanguageType
 
-trait ConstraintMode extends Mode
+trait ConstraintChecker extends Checker
 {
   override def check(program: Program): Boolean = {
     val factory = new Factory()

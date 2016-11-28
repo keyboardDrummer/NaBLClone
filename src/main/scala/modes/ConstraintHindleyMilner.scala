@@ -1,3 +1,3 @@
 package modes
 
-object ConstraintHindleyMilner extends ConstraintMode
+object ConstraintHindleyMilner extends ConstraintChecker

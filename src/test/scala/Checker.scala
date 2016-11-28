@@ -3,35 +3,29 @@ import language.expressions.Expression
 import language.types.{IntLanguageType, LanguageType}
 import modes._
 
-object StaticChecker {
-  def checkMachine(program: Program) = check(program, Set(MachineMode)) //TODO inline
-  def checkMachine(program: Expression) = checkExpression(program, modes = Set(MachineMode)) //TODO inline
+object Checker {
 
   def failExpression(program: Expression, languageType: LanguageType = IntLanguageType): Unit =
   {
     checkExpression(program, languageType, modes = Set.empty)
   }
   
-  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, modes: Set[Mode] = allModes): Unit = {
+  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, modes: Set[Checker] = allModes): Unit = {
     val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
     processAnswers(answers, modes)
   }
   
-  def processAnswers(answers: Map[Mode, Boolean], successModes: Set[Mode]): Unit = {
+  def processAnswers(answers: Map[Checker, Boolean], successModes: Set[Checker]): Unit = {
     val badAnswers = answers.filter(answer => successModes.contains(answer._1) ^ answer._2)
     assert(badAnswers.isEmpty, s"the following answers are bad: $badAnswers")
-  }
-
-  def both(program: Program, mode: ConstraintMode = ConstraintClosure) : Unit = { //TODO INLINE
-    check(program)
   }
   
   def fail(program: Program): Unit = check(program, Set.empty)
 
-  def check(program: Program, modes: Set[Mode] = allModes) : Unit = {
+  def check(program: Program, modes: Set[Checker] = allModes) : Unit = {
     val answers = modes.map(mode => (mode, mode.check(program))).toMap
     processAnswers(answers, modes)
   }
 
-  val allModes: Set[Mode] = Set(MachineMode, ConstraintHindleyMilner, ConstraintClosure)
+  val allModes: Set[Checker] = Set(MachineChecker, ConstraintHindleyMilner, ConstraintClosure)
 }

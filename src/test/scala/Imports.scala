@@ -3,7 +3,7 @@ import language.expressions._
 import language.modules.{Binding, Module, ModuleImport}
 import language.structs._
 import language.types.IntLanguageType
-import modes.{ConstraintHindleyMilner, MachineMode}
+import modes.{ConstraintHindleyMilner, MachineChecker}
 import org.scalatest.FunSuite
 
 class Imports extends FunSuite {
@@ -12,14 +12,14 @@ class Imports extends FunSuite {
     val moduleWithX = Module("hasX", Seq(new Binding("x", Const(3), Some(IntLanguageType))))
     val moduleThatImportsHasX = Module("importsHasX", Seq(new Binding("y", new Variable("x"), Some(IntLanguageType))), imports = Seq(new ModuleImport("hasX")))
     val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    StaticChecker.check(program)
+    Checker.check(program)
   }
 
   test("moduleFail") {
     val moduleWithX = Module("hasX", Seq(new Binding("x", Const(3), Some(IntLanguageType))))
     val moduleThatImportsHasX = Module("importsHasX", Seq(new Binding("y", new Variable("x"), Some(IntLanguageType))), imports = Seq(new ModuleImport("hasY")))
     val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    StaticChecker.fail(program)
+    Checker.fail(program)
   }
 
   test("struct") {
@@ -28,7 +28,7 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    StaticChecker.check(program)
+    Checker.check(program)
   }
 
   test("structFail") {
@@ -37,7 +37,7 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    StaticChecker.fail(program)
+    Checker.fail(program)
   }
 
   test("structFail2") {
@@ -46,7 +46,7 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    StaticChecker.fail(program)
+    Checker.fail(program)
   }
 
   test("structFailBadFieldInit") {
@@ -55,7 +55,7 @@ class Imports extends FunSuite {
     val structUse = new Binding("structUse", new Access(new Variable("newStruct2"), "x"), Some(IntLanguageType))
     val module = Module("module", Seq(structNew, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    StaticChecker.fail(program)
+    Checker.fail(program)
   }
 
   test("lambdaTakingStruct") {
@@ -66,6 +66,6 @@ class Imports extends FunSuite {
           Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
     val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    StaticChecker.check(program, modes = Set(MachineMode, ConstraintHindleyMilner))
+    Checker.check(program, modes = Set(MachineChecker, ConstraintHindleyMilner))
   }
 }

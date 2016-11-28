@@ -1,3 +1,3 @@
 package modes
 
-object ConstraintClosure extends ConstraintMode
+object ConstraintClosure extends ConstraintChecker

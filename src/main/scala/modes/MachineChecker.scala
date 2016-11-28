@@ -5,7 +5,7 @@ import language.Program
 import language.expressions.Expression
 import language.types.LanguageType
 
-object MachineMode extends Mode
+object MachineChecker extends Checker
 {
   override def check(program: Program): Boolean =  {
     val machine: Machine = new Machine()

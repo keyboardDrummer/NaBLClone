@@ -17,6 +17,6 @@ class ReferenceEqualityTest extends FunSuite {
       new Binding("z", Application(new Variable("x"), Const(2)), Some(IntLanguageType))))
 
     val program = Program(Seq(moduleX, moduleY))
-    StaticChecker.check(program)
+    Checker.check(program)
   }
 }

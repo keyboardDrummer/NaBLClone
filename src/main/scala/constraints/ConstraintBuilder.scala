@@ -10,11 +10,11 @@ import constraints.types.objects.{Type, TypeVariable}
 import language.Program
 import language.expressions.Expression
 import language.types.LanguageType
-import modes.ConstraintMode
+import modes.ConstraintChecker
 
 import scala.collection.mutable
 
-class ConstraintBuilder(factory: Factory, val mode: ConstraintMode) {
+class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
 
