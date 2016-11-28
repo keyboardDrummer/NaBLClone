@@ -2,16 +2,11 @@ package constraints
 
 import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import constraints.scopes.imports.DeclarationOfScope
+import constraints.scopes.objects.{ConcreteScope, _}
 import constraints.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
-import constraints.scopes.objects._
-import constraints.scopes.objects.ConcreteScope
-import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import constraints.types.objects.{PrimitiveType, Type, TypeApplication, TypeVariable}
-import language.Program
-import language.expressions.{ClosureLambda, Expression}
-import language.types.LanguageType
+import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import modes.ConstraintChecker
-
 import scala.collection.mutable
 
 case class Copy(key: AnyRef, counter: Int)
@@ -50,7 +45,7 @@ class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
   }
 
   def reference(name: String, id: AnyRef, scope: Scope, declaration: Declaration) : Reference = {
-    val result = Reference(name, id)
+    val result = new Reference(name, id)
     constraints ::= ReferenceInScope(result, scope) //TODO waarom maakt het uit als ik deze twee omdraai?
     constraints ::= ResolvesTo(result, declaration)
     result

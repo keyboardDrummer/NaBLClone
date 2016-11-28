@@ -9,15 +9,15 @@ import scala.collection.mutable
 trait GraphNode
 case class ScopeNode(scope: ConcreteScope) extends GraphNode
 {
-  override def toString = scope.toString
+  override def toString: String = scope.toString
 }
 case class ReferenceNode(reference: Reference) extends GraphNode
 {
-  override def toString = reference.toString
+  override def toString: String = reference.toString
 }
 case class DeclarationNode(declaration: NamedDeclaration) extends GraphNode
 {
-  override def toString = declaration.toString
+  override def toString: String = declaration.toString
 }
 
 
@@ -44,7 +44,7 @@ case class DeclaresScope(target: ScopeNode) extends GraphEdge {
 
 class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
 {
-  def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope) = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
+  def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = add(ScopeNode(currentScope), ImportEdge(ScopeNode(importedScope)))
 
   def resolveScope(importedModule: NamedDeclaration): ConcreteScope = {
     val reachableNodes = depthFirst(DeclarationNode(importedModule)).collect({case d:ScopeNode => d})
@@ -55,7 +55,7 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
     null
   }
 
-  def addReference(reference: Reference, currentScope: ConcreteScope) = add(ReferenceNode(reference), ReferenceEdge(ScopeNode(currentScope)))
+  def addReference(reference: Reference, currentScope: ConcreteScope): Unit = add(ReferenceNode(reference), ReferenceEdge(ScopeNode(currentScope)))
 
   def resolve(reference: Reference): NamedDeclaration = {
     val reachableNodes = depthFirst(ReferenceNode(reference)).collect({case d:DeclarationNode => d}).

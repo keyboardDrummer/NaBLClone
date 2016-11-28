@@ -1,5 +1,5 @@
 package constraints.objects
 
-case class Reference(name: String, id: AnyRef)
+class Reference(val name: String, id: AnyRef)
 {
 }

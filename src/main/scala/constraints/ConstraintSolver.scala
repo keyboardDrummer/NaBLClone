@@ -22,6 +22,26 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
+  def run() : Boolean = {
+    var progress = true
+    while(progress && constraints.nonEmpty)
+    {
+      progress = cycle()
+    }
+    cycle()
+    constraints.isEmpty
+  }
+
+  def cycle() : Boolean = {
+    val remainingConstraints = constraints.filter(c =>
+      !c.apply(this)
+    )
+    val result = constraints.size > remainingConstraints.size || generatedConstraints.nonEmpty
+    constraints = remainingConstraints ++ generatedConstraints
+    generatedConstraints = Seq.empty
+    result
+  }
+
   def declare(declaration: NamedDeclaration, _type: Type): Boolean = {
     var result = true
     val currentValue: Option[Type] = environment.get(declaration)
@@ -37,25 +57,6 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def allConstraints: Seq[Constraint] = constraints ++ generatedConstraints
-
-  def run() : Boolean = {
-    var progress = true
-    while(progress && constraints.nonEmpty)
-    {
-      progress = cycle()
-    }
-    constraints.isEmpty
-  }
-
-  def cycle() : Boolean = {
-    val remainingConstraints = constraints.filter(c =>
-      !c.apply(this)
-    )
-    val result = constraints.size > remainingConstraints.size || generatedConstraints.nonEmpty
-    constraints = remainingConstraints ++ generatedConstraints
-    generatedConstraints = Seq.empty
-    result
-  }
 
   def instantiateType(v: TypeVariable, t: Type): Boolean = {
     if (t.variables.contains(v))

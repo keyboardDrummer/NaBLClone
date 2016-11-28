@@ -101,8 +101,8 @@ class PolymorphicTypes extends FunSuite {
   test("const2" ) {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
-      Application(Application(Application(new Variable("constSquare"), Const(2)), Const(3)), Const(4))))
-    Checker.checkExpression(program, modes = Set(MachineChecker, ConstraintHindleyMilner))
+      Application(Application(Application(new Variable("constSquare"), BoolConst(true)), Const(3)), LongConst(4))))
+    Checker.checkExpression(program)
   }
 
   ignore("constFail" ) {

@@ -52,15 +52,15 @@ class Lambda(name: String, body: Expression, parameterDefinedType: Option[Langua
 
     case ConstraintClosure =>
       val declaration = NamedDeclaration(name, this)
-      val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(Reference(name, this), body, t.constraints(builder, parentScope)))
+      val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(name, body, t.constraints(builder, parentScope)))
       builder.typesAreEqual(_type, ConstraintClosureType(parentScope, declaration, wrappedBody))
   }
 
-  class TypeCheckWrapper(name: Reference, original: ConstraintExpression, parameterType: Type) extends ConstraintExpression
+  class TypeCheckWrapper(name: String, original: ConstraintExpression, parameterType: Type) extends ConstraintExpression
   {
     override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
       val declaration = builder.declarationVariable(parameterType)
-      builder.reference(name.name, builder.copy(name.id), parentScope, declaration)
+      builder.reference(name, this, parentScope, declaration)
       original.constraints(builder, _type, parentScope)
     }
   }

@@ -27,5 +27,5 @@ object Checker {
     processAnswers(answers, modes)
   }
 
-  val allModes: Set[Checker] = Set(MachineChecker, ConstraintHindleyMilner, ConstraintClosure)
+  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner)
 }
