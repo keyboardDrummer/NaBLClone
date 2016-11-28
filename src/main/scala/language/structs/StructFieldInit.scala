@@ -9,9 +9,8 @@ import language.expressions.Expression
 
 class StructFieldInit(val fieldName: String, val value: Expression) {
   def constraints(builder: ConstraintBuilder, structScope: Scope, parentScope: Scope): Unit = {
-    val fieldType = builder.typeVariable()
-    val fieldDeclaration = builder.declarationVariable(fieldType)
-    builder.reference(fieldName, this, structScope, fieldDeclaration)
+    val fieldDeclaration = builder.resolve(fieldName, this, structScope)
+    val fieldType = builder.getType(fieldDeclaration)
     value.constraints(builder, fieldType, parentScope)
   }
 }

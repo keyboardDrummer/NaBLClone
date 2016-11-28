@@ -12,11 +12,10 @@ class Let(name: String, bindingValue: Expression, value: Expression, bindingLang
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
     case ConstraintHindleyMilner =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = builder.typeVariable()
-      val generalizedType = builder.typeVariable()
+      val bindingType = bindingValue.constraints(builder, parentScope)
+      val generalizedType = builder.declarationType(name, this, scope)
       builder.add(Generalization(generalizedType, bindingType))
-      builder.declaration(name, this, scope, Some(generalizedType))
-      bindingValue.constraints(builder, bindingType, parentScope)
+
       bindingLanguageType.foreach(t => {
         val bindingConstraintType = t.constraints(builder, parentScope)
         builder.typesAreEqual(bindingConstraintType, bindingType)
@@ -25,9 +24,8 @@ class Let(name: String, bindingValue: Expression, value: Expression, bindingLang
 
     case ConstraintClosure =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = builder.typeVariable()
+      val bindingType = bindingValue.constraints(builder, parentScope)
       builder.declaration(name, this, scope, Some(bindingType))
-      bindingValue.constraints(builder, bindingType, parentScope)
       value.constraints(builder, _type, scope)
   }
 

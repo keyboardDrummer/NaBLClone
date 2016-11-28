@@ -10,15 +10,13 @@ import modes.{ConstraintClosure, ConstraintHindleyMilner}
 class Variable(val name: String) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit =  builder.mode match {
     case ConstraintHindleyMilner =>
-      val declarationType = builder.typeVariable()
-      val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
-      builder.reference(name, this, scope, declaration)
+      val declaration: DeclarationVariable = builder.resolve(name, this, scope)
+      val declarationType = builder.getType(declaration)
       builder.specialization(_type, declarationType, this)
 
     case ConstraintClosure =>
-      val declarationType = builder.typeVariable()
-      val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
-      builder.reference(name, this, scope, declaration)
+      val declaration: DeclarationVariable = builder.resolve(name, this, scope)
+      val declarationType = builder.getType(declaration)
       builder.typesAreEqual(_type, declarationType)
   }
 
