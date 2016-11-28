@@ -91,7 +91,7 @@ class SubTypes extends FunSuite {
           Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, modes = Set(MachineChecker, ConstraintClosure))
+    Checker.check(program, checkers = Set(MachineChecker, ConstraintClosure))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantLambdaFail") {
@@ -113,7 +113,7 @@ class SubTypes extends FunSuite {
           Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, modes = Set(MachineChecker, ConstraintClosure))
+    Checker.check(program, checkers = Set(MachineChecker, ConstraintClosure))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplication") { //TODO remove this test and ContraVariantApplication???
@@ -124,7 +124,7 @@ class SubTypes extends FunSuite {
           ContraVariantApplication(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, modes = Set(ConstraintHindleyMilner))
+    Checker.check(program, checkers = Set(ConstraintHindleyMilner))
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {

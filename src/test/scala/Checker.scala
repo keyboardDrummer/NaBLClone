@@ -5,14 +5,14 @@ import modes._
 
 object Checker {
 
-  def failExpression(program: Expression, languageType: LanguageType = IntLanguageType): Unit =
+  def failExpression(program: Expression, languageType: LanguageType = IntLanguageType, checkers: Set[Checker] = allModes): Unit =
   {
-    checkExpression(program, languageType, modes = Set.empty)
+    checkExpression(program, languageType, checkers = allModes.diff(checkers))
   }
-  
-  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, modes: Set[Checker] = allModes): Unit = {
+
+  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, checkers: Set[Checker] = allModes): Unit = {
     val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
-    processAnswers(answers, modes)
+    processAnswers(answers, checkers)
   }
   
   def processAnswers(answers: Map[Checker, Boolean], successModes: Set[Checker]): Unit = {
@@ -20,11 +20,11 @@ object Checker {
     assert(badAnswers.isEmpty, s"the following answers are bad: $badAnswers")
   }
   
-  def fail(program: Program): Unit = check(program, Set.empty)
+  def fail(program: Program, checkers: Set[Checker] = allModes): Unit = check(program, checkers = allModes.diff(checkers))
 
-  def check(program: Program, modes: Set[Checker] = allModes) : Unit = {
-    val answers = modes.map(mode => (mode, mode.check(program))).toMap
-    processAnswers(answers, modes)
+  def check(program: Program, checkers: Set[Checker] = allModes) : Unit = {
+    val answers = checkers.map(mode => (mode, mode.check(program))).toMap
+    processAnswers(answers, checkers)
   }
 
   val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner)

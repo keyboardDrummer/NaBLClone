@@ -84,9 +84,9 @@ class ScopeGraph extends scala.collection.mutable.HashMap[GraphNode, mutable.Set
     result.reverse
   }
 
-  def parent(child: ConcreteScope, parent: ConcreteScope) = add(ScopeNode(child), Parent(ScopeNode(parent)))
-  def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration) = add(ScopeNode(inside), DeclaresDeclaration(DeclarationNode(declaration)))
-  def declareScope(declaration: NamedDeclaration, scope: ConcreteScope) = add(DeclarationNode(declaration), DeclaresScope(ScopeNode(scope)))
+  def parent(child: ConcreteScope, parent: ConcreteScope): Unit = add(ScopeNode(child), Parent(ScopeNode(parent)))
+  def declareDeclaration(inside: ConcreteScope, declaration: NamedDeclaration): Unit = add(ScopeNode(inside), DeclaresDeclaration(DeclarationNode(declaration)))
+  def declareScope(declaration: NamedDeclaration, scope: ConcreteScope): Unit = add(DeclarationNode(declaration), DeclaresScope(ScopeNode(scope)))
 
   def add(node: GraphNode, edge: GraphEdge): Unit =
   {
