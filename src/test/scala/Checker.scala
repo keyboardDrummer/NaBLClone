@@ -5,27 +5,27 @@ import modes._
 
 object Checker {
 
-  def failExpression(program: Expression, languageType: LanguageType = IntLanguageType, checkers: Set[Checker] = allModes): Unit =
+  def failExpression(program: Expression, languageType: LanguageType = IntLanguageType, skip: Set[Checker] = Set.empty): Unit =
   {
-    checkExpression(program, languageType, checkers = allModes.diff(checkers))
+    checkExpression(program, languageType, allModes.diff(skip))
   }
 
-  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, checkers: Set[Checker] = allModes): Unit = {
+  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, skip: Set[Checker] = Set.empty): Unit = {
     val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
-    processAnswers(answers, checkers)
+    processAnswers(answers, allModes.diff(skip))
   }
   
+  def fail(program: Program, skip: Set[Checker] = Set.empty): Unit = check(program, skip = allModes.diff(skip))
+
+  def check(program: Program, skip: Set[Checker] = Set.empty) : Unit = {
+    val answers = allModes.map(mode => (mode, mode.check(program))).toMap
+    processAnswers(answers, allModes.diff(skip))
+  }
+
+  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner)
+
   def processAnswers(answers: Map[Checker, Boolean], successModes: Set[Checker]): Unit = {
     val badAnswers = answers.filter(answer => successModes.contains(answer._1) ^ answer._2)
     assert(badAnswers.isEmpty, s"the following answers are bad: $badAnswers")
   }
-  
-  def fail(program: Program, checkers: Set[Checker] = allModes): Unit = check(program, checkers = allModes.diff(checkers))
-
-  def check(program: Program, checkers: Set[Checker] = allModes) : Unit = {
-    val answers = checkers.map(mode => (mode, mode.check(program))).toMap
-    processAnswers(answers, checkers)
-  }
-
-  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner)
 }

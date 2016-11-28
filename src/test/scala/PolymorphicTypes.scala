@@ -18,7 +18,7 @@ class PolymorphicTypes extends FunSuite {
 
   test("lambda2") {
     val program = new Lambda("x", new Variable("x"))
-    Checker.checkExpression(program, LanguageTypeVariable("jo"), checkers = Set(ConstraintHindleyMilner, ConstraintClosure))
+    Checker.checkExpression(program, LanguageTypeVariable("jo"), skip = Set(MachineChecker))
   }
 
   test("letIdentity") {
@@ -65,7 +65,7 @@ class PolymorphicTypes extends FunSuite {
   test("lambdaDoesNotGeneralize") {
     val identity = new Lambda("x", new Variable("x"))
     val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
-    Checker.checkExpression(program, checkers = Set(MachineChecker, ConstraintClosure))
+    Checker.checkExpression(program, skip = Set(ConstraintHindleyMilner))
   }
 
   test("referenceIdentityChangeType") {
@@ -109,7 +109,7 @@ class PolymorphicTypes extends FunSuite {
     val const = new Lambda("x" , new Lambda("y", new Variable("x")))
     val program = new Let("const", const, new Let("constSquare", Application(new Variable("const"), new Variable("const")),
       Application(Application(new Variable("constSquare"), Const(2)), Const(3))))
-    Checker.failExpression(program, checkers = Set(MachineChecker, ConstraintClosure))
+    Checker.failExpression(program, skip = Set(ConstraintHindleyMilner))
   }
 
   test("poly")
@@ -117,6 +117,6 @@ class PolymorphicTypes extends FunSuite {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(new Variable("identity"), Const(3)),
       Some(LanguageForAllType("a", FunctionLanguageType(LanguageTypeVariable("a"), LanguageTypeVariable("a")))))
-    Checker.checkExpression(program, checkers = Set(MachineChecker, ConstraintClosure))
+    Checker.checkExpression(program, skip = Set(ConstraintHindleyMilner))
   }
 }
