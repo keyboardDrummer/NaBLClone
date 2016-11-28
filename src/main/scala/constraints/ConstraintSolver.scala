@@ -28,7 +28,6 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     {
       progress = cycle()
     }
-    cycle()
     constraints.isEmpty
   }
 
