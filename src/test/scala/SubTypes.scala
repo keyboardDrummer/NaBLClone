@@ -116,23 +116,12 @@ class SubTypes extends FunSuite {
     Checker.check(program, skip = Set(ConstraintHindleyMilner))
   }
 
-  test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplication") { //TODO remove this test and ContraVariantApplication???
-    val structParent = new Struct("s", Seq())
-    val structChild = new Struct("s2", Seq(), Some("s"))
-    val takesSuperStruct = new Lambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          ContraVariantApplication(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
-    val module = Module("module", Seq(structUse), Seq(structParent, structChild))
-    val program: Program = Program(Seq(module))
-    Checker.check(program, skip = Set(MachineChecker, ConstraintClosure))
-  }
-
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq())
     val takesSuperStruct = new Lambda("struct", Const(3), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          ContraVariantApplication(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
+          Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.fail(program)

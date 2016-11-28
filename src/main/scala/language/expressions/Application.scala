@@ -8,17 +8,6 @@ import constraints.types.objects.Type
 import constraints.types.{CheckSubType, TypesAreEqual}
 import language.Language
 
-case class ContraVariantApplication(function: Expression, value: Expression) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
-    val functionType = function.constraints(builder, parentScope)
-    val argumentType = value.constraints(builder, parentScope)
-    val parameterType = builder.typeVariable()
-    builder.add(Seq(TypesAreEqual(functionType, builder.getFunctionType(parameterType, _type)), CheckSubType(argumentType, parameterType)) )
-  }
-
-  override def evaluate(machine: Machine): MachineType = Application(function, value).evaluate(machine)
-}
-
 case class Application(function: Expression, value: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val functionType = function.constraints(builder, scope)
