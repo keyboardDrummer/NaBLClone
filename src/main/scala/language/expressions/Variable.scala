@@ -1,32 +1,23 @@
 package language.expressions
 
 import bindingTypeMachine.{Machine, MachineType}
-import constraints.objects.{DeclarationVariable, Reference}
-import constraints.scopes.ReferenceInScope
+import constraints._
+import constraints.objects.DeclarationVariable
 import constraints.scopes.objects.Scope
 import constraints.types.objects.Type
-import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
-import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
-
-class NoSpecializeVariable(val name: String) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    val declarationType = builder.typeVariable()
-    val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
-    builder.reference(name, this, scope, declaration)
-    builder.typesAreEqual(_type, declarationType)
-  }
-
-  override def toString = s"Variable($name)"
-
-  override def evaluate(machine: Machine): MachineType = machine.resolve(name)
-}
+import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
 class Variable(val name: String) extends Expression {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    val declarationType = builder.typeVariable()
-    val declaration: DeclarationVariable = builder.declarationVariable(declarationType)
-    builder.reference(name, this, scope, declaration)
-    builder.specialization(_type, declarationType, this)
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit =  builder.mode match {
+    case ConstraintHindleyMilner =>
+      val declaration: DeclarationVariable = builder.resolve(name, this, scope)
+      val declarationType = builder.getType(declaration)
+      builder.specialization(_type, declarationType, this)
+
+    case ConstraintClosure =>
+      val declaration: DeclarationVariable = builder.resolve(name, this, scope)
+      val declarationType = builder.getType(declaration)
+      builder.typesAreEqual(_type, declarationType)
   }
 
   override def toString = s"Variable($name)"

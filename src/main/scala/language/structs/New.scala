@@ -9,12 +9,12 @@ import constraints.types.objects.{StructType, Type, TypeApplication}
 import language.expressions.Expression
 import language.types.LanguageType
 
-class New(structName: String, fieldInitializers: Seq[StructFieldInit], languageTypeArgument: Option[LanguageType] = None) extends Expression
+class New(structName: String, fieldInitializers: Seq[StructFieldInit], genericTypeArgument: Option[LanguageType] = None) extends Expression
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
     builder.reference(structName, this, parentScope, structDeclaration)
-    val structType: Type = languageTypeArgument.fold[Type](StructType(structDeclaration))((t: LanguageType) => {
+    val structType: Type = genericTypeArgument.fold[Type](StructType(structDeclaration))((t: LanguageType) => {
       val typeArgument = t.constraints(builder, parentScope)
       val instantiatedStruct = builder.declarationVariable()
       builder.add(InstantiateDeclarationConstraint(typeArgument, instantiatedStruct, structDeclaration))
@@ -28,7 +28,7 @@ class New(structName: String, fieldInitializers: Seq[StructFieldInit], languageT
 
   override def evaluate(machine: Machine): MachineType = {
     val structType = machine.resolveStruct(structName)
-    val instantiatedStructType = languageTypeArgument.fold(structType)(t => structType.instantiate(structType.parameterType.get, t.evaluate(machine)))
+    val instantiatedStructType = genericTypeArgument.fold(structType)(t => structType.instantiate(structType.parameterType.get, t.evaluate(machine)))
 
     fieldInitializers.foreach(fieldInit => {
       val fieldType = instantiatedStructType.resolve(fieldInit.fieldName)

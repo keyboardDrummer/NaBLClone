@@ -20,6 +20,11 @@ trait LanguageType
   }
 }
 
+object LanguageType
+{
+  implicit def variable(name: String) : LanguageTypeVariable = LanguageTypeVariable(name)
+}
+
 case class LanguageTypeVariable(name: String) extends LanguageType {
   override def evaluate(machine: Machine): MachineType = MachineTypeVariable(name)
 

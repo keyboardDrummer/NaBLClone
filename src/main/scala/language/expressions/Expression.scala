@@ -4,10 +4,16 @@ import bindingTypeMachine.{Machine, MachineType}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.{ConstraintExpression, Type}
-import language.structs.Access
+import language.structs.{Access, StructFieldInit}
 
 trait Expression extends ConstraintExpression {
   def evaluate(machine: Machine): MachineType
+
+  def constraints(builder: ConstraintBuilder, parentScope: Scope): Type = {
+    val result = builder.typeVariable()
+    constraints(builder, result, parentScope)
+    result
+  }
 
   def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit
 
@@ -15,4 +21,12 @@ trait Expression extends ConstraintExpression {
   def $: (Expression) => Application = apply
 
   def access(field: String) = new Access(this, field)
+
+}
+
+object Expression
+{
+  implicit def const(value: Int) : Const = Const(value)
+  implicit def bool(value: Boolean) : BoolConst = BoolConst(value)
+  implicit def variable(name: String) : Variable = new Variable(name)
 }

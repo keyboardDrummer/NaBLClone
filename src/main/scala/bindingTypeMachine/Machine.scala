@@ -119,9 +119,11 @@ class Machine {
   def areFunctionAndClosureEqual(f: FunctionType, c: MachineClosureType): Boolean = {
     val current = currentScope
     currentScope = c.scope
+    enterScope()
     declare(c.name, f.input)
     val realOutput = c.getType(this)
     val result = areEqual(f.output, realOutput)
+    exitScope()
     currentScope = current
     result
   }

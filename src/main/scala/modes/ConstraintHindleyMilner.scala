@@ -1,0 +1,3 @@
+package modes
+
+object ConstraintHindleyMilner extends ConstraintChecker

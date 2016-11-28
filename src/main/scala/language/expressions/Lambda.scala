@@ -12,11 +12,11 @@ import language.types.LanguageType
 class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val bodyScope: ConcreteScope = builder.newScope(Some(scope))
-    val argumentType = builder.typeVariable()
-    builder.declaration(name, this, bodyScope, Some(argumentType))
-    val bodyType = builder.typeVariable()
+    val argumentType = builder.declarationType(name, this, bodyScope)
+
+    val bodyType = body.constraints(builder, bodyScope)
     builder.typesAreEqual(_type, Language.getFunctionType(argumentType, bodyType))
-    body.constraints(builder, bodyType, bodyScope)
+
     parameterDefinedType.foreach(at => {
       val parameterType = at.constraints(builder, scope)
       builder.add(CheckSubType(argumentType, parameterType))
@@ -61,11 +61,11 @@ class ClosureLambda(name: String, body: Expression, parameterDefinedType: Option
 class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val bodyScope: ConcreteScope = builder.newScope(Some(scope))
-    val argumentConstraintType = builder.typeVariable()
-    builder.declaration(name, this, bodyScope, Some(argumentConstraintType))
-    val bodyType = builder.typeVariable()
+    val argumentConstraintType = builder.declarationType(name, this, bodyScope)
+
+    val bodyType = body.constraints(builder, bodyScope)
     builder.typesAreEqual(_type, Language.getFunctionType(argumentConstraintType, bodyType))
-    body.constraints(builder, bodyType, bodyScope)
+
     parameterDefinedType.foreach(at => at.constraints(builder, argumentConstraintType, scope))
   }
 

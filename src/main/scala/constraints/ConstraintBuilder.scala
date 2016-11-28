@@ -7,28 +7,38 @@ import constraints.scopes.objects._
 import constraints.scopes.objects.ConcreteScope
 import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
 import constraints.types.objects.{Type, TypeVariable}
+import language.Program
+import language.expressions.Expression
+import language.types.LanguageType
+import modes.ConstraintChecker
 
 import scala.collection.mutable
 
-class ConstraintBuilder(factory: Factory) {
+class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
 
-  def scopeVariable(parent: Option[Scope] = None) = {
+  def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
     val result = factory.scopeVariable
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
 
-  def newScope() = factory.freshScope
+  def newScope(): ConcreteScope = factory.freshScope
 
-  def typeVariable() = factory.typeVariable
+  def typeVariable(): TypeVariable = factory.typeVariable
 
   var constraints: List[Constraint] = List.empty
 
   def newScope(parent: Option[Scope]) : ConcreteScope = {
     val result = factory.freshScope
     parent.foreach(p => constraints ::= ParentScope(result, p))
+    result
+  }
+
+  def resolve(name: String, id: AnyRef, scope: Scope) : DeclarationVariable = {
+    val result = declarationVariable()
+    reference(name, id, scope, result)
     result
   }
 
@@ -39,6 +49,12 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
+  def declarationType(name: String, id: AnyRef, container: Scope) : Type  = {
+    val result = typeVariable()
+    declaration(name, id, container, Some(result))
+    result
+  }
+
   def declaration(name: String, id: AnyRef, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
     val result = NamedDeclaration(name, id)
     constraints ::= DeclarationInsideScope(result, container)
@@ -46,14 +62,20 @@ class ConstraintBuilder(factory: Factory) {
     result
   }
 
-  def specialization(first: Type, second: Type, debugInfo: Any = null): Unit = add(new Specialization(first, second, debugInfo))
-  def typesAreEqual(first: Type, second: Type) = add(TypesAreEqual(first, second))
+  def specialization(first: Type, second: Type, debugInfo: Any = null): Unit = add(Specialization(first, second, debugInfo))
+  def typesAreEqual(first: Type, second: Type): Unit = add(TypesAreEqual(first, second))
 
-  def add(addition: Constraint) = constraints ++= Seq(addition)
-  def add(addition: Seq[Constraint]) = constraints ++= addition
+  def add(addition: Constraint): Unit = constraints ++= Seq(addition)
+  def add(addition: Seq[Constraint]): Unit = constraints ++= addition
 
   def declarationVariable(): DeclarationVariable = {
     factory.declarationVariable
+  }
+
+  def getType(declaration: Declaration) : Type = {
+    val result = typeVariable()
+    add(DeclarationOfType(declaration, result))
+    result
   }
 
   def declarationVariable(_type: Type): DeclarationVariable = {
