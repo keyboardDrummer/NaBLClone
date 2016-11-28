@@ -8,12 +8,6 @@ import constraints.types.objects._
 
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint])
 {
-  var copyCounter = 0
-  def copy(id: AnyRef): Copy = {
-    copyCounter += 1
-    Copy(id, copyCounter)
-  }
-
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
@@ -115,7 +109,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
     case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
       val bodyScope = builder.newScope(Some(closure.parentScope))
-      builder.declaration(closure.declaration.name, copy(closure.declaration.id), bodyScope, Some(input))
+      builder.declaration(closure.declaration.name, closure.declaration.id, bodyScope, Some(input))
       closure.body.constraints(builder, output, bodyScope)
       generatedConstraints ++= builder.getConstraints
       true

@@ -1,3 +1,3 @@
 package constraints.objects
 
-case class NamedDeclaration(name: String, id: AnyRef) extends Declaration
+class NamedDeclaration(val name: String, val id: AnyRef) extends Declaration

@@ -58,7 +58,7 @@ class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
   }
 
   def declaration(name: String, id: AnyRef, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
-    val result = NamedDeclaration(name, id)
+    val result = new NamedDeclaration(name, id)
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationOfType(result, t))
     result

@@ -13,7 +13,7 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
       val declaredScope = scopeGraph(DeclarationNode(named)).collect({ case x: DeclaresScope => x}).head.target
       val fieldDeclarations = scopeGraph(declaredScope).collect({ case x: DeclaresDeclaration => x})
 
-      def copy(d: NamedDeclaration): NamedDeclaration = NamedDeclaration(d.name, solver.copy(d.id))
+      def copy(d: NamedDeclaration): NamedDeclaration = new NamedDeclaration(d.name, d.id)
 
       val declarationCopy = copy(named)
 

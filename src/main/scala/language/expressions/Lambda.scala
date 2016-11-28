@@ -51,7 +51,7 @@ class Lambda(name: String, body: Expression, parameterDefinedType: Option[Langua
       parameterDefinedType.foreach(at => at.constraints(builder, argumentConstraintType, parentScope))
 
     case ConstraintClosure =>
-      val declaration = NamedDeclaration(name, this)
+      val declaration = new NamedDeclaration(name, this)
       val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(name, body, t.constraints(builder, parentScope)))
       builder.typesAreEqual(_type, ConstraintClosureType(parentScope, declaration, wrappedBody))
   }
