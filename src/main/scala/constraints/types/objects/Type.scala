@@ -35,7 +35,7 @@ trait ConcreteType extends Type
 The idea here is analogous to the machine closure type, where you store a reference to the concrete program in the type, and you type check that program
 each type you apply the closure type. In constraint terms, this means generating new constraints each time you apply the ConstraintClosureType.
  */
-case class ConstraintClosureType(parentScope: Scope, reference: Reference, body: ConstraintExpression) extends ConcreteType {
+case class ConstraintClosureType(parentScope: Scope, declaration: NamedDeclaration, body: ConstraintExpression) extends ConcreteType {
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = this
 
   override def variables: Set[TypeVariable] = Set.empty

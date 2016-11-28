@@ -12,17 +12,17 @@ trait ConstraintChecker extends Checker
     val builder: ConstraintBuilder = new ConstraintBuilder(factory, this)
     program.constraints(builder)
     val constraints = builder.getConstraints
-    new ConstraintSolver(factory, constraints).run()
+    new ConstraintSolver(builder, constraints).run()
   }
 
   override def checkExpression(expression: Expression, languageType: LanguageType): Boolean = {
     val factory = new Factory()
     val builder: ConstraintBuilder = new ConstraintBuilder(factory, this)
     builder.add(Program.libraryConstraints)
-    val scope = factory.freshScope
+    val scope = factory.newScope
     val _type = languageType.constraints(builder, scope)
     expression.constraints(builder, _type, scope)
     val constraints = builder.getConstraints
-    new ConstraintSolver(factory, constraints).run()
+    new ConstraintSolver(builder, constraints).run()
   }
 }

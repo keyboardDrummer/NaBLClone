@@ -3,10 +3,10 @@ package constraints
 import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import constraints.scopes._
 import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
-import constraints.types.{Copy, TypeGraph, TypeNode}
+import constraints.types.{TypeGraph, TypeNode}
 import constraints.types.objects._
 
-class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constraint])
+class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint])
 {
   var copyCounter = 0
   def copy(id: AnyRef): Copy = {
@@ -20,8 +20,9 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   var constraints: Seq[Constraint] = startingConstraints
   var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
+  var generatedConstraints: Seq[Constraint] = Seq.empty
 
-  def declare(declaration: NamedDeclaration, _type: Type) = {
+  def declare(declaration: NamedDeclaration, _type: Type): Boolean = {
     var result = true
     val currentValue: Option[Type] = environment.get(declaration)
     environment = currentValue match {
@@ -34,6 +35,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     }
     result
   }
+
+  def allConstraints: Seq[Constraint] = constraints ++ generatedConstraints
 
   def run() : Boolean = {
     var progress = true
@@ -48,8 +51,9 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     val remainingConstraints = constraints.filter(c =>
       !c.apply(this)
     )
-    val result = constraints.size > remainingConstraints.size
-    constraints = remainingConstraints
+    val result = constraints.size > remainingConstraints.size || generatedConstraints.nonEmpty
+    constraints = remainingConstraints ++ generatedConstraints
+    generatedConstraints = Seq.empty
     result
   }
 
@@ -63,8 +67,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
     true
   }
 
-  def instantiateScope(v: ScopeVariable, s: Scope) = {
-    constraints.foreach(c => c.instantiateScope(v, s))
+  def instantiateScope(v: ScopeVariable, s: Scope): Unit = {
+    allConstraints.foreach(c => c.instantiateScope(v, s))
   }
 
   def unifyScopes(left: Scope, right: Scope): Boolean = (left, right) match {
@@ -93,6 +97,8 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       case Some(newRight) => unifyTypes(left, newRight)
       case _ => instantiateType(v,left)
     }
+    case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)
+    case (app: TypeApplication, closure: ConstraintClosureType) => unifyClosure(closure, app)
     case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (PrimitiveType(leftName), PrimitiveType(rightName)) => leftName == rightName
@@ -106,8 +112,18 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
       false
   }
 
+  def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
+    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
+      val bodyScope = builder.newScope(Some(closure.parentScope))
+      builder.declaration(closure.declaration.name, copy(closure.declaration.id), bodyScope, Some(input))
+      closure.body.constraints(builder, output, bodyScope)
+      generatedConstraints ++= builder.getConstraints
+      true
+    case _ => false
+  }
+
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
-    constraints.foreach(x => x.instantiateDeclaration(variable, instance))
+    allConstraints.foreach(x => x.instantiateDeclaration(variable, instance))
     environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
     environment.values.foreach(t => t.instantiateDeclaration(variable, instance))
     mappedDeclarationVariables += variable -> instance
@@ -122,7 +138,7 @@ class ConstraintSolver(val factory: Factory, val startingConstraints: Seq[Constr
   }
 
   def boundVariables : Set[TypeVariable] = {
-    val constraintTypes = constraints.flatMap(c => c.boundTypes)
+    val constraintTypes = allConstraints.flatMap(c => c.boundTypes)
     constraintTypes.flatMap(t => t.variables).toSet
   }
 }

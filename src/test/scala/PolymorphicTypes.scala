@@ -53,7 +53,7 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity") {
     val identity = new Lambda("x", new Variable("x"))
     val program = new Let("identity", identity, Application(Application(new Variable("identity"), new Variable("identity")), Const(3)))
-    Checker.checkExpression(program, IntLanguageType, modes = Set(MachineChecker, ConstraintHindleyMilner))
+    Checker.checkExpression(program, IntLanguageType)
   }
 
   test("reuseIdentityFail") {
@@ -65,13 +65,7 @@ class PolymorphicTypes extends FunSuite {
   test("lambdaDoesNotGeneralize") {
     val identity = new Lambda("x", new Variable("x"))
     val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
-    Checker.checkExpression(program, modes = Set(MachineChecker))
-  }
-
-  test("lambdaDoesNotGeneralizeMachine") {
-    val identity = new Lambda("x", new Variable("x"))
-    val program = Application(new Lambda("identity", Application(Application(new Variable("identity"), new Variable("identity")), Const(3))), identity)
-    Checker.checkExpression(program, modes = Set(MachineChecker))
+    Checker.checkExpression(program, modes = Set(MachineChecker, ConstraintClosure))
   }
 
   test("referenceIdentityChangeType") {

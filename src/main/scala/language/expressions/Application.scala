@@ -13,7 +13,7 @@ case class ContraVariantApplication(function: Expression, value: Expression) ext
     val functionType = function.constraints(builder, parentScope)
     val argumentType = value.constraints(builder, parentScope)
     val parameterType = builder.typeVariable()
-    builder.add(Seq(TypesAreEqual(functionType, Language.getFunctionType(parameterType, _type)), CheckSubType(argumentType, parameterType)) )
+    builder.add(Seq(TypesAreEqual(functionType, builder.getFunctionType(parameterType, _type)), CheckSubType(argumentType, parameterType)) )
   }
 
   override def evaluate(machine: Machine): MachineType = Application(function, value).evaluate(machine)
@@ -23,7 +23,7 @@ case class Application(function: Expression, value: Expression) extends Expressi
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val functionType = function.constraints(builder, scope)
     val argumentType = value.constraints(builder, scope)
-    builder.typesAreEqual(functionType, Language.getFunctionType(argumentType, _type))
+    builder.typesAreEqual(functionType, builder.getFunctionType(argumentType, _type))
   }
 
   override def evaluate(machine: Machine): MachineType = {

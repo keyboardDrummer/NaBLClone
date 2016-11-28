@@ -7,10 +7,10 @@ import constraints.types.objects.Type
 import language.Language
 
 case class FunctionLanguageType(argument: LanguageType, result: LanguageType) extends LanguageType {
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope) = {
+  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val inputType = argument.constraints(builder, scope)
     val outputType = result.constraints(builder, scope)
-    builder.typesAreEqual(_type, Language.getFunctionType(inputType, outputType))
+    builder.typesAreEqual(_type, builder.getFunctionType(inputType, outputType))
   }
 
   override def evaluate(machine: Machine): MachineType = FunctionType(argument.evaluate(machine), result.evaluate(machine))

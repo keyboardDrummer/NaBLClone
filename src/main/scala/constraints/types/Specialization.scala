@@ -15,7 +15,7 @@ case class Specialization(var specialized: Type, var template: Type, debugInfo: 
   override def apply(solver: ConstraintSolver): Boolean = {
     template match {
       case poly: Poly =>
-        val instantiatedTemplate = poly.specialize(poly.arguments.map(v => (v, solver.factory.typeVariable)).toMap)
+        val instantiatedTemplate = poly.specialize(poly.arguments.map(v => (v, solver.builder.typeVariable())).toMap)
         solver.unifyTypes(specialized, instantiatedTemplate)
       case _: ConcreteType =>
         solver.unifyTypes(specialized, template)

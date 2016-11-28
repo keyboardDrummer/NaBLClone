@@ -6,8 +6,6 @@ import constraints.scopes.{DeclarationNode, DeclaresDeclaration, DeclaresScope, 
 import constraints.scopes.objects.{Scope, ScopeVariable}
 import constraints.types.objects.{Type, TypeVariable}
 
-case class Copy(original: AnyRef, id: Int)
-
 case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: Declaration, var template: Declaration) extends TypeConstraint {
   override def apply(solver: ConstraintSolver): Boolean = template match {
     case named:NamedDeclaration =>
@@ -24,7 +22,7 @@ case class InstantiateDeclarationConstraint(var _type: Type, var instantiated: D
         return false
 
       val typeParameter = freeVariables.head
-      val declaredScopeCopy = ScopeNode(solver.factory.freshScope)
+      val declaredScopeCopy = ScopeNode(solver.builder.newScope())
       scopeGraph.add(DeclarationNode(declarationCopy), DeclaresScope(declaredScopeCopy))
       fieldDeclarations.foreach(d => {
         val originalDeclaration: NamedDeclaration = d.target.declaration

@@ -16,7 +16,7 @@ class Factory
   }
 
   private var scopeCounter: Int = 0
-  def freshScope: ConcreteScope = {
+  def newScope: ConcreteScope = {
     scopeCounter += 1
     ConcreteScope(scopeCounter)
   }

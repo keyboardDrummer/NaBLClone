@@ -6,17 +6,23 @@ import constraints.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope
 import constraints.scopes.objects._
 import constraints.scopes.objects.ConcreteScope
 import constraints.types.{DeclarationOfType, Specialization, TypesAreEqual}
-import constraints.types.objects.{Type, TypeVariable}
+import constraints.types.objects.{PrimitiveType, Type, TypeApplication, TypeVariable}
 import language.Program
-import language.expressions.Expression
+import language.expressions.{ClosureLambda, Expression}
 import language.types.LanguageType
 import modes.ConstraintChecker
 
 import scala.collection.mutable
 
+case class Copy(key: AnyRef, counter: Int)
 class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
+  var copyCounter = 0
+  def copy(id: AnyRef) : Copy = {
+    copyCounter += 1
+    Copy(id, copyCounter)
+  }
 
-  val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty
+  val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
 
   def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
     val result = factory.scopeVariable
@@ -24,14 +30,15 @@ class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
     result
   }
 
-  def newScope(): ConcreteScope = factory.freshScope
+  def newScope(): ConcreteScope = factory.newScope
 
   def typeVariable(): TypeVariable = factory.typeVariable
 
   var constraints: List[Constraint] = List.empty
 
+  def getFunctionType(argument: Type, result: Type) = TypeApplication(PrimitiveType("Func"), Seq(argument, result))
   def newScope(parent: Option[Scope]) : ConcreteScope = {
-    val result = factory.freshScope
+    val result = factory.newScope
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
