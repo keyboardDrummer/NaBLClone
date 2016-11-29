@@ -3,7 +3,7 @@ package language
 import constraints.types.objects.{PrimitiveType, Type, TypeApplication}
 import language.expressions._
 import language.structs.{Access, Field, StructFieldInit}
-import language.types.{LanguageType, LanguageTypeVariable}
+import language.types.{FunctionLanguageType, LanguageType, LanguageTypeVariable}
 
 trait LanguageWriter {
 
@@ -27,6 +27,10 @@ trait LanguageWriter {
   implicit class LanguageName(name: String) extends ExpressionWriter(Variable(name)) {
     def is(value: Expression): StructFieldInit = StructFieldInit(name, value)
     def of( _type: LanguageType): Field = Field(name, _type)
+  }
+
+  implicit class ExtendedLanguageType(_type: LanguageType) {
+    def ==>(output: LanguageType) : FunctionLanguageType = FunctionLanguageType(_type, output)
   }
 }
 
