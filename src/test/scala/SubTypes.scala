@@ -69,7 +69,7 @@ class SubTypes extends FunSuite {
   }
 
   test("longLambdaTakesInt") {
-    val program = Application(new Lambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
+    val program = Application(Lambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
     Checker.checkExpression(program, IntLanguageType, skip = Set(ConstraintHindleyMilner(false)))
   }
 
@@ -131,7 +131,7 @@ class SubTypes extends FunSuite {
     val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
     val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
-    val takesSuperStruct = new Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
+    val takesSuperStruct = Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
     val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
       Application(new Variable("takesSuperStruct"), new Variable("newChild"))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, structUse), Seq(structParent, structChild))

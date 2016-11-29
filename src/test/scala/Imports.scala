@@ -61,9 +61,9 @@ class Imports extends FunSuite {
   test("lambdaTakingStruct") {
     val structDeclaration = new Struct("s", Seq(new Field("x", IntLanguageType)))
     val newStruct = new Binding("newStruct", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
-    val takesStruct = new Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesStruct", takesStruct,
-          Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
+    val takesStruct = Lambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", Let("takesStruct", takesStruct,
+      Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
     val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner(true)))

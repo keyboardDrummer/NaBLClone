@@ -13,7 +13,7 @@ class ReferenceEqualityTest extends FunSuite {
       new Binding("x", Const(3), Some(IntLanguageType)),
       new Binding("y", new Variable("x"), Some(IntLanguageType))))
     val moduleY = Module("moduleY", Seq(
-      new Binding("x", new Lambda("y", Const(3), Some(IntLanguageType)), Some(identityType)),
+      new Binding("x", Lambda("y", Const(3), Some(IntLanguageType)), Some(identityType)),
       new Binding("z", Application(new Variable("x"), Const(2)), Some(IntLanguageType))))
 
     val program = Program(Seq(moduleX, moduleY))
