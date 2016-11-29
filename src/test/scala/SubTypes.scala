@@ -74,21 +74,21 @@ class SubTypes extends FunSuite {
   }
 
   test("longLambdaTakesIntFail") {
-    val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
+    val program = Application(Lambda("x", new Variable("x"), Some(LongLanguageType)), Const(3))
     Checker.failExpression(program, LongLanguageType)
   }
 
   test("intLambdaTakesLong") {
-    val program = Application(new ContraVariantLambda("x", new Variable("x"), Some(IntLanguageType)), LongConst(3))
+    val program = Application(Lambda("x", new Variable("x"), Some(IntLanguageType)), LongConst(3))
     Checker.failExpression(program)
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantLambda") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq(), Some("s"))
-    val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
+    val takesSuperStruct = Lambda("struct", Const(3), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner))
@@ -97,9 +97,9 @@ class SubTypes extends FunSuite {
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantLambdaFail") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq())
-    val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
+    val takesSuperStruct = Lambda("struct", Const(3), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.fail(program)
@@ -108,9 +108,9 @@ class SubTypes extends FunSuite {
   test("lambdaTakingChildStructSimpleContraVariantLambda") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq(), Some("s"))
-    val takesSuperStruct = new ContraVariantLambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
+    val takesSuperStruct = Lambda("struct", Const(3), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner))
@@ -119,9 +119,9 @@ class SubTypes extends FunSuite {
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {
     val structParent = new Struct("s", Seq())
     val structChild = new Struct("s2", Seq())
-    val takesSuperStruct = new Lambda("struct", Const(3), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
+    val takesSuperStruct = Lambda("struct", Const(3), Some(new LanguageStructType("s")))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Application(new Variable("takesSuperStruct"), new New("s2", Seq.empty))), Some(IntLanguageType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.fail(program)
@@ -132,24 +132,27 @@ class SubTypes extends FunSuite {
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
     val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
     val takesSuperStruct = new ContraVariantLambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Application(new Variable("takesSuperStruct"), new Variable("newChild"))), Some(IntLanguageType))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Application(new Variable("takesSuperStruct"), new Variable("newChild"))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner))
   }
 
   test("lambdaTakingParentAndChildStructContraVariantLambda") {
-    val structParent = new Struct("s", Seq(new Field("x", IntLanguageType)))
-    val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
-    val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
-    val newParent = new Binding("newParent", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
-    val takesSuperStruct = new ContraVariantLambda("struct", new Access(new Variable("struct"), "x"), Some(new LanguageStructType("s")))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-            Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
+    val structParent = new Struct("parent", Seq(new Field("x", IntLanguageType)))
+    val structChild = new Struct("child", Seq(new Field("y", IntLanguageType)), Some("parent"))
+    val newParent = new Binding("newParent", new New("parent", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("parent")))
+    val newChild = new Binding("newChild", new New("child", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("child")))
+    val takesSuperStruct = Lambda("struct", new Access(new Variable("struct"), "x")) // TODO terughalen, Some(new LanguageStructType("parent")))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Add(
+        Application(new Variable("takesSuperStruct"), new Variable("newChild")),
+        Application(new Variable("takesSuperStruct"), new Variable("newParent")))),
+      Some(IntLanguageType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = Set(ConstraintHindleyMilner, ConstraintClosure))
+    Checker.check(program, skip = Set(ConstraintHindleyMilner))
   }
 
   test("genericLambdaTakingParentAndChildStruct") {
@@ -157,9 +160,9 @@ class SubTypes extends FunSuite {
     val structChild = new Struct("s2", Seq(new Field("y", IntLanguageType)), Some("s"))
     val newChild = new Binding("newChild", new New("s2", Seq(new StructFieldInit("x", Const(3)), new StructFieldInit("y", Const(2)))), Some(new LanguageStructType("s2")))
     val newParent = new Binding("newParent", new New("s", Seq(new StructFieldInit("x", Const(3)))), Some(new LanguageStructType("s")))
-    val takesSuperStruct = new Lambda("struct", new Access(new Variable("struct"), "x"))
-    val structUse = new Binding("structUse", new Let("takesSuperStruct", takesSuperStruct,
-          Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
+    val takesSuperStruct = Lambda("struct", new Access(new Variable("struct"), "x"))
+    val structUse = new Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
+      Add(Application(new Variable("takesSuperStruct"), new Variable("newChild")), Application(new Variable("takesSuperStruct"), new Variable("newParent")))), Some(IntLanguageType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner))

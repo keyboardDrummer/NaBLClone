@@ -74,23 +74,24 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case _ => false
   }
 
-  def canAssignTo(target: Type, value: Type): Boolean = (target, value) match {
+  def canAssignTo(target: Type, value: Type): Boolean = (resolveType(target), resolveType(value)) match {
     case (v: TypeVariable,_) => false
     case (_,v: TypeVariable) => false
-    case _ => typeGraph.isSuperType(TypeNode(target), TypeNode(value))
+    case (l, r) => typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
-  def unifyTypes(left: Type, right: Type): Boolean = (left,right) match {
-    case (v: TypeVariable,_) => mappedTypeVariables.get(v) match
+  def resolveType(_type: Type): Type = _type match {
+    case v: TypeVariable => mappedTypeVariables.get(v) match
     {
-      case Some(newLeft) => unifyTypes(newLeft, right)
-      case _ => instantiateType(v,right)
+      case Some(value) => resolveType(value)
+      case _ => _type
     }
-    case (_,v: TypeVariable) =>  mappedTypeVariables.get(v) match
-    {
-      case Some(newRight) => unifyTypes(left, newRight)
-      case _ => instantiateType(v,left)
-    }
+    case _ => _type
+  }
+
+  def unifyTypes(left: Type, right: Type): Boolean = (resolveType(left), resolveType(right)) match {
+    case (v: TypeVariable,_) => instantiateType(v,right)
+    case (_,v: TypeVariable) => instantiateType(v,left)
     case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)
     case (app: TypeApplication, closure: ConstraintClosureType) => unifyClosure(closure, app)
     case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
