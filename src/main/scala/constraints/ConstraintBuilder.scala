@@ -38,8 +38,8 @@ class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
     result
   }
 
-  def resolve(name: String, id: AnyRef, scope: Scope) : DeclarationVariable = {
-    val result = declarationVariable()
+  def resolve(name: String, id: AnyRef, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
+    val result = _type.fold(declarationVariable())(t => declarationVariable(t))
     reference(name, id, scope, result)
     result
   }
@@ -67,8 +67,8 @@ class ConstraintBuilder(factory: Factory, val mode: ConstraintChecker) {
   def specialization(first: Type, second: Type, debugInfo: Any = null): Unit = add(Specialization(first, second, debugInfo))
   def typesAreEqual(first: Type, second: Type): Unit = add(TypesAreEqual(first, second))
 
-  def add(addition: Constraint): Unit = constraints ++= Seq(addition)
-  def add(addition: Seq[Constraint]): Unit = constraints ++= addition
+  def add(addition: Constraint): Unit = constraints ::= addition
+  def add(addition: List[Constraint]): Unit = constraints = addition ++ constraints
 
   def declarationVariable(): DeclarationVariable = {
     factory.declarationVariable

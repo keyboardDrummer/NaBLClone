@@ -15,9 +15,7 @@ class Variable(val name: String) extends Expression {
       builder.specialization(_type, declarationType, this)
 
     case ConstraintClosure =>
-      val declaration: DeclarationVariable = builder.resolve(name, this, scope)
-      val declarationType = builder.getType(declaration)
-      builder.typesAreEqual(_type, declarationType)
+      builder.resolve(name, this, scope, Some(_type))
   }
 
   override def toString = s"Variable($name)"

@@ -2,15 +2,14 @@ package language.expressions
 
 import bindingTypeMachine.{Machine, MachineClosureType, MachineType}
 import constraints.ConstraintBuilder
-import constraints.objects.{NamedDeclaration, Reference}
+import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.{ConcreteScope, Scope}
+import constraints.types.CheckSubType
 import constraints.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
-import constraints.types.{CheckSubType, TypesAreEqual}
-import language.Language
 import language.types.LanguageType
 import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
-class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
+case class ContraVariantLambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val bodyScope: ConcreteScope = builder.newScope(Some(scope))
     val argumentType = builder.declarationType(name, this, bodyScope)

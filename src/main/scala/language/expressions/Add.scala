@@ -8,7 +8,7 @@ import constraints.types.{CheckSubType, TypesAreEqual}
 
 case class OverloadedAdd(left: Expression, right: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    builder.add(Seq(CheckSubType(_type, LongType)))
+    builder.add(List(CheckSubType(_type, LongType)))
     left.constraints(builder, _type, scope)
     right.constraints(builder, _type, scope)
   }
@@ -24,7 +24,7 @@ case class OverloadedAdd(left: Expression, right: Expression) extends Expression
 
 case class Add(left: Expression, right: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    builder.add(Seq(TypesAreEqual(_type, IntType)))
+    builder.add(List(TypesAreEqual(_type, IntType)))
     left.constraints(builder, IntType, scope)
     right.constraints(builder, IntType, scope)
   }

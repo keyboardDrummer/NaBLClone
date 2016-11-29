@@ -8,6 +8,8 @@ case class PrimitiveType(name: String) extends ConcreteType {
   override def instantiateType(variable: TypeVariable, instance: Type): Type = this
 
   override def fullyApplied: Boolean = true
+
+  override def toString: String = name
 }
 
 case class TypeApplication(override val function: Type, var arguments: Seq[Type]) extends ConcreteType {

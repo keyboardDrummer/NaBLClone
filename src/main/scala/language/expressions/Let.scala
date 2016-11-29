@@ -8,7 +8,7 @@ import constraints.types.objects.Type
 import language.types.LanguageType
 import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
-class Let(name: String, bindingValue: Expression, value: Expression, bindingLanguageType: Option[LanguageType] = None) extends Expression {
+case class Let(name: String, bindingValue: Expression, value: Expression, bindingLanguageType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
     case ConstraintHindleyMilner =>
       val scope = builder.newScope(Some(parentScope))

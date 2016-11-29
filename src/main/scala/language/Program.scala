@@ -8,8 +8,8 @@ import language.modules.Module
 
 object Program
 {
-  def libraryConstraints: Seq[Constraint] = {
-    Seq(AssignSubType(IntType, LongType))
+  def libraryConstraints: List[Constraint] = {
+    List(AssignSubType(IntType, LongType))
   }
 }
 

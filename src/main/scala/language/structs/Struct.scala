@@ -8,7 +8,7 @@ import constraints.types.AssignSubType
 import constraints.types.objects.StructType
 import language.types.LanguageTypeVariable
 
-class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
+class Struct(val name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
 {
   def evaluate(machine: Machine): Unit = {
 
@@ -37,7 +37,7 @@ class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, ty
       val parentDeclaration = builder.declarationVariable()
       val scopeOfParent = builder.declaredScopeVariable(parentDeclaration)
       builder.reference(p, this, parentScope, parentDeclaration)
-      builder.add(Seq(AssignSubType(StructType(structDeclaration), StructType(parentDeclaration))))
+      builder.add(List(AssignSubType(StructType(structDeclaration), StructType(parentDeclaration))))
       scopeOfParent
     })
     val structScope = builder.declaredNewScope(structDeclaration, scopeOfParent)
@@ -46,4 +46,6 @@ class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, ty
       builder.declaration(field.name, field, structScope, Some(_type))
     })
   }
+
+  override def toString = s"Struct($name)"
 }
