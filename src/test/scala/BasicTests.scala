@@ -47,7 +47,7 @@ class BasicTests extends FunSuite with LanguageWriter {
   }
 
   test("lambdaApplicationAddInside3") {
-    val program = Application(Lambda("x", Add(Variable("y"), Variable("x")), Some(IntType)), Const(3))
+    val program = Lambda("x", Add("y", "x"), Some(IntType)) $ 3
     Checker.failExpression(program)
   }
 
@@ -71,20 +71,20 @@ class BasicTests extends FunSuite with LanguageWriter {
   test("Shadowing")  {
     val identity = Lambda("x", Variable("x"), Some(IntType))
     val innerLambda: Lambda = Lambda("x", Variable("x"), Some(IntType))
-    val outerLambda: Lambda = Lambda("x", innerLambda, Some(FunctionLanguageType(IntType, IntType)))
+    val outerLambda: Lambda = Lambda("x", innerLambda, Some(IntType ==> IntType))
     val program = Application(Application(outerLambda, identity), Const(2))
     Checker.checkExpression(program, skip = Set(ConstraintHindleyMilner(true)))
   }
 
   test("Shadowing2")  {
     val innerLambda: Lambda = Lambda("x", Variable("x"), Some(IntType))
-    val program = Application(Application(Lambda("x", innerLambda, Some(FunctionLanguageType(IntType, IntType))), Const(3)), Const(2))
+    val program = Application(Application(Lambda("x", innerLambda, Some(IntType ==> IntType)), Const(3)), Const(2))
     Checker.failExpression(program)
   }
 
   test("Shadowing3")  {
     val innerLambda: Lambda = Lambda("x", Variable("x"), Some(IntType))
-    val program = Application(Application(Lambda("x", innerLambda, Some(FunctionLanguageType(IntType, IntType))), Const(3)), Const(2))
+    val program = Application(Application(Lambda("x", innerLambda, Some(IntType ==> IntType)), Const(3)), Const(2))
     Checker.failExpression(program)
   }
 

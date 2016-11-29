@@ -5,7 +5,7 @@ import constraints.ConstraintBuilder
 import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.Scope
 import constraints.types.AssignSubType
-import constraints.types.objects.StructType
+import constraints.types.objects.StructConstraintType
 import language.types.LanguageTypeVariable
 
 case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
@@ -37,7 +37,7 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
       val parentDeclaration = builder.declarationVariable()
       val scopeOfParent = builder.declaredScopeVariable(parentDeclaration)
       builder.reference(p, this, parentScope, parentDeclaration)
-      builder.add(List(AssignSubType(StructType(structDeclaration), StructType(parentDeclaration))))
+      builder.add(List(AssignSubType(StructConstraintType(structDeclaration), StructConstraintType(parentDeclaration))))
       scopeOfParent
     })
     val structScope = builder.declaredNewScope(structDeclaration, scopeOfParent)

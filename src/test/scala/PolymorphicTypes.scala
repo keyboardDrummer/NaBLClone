@@ -1,10 +1,11 @@
 
+import language.LanguageWriter
 import language.expressions._
 import language.types._
 import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker}
 import org.scalatest.FunSuite
 
-class PolymorphicTypes extends FunSuite {
+class PolymorphicTypes extends FunSuite with LanguageWriter {
 
   test("boolIntoIdentity") {
     val program = Application(Lambda("x", Variable("x")), BoolConst(true))
@@ -53,13 +54,13 @@ class PolymorphicTypes extends FunSuite {
   test("reuseIdentity") {
     val identity = Lambda("x", Variable("x"))
     val program = Let("identity", identity, Application(Application(Variable("identity"), Variable("identity")), Const(3)))
-    Checker.checkExpression(program, IntLanguageType)
+    Checker.checkExpression(program, IntType)
   }
 
   test("reuseIdentityFail") {
     val identity = Lambda("x", Variable("x"))
     val program = Let("identity", identity, Application(Application(Variable("identity"), Variable("identity")), BoolConst(true)))
-    Checker.failExpression(program, IntLanguageType)
+    Checker.failExpression(program, IntType)
   }
 
   test("lambdaDoesNotGeneralize") {

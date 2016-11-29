@@ -3,9 +3,9 @@ package constraints.types.objects
 import constraints.Factory
 import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 
-case class StructType(var declaration: Declaration) extends ConcreteType
+case class StructConstraintType(var declaration: Declaration) extends ConcreteType
 {
-  override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration) = {
+  override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
     if (declaration == variable)
       declaration = instance
   }

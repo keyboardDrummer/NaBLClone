@@ -1,16 +1,16 @@
 import language.Program
 import language.expressions.Expression
-import language.types.{IntLanguageType, LanguageType}
+import language.types.{IntType, LanguageType}
 import modes._
 
 object Checker {
 
-  def failExpression(program: Expression, languageType: LanguageType = IntLanguageType, skip: Set[Checker] = Set.empty): Unit =
+  def failExpression(program: Expression, languageType: LanguageType = IntType, skip: Set[Checker] = Set.empty): Unit =
   {
     checkExpression(program, languageType, allModes.diff(skip))
   }
 
-  def checkExpression(program: Expression, languageType: LanguageType = IntLanguageType, skip: Set[Checker] = Set.empty): Unit = {
+  def checkExpression(program: Expression, languageType: LanguageType = IntType, skip: Set[Checker] = Set.empty): Unit = {
     val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
     processAnswers(answers, allModes.diff(skip))
   }

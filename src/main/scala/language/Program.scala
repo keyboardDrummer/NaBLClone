@@ -1,7 +1,7 @@
 package language
 
 import bindingTypeMachine.{IntMachineType, LongMachineType, Machine}
-import constraints.types.objects.{IntType, LongType}
+import constraints.types.objects.{IntConstraintType, LongConstraintType}
 import constraints.types.{AssignSubType, CheckSubType}
 import constraints.{Constraint, ConstraintBuilder}
 import language.modules.Module
@@ -9,7 +9,7 @@ import language.modules.Module
 object Program
 {
   def libraryConstraints: List[Constraint] = {
-    List(AssignSubType(IntType, LongType))
+    List(AssignSubType(IntConstraintType, LongConstraintType))
   }
 }
 

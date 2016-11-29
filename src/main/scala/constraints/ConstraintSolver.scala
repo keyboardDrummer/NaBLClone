@@ -99,7 +99,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (_,v: TypeVariable) => instantiateType(v,left)
     case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)
     case (app: TypeApplication, closure: ConstraintClosureType) => unifyClosure(closure, app)
-    case(StructType(leftDeclaration), StructType(rightDeclaration)) =>
+    case(StructConstraintType(leftDeclaration), StructConstraintType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (PrimitiveType(leftName), PrimitiveType(rightName)) => leftName == rightName
     case (TypeApplication(leftFunction, leftArguments), TypeApplication(rightFunction, rightArguments)) =>

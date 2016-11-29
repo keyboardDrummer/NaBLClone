@@ -4,7 +4,7 @@ import bindingTypeMachine.{Machine, MachineType, StructMachineType}
 import constraints.scopes.imports.DeclarationOfScope
 import constraints.scopes.objects.Scope
 import constraints.types.TypesAreEqual
-import constraints.types.objects.{StructType, Type}
+import constraints.types.objects.{StructConstraintType, Type}
 import constraints.{Constraint, ConstraintBuilder}
 import language.expressions.Expression
 
@@ -17,7 +17,7 @@ case class Access(target: Expression, field: String) extends Expression
     val fieldDeclaration = builder.declarationVariable(_type)
     val structScope = builder.declaredScopeVariable(structDeclaration)
     builder.reference(field, this, structScope, fieldDeclaration)
-    target.constraints(builder, StructType(structDeclaration), scope)
+    target.constraints(builder, StructConstraintType(structDeclaration), scope)
   }
 
   override def evaluate(machine: Machine): MachineType = {
