@@ -3,8 +3,10 @@ package constraints
 import constraints.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import constraints.scopes._
 import constraints.scopes.objects.{ConcreteScope, Scope, ScopeVariable}
-import constraints.types.{TypeGraph, TypeNode}
+import constraints.types.{CheckSubType, TypeGraph, TypeNode}
 import constraints.types.objects._
+
+import scala.collection.generic.SeqFactory
 
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint])
 {
@@ -77,7 +79,10 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def canAssignTo(target: Type, value: Type): Boolean = (resolveType(target), resolveType(value)) match {
     case (v: TypeVariable,_) => false
     case (_,v: TypeVariable) => false
-    case (l, r) => typeGraph.isSuperType(TypeNode(l), TypeNode(r))
+    case (closure: ConstraintClosureType, app: TypeApplication) => canAssignClosure(closure, app)
+    case (app: TypeApplication, closure: ConstraintClosureType) => canAssignClosure(closure, app)
+    case (l, r) =>
+      typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
   def resolveType(_type: Type): Type = _type match {
@@ -105,6 +110,17 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
         false
     case _ =>
       false
+  }
+
+  def canAssignClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
+    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
+      val bodyScope = builder.newScope(Some(closure.parentScope))
+      builder.declaration(closure.declaration.name, closure.declaration.id, bodyScope, Some(input))
+      val actualOutput = closure.body.constraints(builder, bodyScope)
+      builder.add(CheckSubType(actualOutput, output))
+      generatedConstraints ++= builder.getConstraints
+      true
+    case _ => false
   }
 
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {

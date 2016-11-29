@@ -64,7 +64,7 @@ class BasicTests extends FunSuite {
     val identity = Lambda("x", new Variable("x"), Some(IntLanguageType))
     val functionIdentity = Lambda("y", new Variable("y"), Some(FunctionLanguageType(IntLanguageType, IntLanguageType)))
     val program = Application(Application(functionIdentity, identity), Const(3))
-    Checker.checkExpression(program, skip = Set(ConstraintClosure))
+    Checker.checkExpression(program)
   }
 
   test("Shadowing")  {
@@ -72,7 +72,7 @@ class BasicTests extends FunSuite {
     val innerLambda: Lambda = Lambda("x", new Variable("x"), Some(IntLanguageType))
     val outerLambda: Lambda = Lambda("x", innerLambda, Some(FunctionLanguageType(IntLanguageType, IntLanguageType)))
     val program = Application(Application(outerLambda, identity), Const(2))
-    Checker.checkExpression(program, skip = Set(ConstraintClosure, ConstraintHindleyMilner(true)))
+    Checker.checkExpression(program, skip = Set(ConstraintHindleyMilner(true)))
   }
 
   test("Shadowing2")  {

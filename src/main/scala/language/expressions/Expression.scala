@@ -9,14 +9,6 @@ import language.structs.{Access, StructFieldInit}
 trait Expression extends ConstraintExpression {
   def evaluate(machine: Machine): MachineType
 
-  def constraints(builder: ConstraintBuilder, parentScope: Scope): Type = {
-    val result = builder.typeVariable()
-    constraints(builder, result, parentScope)
-    result
-  }
-
-  def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit
-
   def apply(argument: Expression) = Application(this, argument)
   def $: (Expression) => Application = apply
 
