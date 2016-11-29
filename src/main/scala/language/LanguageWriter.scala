@@ -1,7 +1,7 @@
 package language
 
 import constraints.types.objects.{PrimitiveType, Type, TypeApplication}
-import language.expressions.{BoolConst, Const, Expression, Variable}
+import language.expressions._
 import language.structs.{Access, Field, StructFieldInit}
 import language.types.{LanguageType, LanguageTypeVariable}
 
@@ -13,10 +13,20 @@ trait LanguageWriter {
 
   implicit def typeVariable(name: String) : LanguageTypeVariable = LanguageTypeVariable(name)
 
-  implicit class LanguageName(name: String) {
+  class ExpressionWriter(expression: Expression) {
+    def $(argument: Expression) = Application(expression, argument)
+    def add(right: Expression) = Add(expression, right)
+    def access(field: String): Access = Access(expression, field)
+  }
+
+  implicit class ExtendedExpression(expression: Expression) extends ExpressionWriter(expression) {
+  }
+
+  implicit class LanguageInt(value: Int) extends ExpressionWriter(Const(value))
+
+  implicit class LanguageName(name: String) extends ExpressionWriter(Variable(name)) {
     def is(value: Expression): StructFieldInit = StructFieldInit(name, value)
     def of( _type: LanguageType): Field = Field(name, _type)
-    def access(field: String): Access = Access(Variable(name), field)
   }
 }
 

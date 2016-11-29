@@ -1,9 +1,10 @@
+import language.LanguageWriter
 import language.expressions._
 import language.types.{FunctionLanguageType, IntLanguageType}
 import modes.{ConstraintClosure, ConstraintHindleyMilner}
 import org.scalatest.FunSuite
 
-class BasicTests extends FunSuite {
+class BasicTests extends FunSuite with LanguageWriter {
 
   test("constant") {
     val program = Const(3)
@@ -11,17 +12,17 @@ class BasicTests extends FunSuite {
   }
 
   test("add") {
-    val program = Add(Const(3), Const(2))
+    val program = Add(3, 2)
     Checker.checkExpression(program)
   }
 
   test("addVariable") {
-    val program = Add(Const(3), Variable("jo"))
+    val program = Add(3, "jo")
     Checker.failExpression(program)
   }
 
   test("badArgumentUse") {
-    val program = Application(Lambda("x", Application(Variable("x"), Const(3)), Some(IntLanguageType)), Const(2))
+    val program = Lambda("x", Variable("x") $ 3, Some(IntLanguageType)) $ 2
     Checker.failExpression(program)
   }
 
@@ -31,17 +32,17 @@ class BasicTests extends FunSuite {
   }
 
   test("lambdaApplication") {
-    val program = Application(Lambda("x", Variable("x"), Some(IntLanguageType)), Const(3))
+    val program = Lambda("x", "x", Some(IntLanguageType)) $ 3
     Checker.checkExpression(program)
   }
 
   test("lambdaApplicationAddInside") {
-    val program = Application(Lambda("x", Add(Const(3), Variable("x")), Some(IntLanguageType)), Const(3))
+    val program = Lambda("x", 3 add "x", Some(IntLanguageType)) $ 3
     Checker.checkExpression(program)
   }
 
   test("lambdaApplicationAddInside2") {
-    val program = Application(Lambda("x", Add(Variable("x"), Variable("x")), Some(IntLanguageType)), Const(3))
+    val program = Lambda("x", "x" add "x", Some(IntLanguageType)) $ 3
     Checker.checkExpression(program)
   }
 
