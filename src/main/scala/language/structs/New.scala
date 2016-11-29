@@ -9,7 +9,7 @@ import constraints.types.objects.{StructType, Type, TypeApplication}
 import language.expressions.Expression
 import language.types.LanguageType
 
-class New(structName: String, fieldInitializers: Seq[StructFieldInit], genericTypeArgument: Option[LanguageType] = None) extends Expression
+case class New(structName: String, fieldInitializers: Seq[StructFieldInit], genericTypeArgument: Option[LanguageType] = None) extends Expression
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()

@@ -2,4 +2,4 @@ package language.structs
 
 import language.types.LanguageType
 
-class Field(val name: String, val _type: LanguageType)
+case class Field(name: String, _type: LanguageType)

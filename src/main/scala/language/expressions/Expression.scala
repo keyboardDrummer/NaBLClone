@@ -12,13 +12,6 @@ trait Expression extends ConstraintExpression {
   def apply(argument: Expression) = Application(this, argument)
   def $: (Expression) => Application = apply
 
-  def access(field: String) = new Access(this, field)
+  def access(field: String) = Access(this, field)
 
-}
-
-object Expression
-{
-  implicit def const(value: Int) : Const = Const(value)
-  implicit def bool(value: Boolean) : BoolConst = BoolConst(value)
-  implicit def variable(name: String) : Variable = new Variable(name)
 }

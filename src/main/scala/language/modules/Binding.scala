@@ -7,7 +7,7 @@ import constraints.types.objects.Type
 import language.expressions.Expression
 import language.types.LanguageType
 
-class Binding(name: String, body: Expression, bindingType: Option[LanguageType] = None)
+case class Binding(name: String, body: Expression, bindingType: Option[LanguageType] = None)
 {
   def evaluate(machine: Machine): Unit = {
     val evaluatedType = body.evaluate(machine)

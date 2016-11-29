@@ -8,7 +8,7 @@ import constraints.types.AssignSubType
 import constraints.types.objects.StructType
 import language.types.LanguageTypeVariable
 
-class Struct(val name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
+case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
 {
   def evaluate(machine: Machine): Unit = {
 
@@ -17,7 +17,7 @@ class Struct(val name: String, fields: Seq[Field], parent: Option[String] = None
     val variables = fields.flatMap(field => field._type.variables).toSet
     if (variables != expectedVariables)
     {
-      throw TypeCheckException("struct type variables don't add up")
+      throw TypeCheckException(s"struct type variables don't add up, variables are $variables but expected $expectedVariables")
     }
 
     val parentType = parent.map(p => machine.resolveStruct(p))

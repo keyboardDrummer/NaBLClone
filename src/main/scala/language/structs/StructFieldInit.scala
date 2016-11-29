@@ -7,7 +7,7 @@ import constraints.types.DeclarationOfType
 import constraints.{Constraint, ConstraintBuilder, ResolvesTo}
 import language.expressions.Expression
 
-class StructFieldInit(val fieldName: String, val value: Expression) {
+case class StructFieldInit(fieldName: String, value: Expression) {
   def constraints(builder: ConstraintBuilder, structScope: Scope, parentScope: Scope): Unit = {
     val fieldDeclaration = builder.resolve(fieldName, this, structScope)
     val fieldType = builder.getType(fieldDeclaration)

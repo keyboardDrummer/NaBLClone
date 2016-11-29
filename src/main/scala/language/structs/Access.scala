@@ -8,7 +8,7 @@ import constraints.types.objects.{StructType, Type}
 import constraints.{Constraint, ConstraintBuilder}
 import language.expressions.Expression
 
-class Access(target: Expression, field: String) extends Expression
+case class Access(target: Expression, field: String) extends Expression
 {
   /* We don't need a scope import because we can directly use the struct scope to resolve the member.
    */
