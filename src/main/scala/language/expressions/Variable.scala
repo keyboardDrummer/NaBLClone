@@ -9,7 +9,7 @@ import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
 class Variable(val name: String) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit =  builder.mode match {
-    case ConstraintHindleyMilner =>
+    case _:ConstraintHindleyMilner =>
       val declaration: DeclarationVariable = builder.resolve(name, this, scope)
       val declarationType = builder.getType(declaration)
       builder.specialization(_type, declarationType, this)

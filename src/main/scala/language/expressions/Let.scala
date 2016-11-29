@@ -10,7 +10,7 @@ import modes.{ConstraintClosure, ConstraintHindleyMilner}
 
 case class Let(name: String, bindingValue: Expression, value: Expression, bindingLanguageType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
-    case ConstraintHindleyMilner =>
+    case _:ConstraintHindleyMilner =>
       val scope = builder.newScope(Some(parentScope))
       val bindingType = bindingValue.constraints(builder, parentScope)
       val generalizedType = builder.declarationType(name, this, scope)

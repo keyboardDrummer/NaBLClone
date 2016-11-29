@@ -1,5 +1,6 @@
 import language.expressions._
 import language.types.{FunctionLanguageType, IntLanguageType}
+import modes.{ConstraintClosure, ConstraintHindleyMilner}
 import org.scalatest.FunSuite
 
 class BasicTests extends FunSuite {
@@ -63,7 +64,7 @@ class BasicTests extends FunSuite {
     val identity = new Lambda("x", new Variable("x"), Some(IntLanguageType))
     val functionIdentity = new Lambda("y", new Variable("y"), Some(FunctionLanguageType(IntLanguageType, IntLanguageType)))
     val program = Application(Application(functionIdentity, identity), Const(3))
-    Checker.checkExpression(program)
+    Checker.checkExpression(program, skip = Set(ConstraintClosure))
   }
 
   test("Shadowing")  {
@@ -71,7 +72,7 @@ class BasicTests extends FunSuite {
     val innerLambda: Lambda = new Lambda("x", new Variable("x"), Some(IntLanguageType))
     val outerLambda: Lambda = new Lambda("x", innerLambda, Some(FunctionLanguageType(IntLanguageType, IntLanguageType)))
     val program = Application(Application(outerLambda, identity), Const(2))
-    Checker.checkExpression(program)
+    Checker.checkExpression(program, skip = Set(ConstraintClosure, ConstraintHindleyMilner(true)))
   }
 
   test("Shadowing2")  {

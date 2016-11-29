@@ -22,7 +22,7 @@ object Checker {
     processAnswers(answers, allModes.diff(skip))
   }
 
-  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner)
+  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner(true), ConstraintHindleyMilner(false))
 
   def processAnswers(answers: Map[Checker, Boolean], successModes: Set[Checker]): Unit = {
     val badAnswers = answers.filter(answer => successModes.contains(answer._1) ^ answer._2)

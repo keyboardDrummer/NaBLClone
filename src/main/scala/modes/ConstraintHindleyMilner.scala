@@ -1,5 +1,8 @@
 package modes
 
-object ConstraintHindleyMilner extends ConstraintChecker
+object ConstraintHindleyMilner
+{
+  def both: Set[Checker] = Set(ConstraintHindleyMilner(true), ConstraintHindleyMilner(false))
+}
 
-//object ConstraintHindlerMilnerWithSubtyping extends Constr
+case class ConstraintHindleyMilner(subTyping: Boolean) extends ConstraintChecker

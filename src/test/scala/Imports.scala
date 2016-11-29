@@ -66,6 +66,6 @@ class Imports extends FunSuite {
           Application(new Variable("takesStruct"), new Variable("newStruct"))), Some(IntLanguageType))
     val module = Module("module", Seq(newStruct, structUse), Seq(structDeclaration))
     val program: Program = Program(Seq(module))
-    Checker.check(program)
+    Checker.check(program, skip = Set(ConstraintHindleyMilner(true)))
   }
 }
