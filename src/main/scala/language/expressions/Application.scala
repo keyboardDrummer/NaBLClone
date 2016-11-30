@@ -1,12 +1,9 @@
 package language.expressions
 
-import bindingTypeMachine._
-import bindingTypeMachine.{MachineClosureType, Machine, MachineType}
+import bindingTypeMachine.{Machine, MachineClosureType, MachineType, _}
 import constraints.ConstraintBuilder
 import constraints.scopes.objects.Scope
 import constraints.types.objects.Type
-import constraints.types.{CheckSubType, TypesAreEqual}
-import language.Language
 
 case class Application(function: Expression, value: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {

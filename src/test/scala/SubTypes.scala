@@ -1,10 +1,10 @@
 
-import language.{LanguageWriter, Program}
 import language.expressions._
 import language.modules.{Binding, Module}
 import language.structs._
 import language.types.{IntType, LongType}
-import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker}
+import language.{LanguageWriter, Program}
+import modes.ConstraintHindleyMilner
 import org.scalatest.FunSuite
 
 class SubTypes extends FunSuite with LanguageWriter {
@@ -156,13 +156,14 @@ class SubTypes extends FunSuite with LanguageWriter {
   }
 
   test("genericLambdaTakingParentAndChildStruct") {
-    val structParent = Struct("s", Seq(Field("x", IntType)))
-    val structChild = Struct("s2", Seq(Field("y", IntType)), Some("s"))
-    val newChild = Binding("newChild", New("s2", Seq(StructFieldInit("x", Const(3)), StructFieldInit("y", Const(2)))), Some(new StructType("s2")))
-    val newParent = Binding("newParent", New("s", Seq(StructFieldInit("x", Const(3)))), Some(new StructType("s")))
-    val takesSuperStruct = Lambda("struct", Access(Variable("struct"), "x"))
+    val structParent = Struct("parent", Seq("x" of IntType))
+    val structChild = Struct("child", Seq("y" of IntType), Some("parent"))
+    val newChild = Binding("newChild", New("child", Seq("x" is 3, "y" is 2)), Some(new StructType("child")))
+    val newParent = Binding("newParent", New("parent", Seq("x" is 3)), Some(new StructType("parent")))
+    val takesSuperStruct = Lambda("struct", Variable("struct").access("x"))
     val structUse = Binding("structUse", Let("takesSuperStruct", takesSuperStruct,
-      Add(Application(Variable("takesSuperStruct"), Variable("newChild")), Application(Variable("takesSuperStruct"), Variable("newParent")))), Some(IntType))
+      Add(Variable("takesSuperStruct") $ "newChild",
+          Variable("takesSuperStruct") $ "newParent")), Some(IntType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = ConstraintHindleyMilner.both)
