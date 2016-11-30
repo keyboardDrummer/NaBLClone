@@ -1,7 +1,7 @@
 import language.LanguageWriter
 import language.expressions._
 import language.types.{FunctionLanguageType, IntType}
-import modes.{ConstraintClosure, ConstraintHindleyMilner}
+import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker}
 import org.scalatest.FunSuite
 
 class BasicTests extends FunSuite with LanguageWriter {
@@ -107,5 +107,17 @@ class BasicTests extends FunSuite with LanguageWriter {
   test("letFail") {
     val program = Let("x", Const(3), Variable("y"))
     Checker.failExpression(program)
+  }
+
+  test("recursive function")
+  {
+    val incrementInfinitely = Let("f", Lambda("x", Add(1, "f" $ "x")), "f" $ 0)
+    Checker.checkExpression(incrementInfinitely, skip = Set(MachineChecker, ConstraintClosure) ++ ConstraintHindleyMilner.both)
+  }
+
+  test("recursive function typed")
+  {
+    val incrementInfinitely = Let("f", Lambda("x", Add(1, "f" $ "x")), "f" $ 0, bindingLanguageType = Some(IntType ==> IntType))
+    Checker.checkExpression(incrementInfinitely, skip = Set(ConstraintClosure))
   }
 }

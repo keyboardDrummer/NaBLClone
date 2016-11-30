@@ -12,7 +12,7 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
     case _:ConstraintHindleyMilner =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = bindingValue.constraints(builder, parentScope)
+      val bindingType = bindingValue.constraints(builder, scope)
       val generalizedType = builder.declarationType(name, this, scope)
       builder.add(Generalization(generalizedType, bindingType))
 
@@ -30,8 +30,15 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
   }
 
   override def evaluate(machine: Machine): MachineType = {
-    val bindingType = bindingValue.evaluate(machine)
-    bindingLanguageType.foreach(t => machine.assertSubType(bindingType, t.evaluate(machine)))
+    val bindingType = bindingLanguageType.fold(bindingValue.evaluate(machine))(t => {
+      machine.enterScope()
+      val bindingSpecifiedType = t.evaluate(machine)
+      machine.declare(name, bindingSpecifiedType)
+      val bindingType = bindingValue.evaluate(machine)
+      machine.exitScope()
+      machine.assertSubType(bindingType, bindingSpecifiedType)
+      bindingType
+    })
     machine.enterScope()
     machine.declare(name, bindingType)
     val result = value.evaluate(machine)
