@@ -1,3 +1,5 @@
 package modes
 
-object ConstraintClosure extends ConstraintChecker
+object ConstraintClosure extends ConstraintChecker {
+  override def subTyping: Boolean = true
+}

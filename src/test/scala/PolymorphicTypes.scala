@@ -2,7 +2,7 @@
 import language.LanguageWriter
 import language.expressions._
 import language.types._
-import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker}
+import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker, SimpleConstraintChecker}
 import org.scalatest.FunSuite
 
 class PolymorphicTypes extends FunSuite with LanguageWriter {
@@ -54,7 +54,7 @@ class PolymorphicTypes extends FunSuite with LanguageWriter {
   test("reuseIdentity") {
     val identity = Lambda("x", Variable("x"))
     val program = Let("identity", identity, Application(Application(Variable("identity"), Variable("identity")), Const(3)))
-    Checker.checkExpression(program, IntType)
+    Checker.checkExpression(program, IntType, skip = Set(SimpleConstraintChecker))
   }
 
   test("reuseIdentityFail") {
@@ -66,7 +66,7 @@ class PolymorphicTypes extends FunSuite with LanguageWriter {
   test("lambdaDoesNotGeneralize") {
     val identity = Lambda("x", Variable("x"))
     val program = Application(Lambda("identity", Application(Application(Variable("identity"), Variable("identity")), Const(3))), identity)
-    Checker.checkExpression(program, skip = ConstraintHindleyMilner.both)
+    Checker.checkExpression(program, skip = Checker.threeMusketiers)
   }
 
   test("referenceIdentityChangeType") {
@@ -103,7 +103,7 @@ class PolymorphicTypes extends FunSuite with LanguageWriter {
     val const = Lambda("x", Lambda("y", Variable("x")))
     val program = Let("const", const, Let("constSquare", Application(Variable("const"), Variable("const")),
       Application(Application(Application(Variable("constSquare"), BoolConst(true)), Const(3)), LongConst(4))))
-    Checker.checkExpression(program)
+    Checker.checkExpression(program, skip = Set(SimpleConstraintChecker))
   }
 
   test("constFail" ) {

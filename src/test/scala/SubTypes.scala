@@ -70,7 +70,7 @@ class SubTypes extends FunSuite with LanguageWriter {
 
   test("longLambdaTakesInt") {
     val program = Application(Lambda("x", Variable("x"), Some(LongType)), Const(3))
-    Checker.checkExpression(program, IntType, skip = Set(ConstraintHindleyMilner(false)))
+    Checker.checkExpression(program, IntType, skip = Checker.noSubTypingModes)
   }
 
   test("longLambdaTakesIntFail") {
@@ -91,7 +91,7 @@ class SubTypes extends FunSuite with LanguageWriter {
       Application(Variable("takesSuperStruct"), New("s2", Seq.empty))), Some(IntType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = ConstraintHindleyMilner.both)
+    Checker.check(program, skip = Checker.threeMusketiers)
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismLambdaFail") {
@@ -113,7 +113,7 @@ class SubTypes extends FunSuite with LanguageWriter {
       Application(Variable("takesSuperStruct"), New("s2", Seq.empty))), Some(IntType))
     val module = Module("module", Seq(structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = ConstraintHindleyMilner.both)
+    Checker.check(program, skip = Checker.threeMusketiers)
   }
 
   test("lambdaTakingChildStructSimpleNoPolymorphismContraVariantApplicationFail") {
@@ -136,7 +136,7 @@ class SubTypes extends FunSuite with LanguageWriter {
       Application(Variable("takesSuperStruct"), Variable("newChild"))), Some(IntType))
     val module = Module("module", Seq(newChild, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = ConstraintHindleyMilner.both)
+    Checker.check(program, skip = Checker.threeMusketiers)
   }
 
   test("lambdaTakingParentAndChildStructLambda") {
@@ -152,7 +152,7 @@ class SubTypes extends FunSuite with LanguageWriter {
       Some(IntType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = ConstraintHindleyMilner.both)
+    Checker.check(program, skip = Checker.threeMusketiers)
   }
 
   test("genericLambdaTakingParentAndChildStruct") {
@@ -166,14 +166,14 @@ class SubTypes extends FunSuite with LanguageWriter {
           Variable("takesSuperStruct") $ "newParent")), Some(IntType))
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
-    Checker.check(program, skip = ConstraintHindleyMilner.both)
+    Checker.check(program, skip = Checker.threeMusketiers)
   }
 
   test("polymorphic function with subtype constraint complex") {
     val function = Lambda("x", "x", Some(LongType))
     val const = Lambda("x", Lambda("y", "x"))
     val program = Let("f", function, const $ (Variable("f") $ Const(3)) $ (Variable("f") $ LongConst(3)))
-    Checker.checkExpression(program, skip = ConstraintHindleyMilner.both)
+    Checker.checkExpression(program, skip = Checker.threeMusketiers)
   }
 
   test("polymorphic function with subtype constraint fail") {

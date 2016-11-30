@@ -8,7 +8,7 @@ import constraints.types.objects._
 
 import scala.collection.generic.SeqFactory
 
-class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint])
+class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint], val maxCycles: Int = 100)
 {
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
@@ -18,11 +18,14 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
+
   def run() : Boolean = {
     var progress = true
-    while(progress && constraints.nonEmpty)
+    var cycles = 9
+    while(progress && constraints.nonEmpty && cycles < maxCycles)
     {
       progress = cycle()
+      cycles += 1
     }
     constraints.isEmpty
   }

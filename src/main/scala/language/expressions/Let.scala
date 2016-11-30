@@ -6,7 +6,7 @@ import constraints.scopes.objects.Scope
 import constraints.types.Generalization
 import constraints.types.objects.Type
 import language.types.LanguageType
-import modes.{ConstraintClosure, ConstraintHindleyMilner}
+import modes.{ConstraintChecker, ConstraintClosure, ConstraintHindleyMilner}
 
 case class Let(name: String, bindingValue: Expression, value: Expression, bindingLanguageType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
@@ -22,9 +22,9 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
       })
       value.constraints(builder, _type, scope)
 
-    case ConstraintClosure =>
+    case _:ConstraintChecker =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = bindingValue.constraints(builder, parentScope)
+      val bindingType = bindingValue.constraints(builder, scope)
       builder.declaration(name, this, scope, Some(bindingType))
       value.constraints(builder, _type, scope)
   }

@@ -7,12 +7,17 @@ import constraints.scopes.objects.{ConcreteScope, Scope}
 import constraints.types.CheckSubType
 import constraints.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
 import language.types.LanguageType
-import modes.{ConstraintClosure, ConstraintHindleyMilner}
+import modes.{ConstraintChecker, ConstraintClosure}
 
 case class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
 
-    case c:ConstraintHindleyMilner =>
+    case ConstraintClosure =>
+      val declaration = new NamedDeclaration(name, this)
+      val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(name, body, t.constraints(builder, parentScope)))
+      builder.typesAreEqual(_type, ConstraintClosureType(parentScope, declaration, wrappedBody))
+
+    case c:ConstraintChecker =>
       val bodyScope: ConcreteScope = builder.newScope(Some(parentScope))
       val argumentConstraintType = builder.declarationType(name, this, bodyScope)
 
@@ -30,11 +35,6 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
       {
         parameterDefinedType.foreach(at => at.constraints(builder, argumentConstraintType, parentScope))
       }
-
-    case ConstraintClosure =>
-      val declaration = new NamedDeclaration(name, this)
-      val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(name, body, t.constraints(builder, parentScope)))
-      builder.typesAreEqual(_type, ConstraintClosureType(parentScope, declaration, wrappedBody))
   }
 
   class TypeCheckWrapper(name: String, original: ConstraintExpression, parameterType: Type) extends ConstraintExpression

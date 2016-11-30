@@ -7,6 +7,8 @@ import language.types.LanguageType
 
 trait ConstraintChecker extends Checker
 {
+  def subTyping: Boolean
+
   override def check(program: Program): Boolean = {
     val factory = new Factory()
     val builder: ConstraintBuilder = new ConstraintBuilder(factory, this)

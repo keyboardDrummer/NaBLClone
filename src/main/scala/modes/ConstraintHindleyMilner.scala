@@ -6,3 +6,7 @@ object ConstraintHindleyMilner
 }
 
 case class ConstraintHindleyMilner(subTyping: Boolean) extends ConstraintChecker
+
+object SimpleConstraintChecker extends ConstraintChecker {
+  override def subTyping: Boolean = false
+}
