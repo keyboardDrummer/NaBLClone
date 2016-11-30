@@ -2,7 +2,7 @@
 import language.expressions._
 import language.modules.{Binding, Module}
 import language.structs._
-import language.types.{IntType, LongType}
+import language.types.{BoolType, IntType, LongType}
 import language.{LanguageWriter, Program}
 import modes.ConstraintHindleyMilner
 import org.scalatest.FunSuite
@@ -167,5 +167,17 @@ class SubTypes extends FunSuite with LanguageWriter {
     val module = Module("module", Seq(newChild, newParent, structUse), Seq(structParent, structChild))
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = ConstraintHindleyMilner.both)
+  }
+
+  test("polymorphic function with subtype constraint complex") {
+    val function = Lambda("x", "x", Some(LongType))
+    val const = Lambda("x", Lambda("y", "x"))
+    val program = Let("f", function, const $ (Variable("f") $ Const(3)) $ (Variable("f") $ LongConst(3)))
+    Checker.checkExpression(program, skip = ConstraintHindleyMilner.both)
+  }
+
+  test("polymorphic function with subtype constraint fail") {
+    val program = Lambda("x", "x", Some(LongType)) $ true
+    Checker.failExpression(program, BoolType)
   }
 }

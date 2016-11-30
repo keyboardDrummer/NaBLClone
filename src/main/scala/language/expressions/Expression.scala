@@ -10,7 +10,6 @@ trait Expression extends ConstraintExpression {
   def evaluate(machine: Machine): MachineType
 
   def apply(argument: Expression) = Application(this, argument)
-  def $: (Expression) => Application = apply
 
   def access(field: String) = Access(this, field)
 
