@@ -12,13 +12,13 @@ case class PrimitiveType(name: String) extends ConcreteType {
   override def toString: String = name
 }
 
-case class TypeApplication(override val function: Type, var arguments: Seq[Type]) extends ConcreteType {
+case class TypeApplication(override val function: Type, var arguments: Seq[Type], origin: AnyRef) extends ConcreteType {
   override def variables: Set[TypeVariable] = arguments.flatMap(t => t.variables).toSet
 
-  override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = TypeApplication(function, arguments.map(a => a.specialize(mapping)))
+  override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = TypeApplication(function, arguments.map(a => a.specialize(mapping)), origin)
 
   override def instantiateType(variable: TypeVariable, instance: Type): Type = {
-    TypeApplication(function.instantiateType(variable, instance), arguments.map(argument => argument.instantiateType(variable, instance)))
+    TypeApplication(function.instantiateType(variable, instance), arguments.map(argument => argument.instantiateType(variable, instance)), origin)
   }
 
   override def fullyApplied: Boolean = arguments.forall(a => a.fullyApplied)

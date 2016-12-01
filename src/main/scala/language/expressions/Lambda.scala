@@ -21,7 +21,7 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
       val argumentConstraintType = builder.declarationType(name, this, bodyScope)
 
       val bodyType = body.constraints(builder, bodyScope)
-      builder.typesAreEqual(_type, builder.getFunctionType(argumentConstraintType, bodyType))
+      builder.typesAreEqual(_type, builder.getFunctionType(argumentConstraintType, bodyType, this))
 
       if (c.subTyping)
       {

@@ -107,7 +107,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case(StructConstraintType(leftDeclaration), StructConstraintType(rightDeclaration)) =>
       unifyDeclarations(leftDeclaration, rightDeclaration)
     case (PrimitiveType(leftName), PrimitiveType(rightName)) => leftName == rightName
-    case (TypeApplication(leftFunction, leftArguments), TypeApplication(rightFunction, rightArguments)) =>
+    case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
       if (leftArguments.size == rightArguments.size && unifyTypes(leftFunction, rightFunction))
         leftArguments.indices.forall(index =>
           unifyTypes(left.asInstanceOf[TypeApplication].arguments(index), right.asInstanceOf[TypeApplication].arguments(index)))
@@ -118,7 +118,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def canAssignClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
+    case TypeApplication(PrimitiveType("Func"), Seq(input, output), _) =>
       val bodyScope = builder.newScope(Some(closure.parentScope))
       builder.declaration(closure.name, closure.id, bodyScope, Some(input))
       val actualOutput = closure.body.constraints(builder, bodyScope)
@@ -128,10 +128,11 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case _ => false
   }
 
-  val unifiedClosures: mutable.Set[(ConstraintClosureType, TypeApplication)] = mutable.Set.empty
+  val unifiedClosures: mutable.Set[(ConstraintClosureType, AnyRef)] = mutable.Set.empty
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
-      if (!unifiedClosures.add((closure, typeApplication)))
+    case TypeApplication(PrimitiveType("Func"), Seq(input: ConcreteType, output), origin) =>
+      //a//Zorgen dat we niet twee keer dezelfde applicatie van een closureType gaan unify'en. Misschien bijhouden waar in de AST de TypeApplication vandaan komt.
+      if (!unifiedClosures.add((closure, origin)))
       {
         return true
       }

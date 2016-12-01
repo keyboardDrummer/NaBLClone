@@ -113,11 +113,11 @@ class PolymorphicTypes extends FunSuite with LanguageWriter {
     Checker.failExpression(program)
   }
 
-  test("poly")
+  test("identity with let type")
   {
     val identity = Lambda("x", Variable("x"))
     val program = Let("identity", identity, Application(Variable("identity"), Const(3)),
-      Some(LanguageForAllType("a", FunctionLanguageType(LanguageTypeVariable("a"), LanguageTypeVariable("a")))))
+      Some(LanguageForAllType("a", LanguageTypeVariable("a") ==> LanguageTypeVariable("a"))))
     Checker.checkExpression(program, skip = ConstraintHindleyMilner.both)
   }
 }

@@ -21,6 +21,6 @@ case class LanguageTypeApplication(function: LanguageType, argument: LanguageTyp
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val functionType = function.constraints(builder, scope)
     val argumentType = argument.constraints(builder, scope)
-    builder.typesAreEqual(TypeApplication(functionType, Seq(argumentType)), _type)
+    builder.typesAreEqual(TypeApplication(functionType, Seq(argumentType), this), _type) //TODO dit snap ik niet. Type Application op een function type???
   }
 }

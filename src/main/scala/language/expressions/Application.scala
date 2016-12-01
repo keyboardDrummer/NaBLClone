@@ -9,7 +9,7 @@ case class Application(function: Expression, value: Expression) extends Expressi
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val functionType = function.constraints(builder, scope)
     val argumentType = value.constraints(builder, scope)
-    builder.typesAreEqual(functionType, builder.getFunctionType(argumentType, _type))
+    builder.typesAreEqual(functionType, builder.getFunctionType(argumentType, _type, this))
   }
 
   override def evaluate(machine: Machine): MachineType = {
