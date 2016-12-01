@@ -7,23 +7,24 @@ object Checker {
 
   def failExpression(program: Expression, languageType: LanguageType = IntType, skip: Set[Checker] = Set.empty): Unit =
   {
-    checkExpression(program, languageType, allModes.diff(skip))
+    checkExpression(program, languageType, allCheckersSet.diff(skip))
   }
 
   def checkExpression(program: Expression, languageType: LanguageType = IntType, skip: Set[Checker] = Set.empty): Unit = {
-    val answers = allModes.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
-    processAnswers(answers, allModes.diff(skip))
+    val answers = allCheckers.map(mode => (mode, mode.checkExpression(program, languageType))).toMap
+    processAnswers(answers, allCheckersSet.diff(skip))
   }
-  
-  def fail(program: Program, skip: Set[Checker] = Set.empty): Unit = check(program, skip = allModes.diff(skip))
+
+  def fail(program: Program, skip: Set[Checker] = Set.empty): Unit = check(program, skip = allCheckersSet.diff(skip))
 
   def check(program: Program, skip: Set[Checker] = Set.empty) : Unit = {
-    val answers = allModes.map(mode => (mode, mode.check(program))).toMap
-    processAnswers(answers, allModes.diff(skip))
+    val answers = allCheckers.map(mode => (mode, mode.check(program))).toMap
+    processAnswers(answers, allCheckersSet.diff(skip))
   }
 
-  val allModes: Set[Checker] = Set(MachineChecker, ConstraintClosure,
+  val allCheckers: Seq[Checker] = Seq(MachineChecker, ConstraintClosure,
     ConstraintHindleyMilner(true), ConstraintHindleyMilner(false), SimpleConstraintChecker)
+  val allCheckersSet: Set[Checker] = allCheckers.toSet
 
   val noSubTypingModes: Set[Checker] = Set(ConstraintHindleyMilner(false), SimpleConstraintChecker)
   val threeMusketiers: Set[Checker] = ConstraintHindleyMilner.both ++ Set(SimpleConstraintChecker)

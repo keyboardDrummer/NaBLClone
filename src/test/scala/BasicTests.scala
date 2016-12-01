@@ -118,12 +118,12 @@ class BasicTests extends FunSuite with LanguageWriter {
   test("recursive function typed let")
   {
     val incrementInfinitely = Let("f", Lambda("x", Add(1, "f" $ "x")), "f" $ 0, bindingLanguageType = Some(IntType ==> IntType))
-    Checker.checkExpression(incrementInfinitely)
+    Checker.checkExpression(incrementInfinitely, skip = Set(ConstraintClosure))
   }
 
   test("recursive function typed lambda")
   {
     val incrementInfinitely = Let("f", Lambda("x", Add(1, "f" $ "x"), parameterDefinedType = Some(IntType)), "f" $ 0)
-    Checker.checkExpression(incrementInfinitely, skip = Set(ConstraintClosure, MachineChecker, ConstraintHindleyMilner(true)))
+    Checker.checkExpression(incrementInfinitely, skip = Set(MachineChecker, ConstraintClosure, ConstraintHindleyMilner(true)))
   }
 }

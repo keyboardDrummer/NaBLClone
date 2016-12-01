@@ -99,6 +99,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def unifyTypes(left: Type, right: Type): Boolean = (resolveType(left), resolveType(right)) match {
+    case (TypeVariable(nl), TypeVariable(nr)) if nl == nr => true
     case (v: TypeVariable,_) => instantiateType(v,right)
     case (_,v: TypeVariable) => instantiateType(v,left)
     case (closure: ConstraintClosureType, app: TypeApplication) => unifyClosure(closure, app)
@@ -129,7 +130,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
   val unifiedClosures: mutable.Set[(ConstraintClosureType, TypeApplication)] = mutable.Set.empty
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input: ConcreteType, output: ConcreteType)) =>
+    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
       if (!unifiedClosures.add((closure, typeApplication)))
       {
         return true
