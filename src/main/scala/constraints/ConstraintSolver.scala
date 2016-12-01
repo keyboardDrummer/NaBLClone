@@ -7,6 +7,7 @@ import constraints.types.{CheckSubType, TypeGraph, TypeNode}
 import constraints.types.objects._
 
 import scala.collection.generic.SeqFactory
+import scala.collection.mutable
 
 class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: Seq[Constraint], val maxCycles: Int = 100)
 {
@@ -61,7 +62,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       return false
 
     mappedTypeVariables += v -> t
-    startingConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
+    allConstraints.foreach(c => c.instantiateType(v, t)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(v, t))
     true
   }
@@ -118,7 +119,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def canAssignClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
     case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
       val bodyScope = builder.newScope(Some(closure.parentScope))
-      builder.declaration(closure.declaration.name, closure.declaration.id, bodyScope, Some(input))
+      builder.declaration(closure.name, closure.id, bodyScope, Some(input))
       val actualOutput = closure.body.constraints(builder, bodyScope)
       builder.add(CheckSubType(actualOutput, output))
       generatedConstraints ++= builder.getConstraints
@@ -126,10 +127,15 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case _ => false
   }
 
+  val unifiedClosures: mutable.Set[(ConstraintClosureType, TypeApplication)] = mutable.Set.empty
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input, output)) =>
+    case TypeApplication(PrimitiveType("Func"), Seq(input: ConcreteType, output: ConcreteType)) =>
+      if (!unifiedClosures.add((closure, typeApplication)))
+      {
+        return true
+      }
       val bodyScope = builder.newScope(Some(closure.parentScope))
-      builder.declaration(closure.declaration.name, closure.declaration.id, bodyScope, Some(input))
+      builder.declaration(closure.name, closure.id, bodyScope, Some(input))
       closure.body.constraints(builder, output, bodyScope)
       generatedConstraints ++= builder.getConstraints
       true

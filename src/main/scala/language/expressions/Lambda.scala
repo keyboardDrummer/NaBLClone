@@ -13,9 +13,8 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
 
     case ConstraintClosure =>
-      val declaration = new NamedDeclaration(name, this)
       val wrappedBody = parameterDefinedType.fold[ConstraintExpression](body)(t => new TypeCheckWrapper(name, body, t.constraints(builder, parentScope)))
-      builder.typesAreEqual(_type, ConstraintClosureType(parentScope, declaration, wrappedBody))
+      builder.typesAreEqual(_type, ConstraintClosureType(parentScope, name, this, wrappedBody))
 
     case c:ConstraintChecker =>
       val bodyScope: ConcreteScope = builder.newScope(Some(parentScope))

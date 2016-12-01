@@ -27,6 +27,11 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
       val bindingType = bindingValue.constraints(builder, scope)
       builder.declaration(name, this, scope, Some(bindingType))
       value.constraints(builder, _type, scope)
+
+      bindingLanguageType.foreach(t => {
+        val bindingConstraintType = t.constraints(builder, parentScope)
+        builder.typesAreEqual(bindingConstraintType, bindingType)
+      })
   }
 
   override def evaluate(machine: Machine): MachineType = {
