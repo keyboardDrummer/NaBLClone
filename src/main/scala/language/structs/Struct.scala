@@ -1,24 +1,20 @@
 package language.structs
 
-import bindingTypeMachine.{Machine, MachineType, StructMachineType, TypeCheckException}
+import bindingTypeMachine._
 import constraints.ConstraintBuilder
 import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.Scope
 import constraints.types.AssignSubType
 import constraints.types.objects.StructConstraintType
-import language.types.LanguageTypeVariable
 
 case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
 {
   def evaluate(machine: Machine): Unit = {
 
-    val expectedVariables = typeParameter.fold(Set.empty[LanguageTypeVariable])(p => Set(LanguageTypeVariable(p)))
-
-    val variables = fields.flatMap(field => field._type.variables).toSet
-    if (variables != expectedVariables)
-    {
-      throw TypeCheckException(s"struct type variables don't add up, variables are $variables but expected $expectedVariables")
-    }
+    machine.enterTypeScope()
+    typeParameter.foreach(t => machine.declareType(t, MachineTypeVariable(t)))
+    val selfReference = MachineTypeReference(null)
+    machine.declareType(name, selfReference)
 
     val parentType = parent.map(p => machine.resolveStruct(p))
 
@@ -26,8 +22,10 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
       (field.name, field._type.evaluate(machine))
     }).toMap, parentType, typeParameter)
 
+    selfReference.reference = structType
     parentType.foreach(p => machine.addSubType(structType, p))
     machine.declareStruct(structType)
+    machine.exitScope()
   }
 
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =

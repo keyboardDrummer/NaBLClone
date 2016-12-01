@@ -5,7 +5,7 @@ import language.types._
 import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker, SimpleConstraintChecker}
 import org.scalatest.FunSuite
 
-class PolymorphicTypes extends FunSuite with LanguageWriter {
+class PolymorphicFunctions extends FunSuite with LanguageWriter {
 
   test("boolIntoIdentity") {
     val program = Application(Lambda("x", Variable("x")), BoolConst(true))
@@ -117,7 +117,7 @@ class PolymorphicTypes extends FunSuite with LanguageWriter {
   {
     val identity = Lambda("x", Variable("x"))
     val program = Let("identity", identity, Application(Variable("identity"), Const(3)),
-      Some(LanguageForAllType("a", LanguageTypeVariable("a") ==> LanguageTypeVariable("a"))))
+      Some(LanguageForAllType("a", LanguageForAllType("a", LanguageTypeVariable("a") ==> LanguageTypeVariable("a")))))
     Checker.checkExpression(program, skip = ConstraintHindleyMilner.both)
   }
 }

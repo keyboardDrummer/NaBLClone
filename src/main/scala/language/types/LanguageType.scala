@@ -26,7 +26,7 @@ object LanguageType
 }
 
 case class LanguageTypeVariable(name: String) extends LanguageType {
-  override def evaluate(machine: Machine): MachineType = MachineTypeVariable(name)
+  override def evaluate(machine: Machine): MachineType = machine.resolveType(name)
 
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val typeVariable = builder.typeVariables.getOrElseUpdate(name, builder.typeVariable())
@@ -36,22 +36,4 @@ case class LanguageTypeVariable(name: String) extends LanguageType {
   override def variables: Set[LanguageTypeVariable] = Set(this)
 }
 
-case class LanguageForAllType(variable: String, body: LanguageType) extends LanguageType {
-  override def evaluate(machine: Machine): MachineType = {
-    if (body.variables != Set(LanguageTypeVariable(variable)))
-    {
-      throw TypeCheckException("language forall variables don't add up")
-    }
-    body.evaluate(machine)
-  }
 
-  override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    if (body.variables != Set(LanguageTypeVariable(variable)))
-    {
-      throw TypeCheckException("language forall variables don't add up") //TODO gekke check tijdens constraint collectie
-    }
-    body.constraints(builder, _type, scope)
-  }
-
-  override def variables: Set[LanguageTypeVariable] = body.variables.diff(Set(LanguageTypeVariable(variable)))
-}

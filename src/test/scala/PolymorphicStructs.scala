@@ -118,4 +118,10 @@ class PolymorphicStructs extends FunSuite with LanguageWriter {
     val program: Program = Program(Seq(module))
     Checker.check(program)
   }
+
+  test("list with map") {
+    val listDef = Struct("list", Seq("head" of "a", "tail" of LanguageTypeApplication("list", LanguageTypeVariable("a"))))
+    val program = Program(Seq(Module("module", Seq.empty, Seq(listDef))))
+    Checker.check(program)
+  }
 }

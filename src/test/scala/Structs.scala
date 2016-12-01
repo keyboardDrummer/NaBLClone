@@ -2,25 +2,12 @@ import language._
 import language.expressions._
 import language.modules.{Binding, Module, ModuleImport}
 import language.structs._
-import language.types.IntType
+import language.types.{IntType, LanguageTypeApplication, LanguageTypeVariable}
 import modes.{ConstraintHindleyMilner, MachineChecker}
 import org.scalatest.FunSuite
 
-class Imports extends FunSuite with LanguageWriter {
+class Structs extends FunSuite with LanguageWriter {
 
-  test("module") {
-    val moduleWithX = Module("hasX", Seq(Binding("x", Const(3), Some(IntType))))
-    val moduleThatImportsHasX = Module("importsHasX", Seq(Binding("y", Variable("x"), Some(IntType))), imports = Seq(new ModuleImport("hasX")))
-    val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    Checker.check(program)
-  }
-
-  test("moduleFail") {
-    val moduleWithX = Module("hasX", Seq(Binding("x", Const(3), Some(IntType))))
-    val moduleThatImportsHasX = Module("importsHasX", Seq(Binding("y", Variable("x"), Some(IntType))), imports = Seq(new ModuleImport("hasY")))
-    val program = Program(Seq(moduleThatImportsHasX, moduleWithX))
-    Checker.fail(program)
-  }
 
   test("struct") {
     val structDeclaration = Struct("s", Seq(Field("x", IntType)))
@@ -68,4 +55,11 @@ class Imports extends FunSuite with LanguageWriter {
     val program: Program = Program(Seq(module))
     Checker.check(program, skip = Set(ConstraintHindleyMilner(true)))
   }
+
+  test("intList") {
+    val listDef = Struct("intList", Seq("head" of IntType, "tail" of "intList"))
+    val program = Program(Seq(Module("module", Seq.empty, Seq(listDef))))
+    Checker.check(program)
+  }
+
 }

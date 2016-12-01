@@ -10,8 +10,8 @@ trait LanguageWriter {
   implicit def const(value: Int) : Const = Const(value)
   implicit def bool(value: Boolean) : BoolConst = BoolConst(value)
   implicit def variable(name: String) : Variable = Variable(name)
-
   implicit def typeVariable(name: String) : LanguageTypeVariable = LanguageTypeVariable(name)
+
 
   class ExpressionWriter(expression: Expression) {
     def $(argument: Expression) = Application(expression, argument)
