@@ -1,7 +1,7 @@
 import language.LanguageWriter
 import language.expressions._
-import language.types.{FunctionLanguageType, IntType}
-import modes.{ConstraintClosure, ConstraintHindleyMilner, MachineChecker}
+import language.types.IntType
+import modes.{ConstraintHindleyMilner, MachineChecker}
 import org.scalatest.FunSuite
 
 class BasicTests extends FunSuite with LanguageWriter {

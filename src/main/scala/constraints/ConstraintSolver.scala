@@ -130,8 +130,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
   val unifiedClosures: mutable.Set[(ConstraintClosureType, AnyRef)] = mutable.Set.empty
   def unifyClosure(closure: ConstraintClosureType, typeApplication: TypeApplication): Boolean = typeApplication match {
-    case TypeApplication(PrimitiveType("Func"), Seq(input: ConcreteType, output), origin) =>
-      //a//Zorgen dat we niet twee keer dezelfde applicatie van een closureType gaan unify'en. Misschien bijhouden waar in de AST de TypeApplication vandaan komt.
+    case TypeApplication(PrimitiveType("Func"), Seq(input, output), origin) =>
       if (!unifiedClosures.add((closure, origin)))
       {
         return true
