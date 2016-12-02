@@ -62,4 +62,9 @@ class Structs extends FunSuite with LanguageWriter {
     Checker.check(program)
   }
 
+  ignore("intList fail") {
+    val listDef = Struct("intList", Seq("head" of IntType, "tail" of "intList2"))
+    val program = Program(Seq(Module("module", Seq.empty, Seq(listDef))))
+    Checker.fail(program)
+  }
 }
