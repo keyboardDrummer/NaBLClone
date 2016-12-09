@@ -16,7 +16,6 @@ case class UnionType(name: String, options: Seq[UnionOption]) extends TypeDefini
       builder.declaration(option.name, this, parentScope,
         Some(builder.getFunctionType(option._type.constraints(builder,parentScope), _type, this)))
     })
-    Console.out.append("jo")
   }
 
   override def evaluate(machine: Machine): Unit = ???

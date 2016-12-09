@@ -4,7 +4,7 @@ import bindingTypeMachine._
 import constraints.ConstraintBuilder
 import constraints.objects.NamedDeclaration
 import constraints.scopes.objects.Scope
-import constraints.types.AssignSubType
+import constraints.types.{AssignSubType, DeclarationOfType}
 import constraints.types.objects.StructConstraintType
 
 trait TypeDefinition
@@ -36,6 +36,7 @@ case class Struct(name: String, fields: Seq[Field], parent: Option[String] = Non
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {
     val structDeclaration: NamedDeclaration = builder.declaration(name, this, parentScope)
+    builder.add(DeclarationOfType(structDeclaration, StructConstraintType(structDeclaration)))
     val scopeOfParent: Option[Scope] = parent.map(p => {
       val parentDeclaration = builder.declarationVariable()
       val scopeOfParent = builder.declaredScopeVariable(parentDeclaration)
