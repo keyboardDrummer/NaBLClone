@@ -7,10 +7,15 @@ import constraints.scopes.objects.Scope
 import constraints.types.AssignSubType
 import constraints.types.objects.StructConstraintType
 
-case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None)
+trait TypeDefinition
+{
+  def constraints(builder: ConstraintBuilder, parentScope: Scope) : Unit
+  def evaluate(machine: Machine): Unit
+}
+
+case class Struct(name: String, fields: Seq[Field], parent: Option[String] = None, typeParameter: Option[String] = None) extends TypeDefinition
 {
   def evaluate(machine: Machine): Unit = {
-
     machine.enterTypeScope()
     typeParameter.foreach(t => machine.declareType(t, MachineTypeVariable(t)))
     val selfReference = MachineTypeReference(null)

@@ -12,7 +12,7 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = builder.mode match {
     case _:ConstraintHindleyMilner =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = bindingValue.constraints(builder, scope)
+      val bindingType = bindingValue.getType(builder, scope)
       val generalizedType = builder.declarationType(name, this, scope)
       builder.add(Generalization(generalizedType, bindingType))
 
@@ -24,7 +24,7 @@ case class Let(name: String, bindingValue: Expression, value: Expression, bindin
 
     case _:ConstraintChecker =>
       val scope = builder.newScope(Some(parentScope))
-      val bindingType = bindingValue.constraints(builder, scope)
+      val bindingType = bindingValue.getType(builder, scope)
       builder.declaration(name, this, scope, Some(bindingType))
       value.constraints(builder, _type, scope)
 

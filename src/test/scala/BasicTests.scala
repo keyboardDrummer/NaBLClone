@@ -108,4 +108,6 @@ class BasicTests extends FunSuite with LanguageWriter {
     val program = Let("x", Const(3), Variable("y"))
     Checker.failExpression(program)
   }
+
+
 }

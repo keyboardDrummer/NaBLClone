@@ -121,7 +121,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case TypeApplication(PrimitiveType("Func"), Seq(input, output), _) =>
       val bodyScope = builder.newScope(Some(closure.parentScope))
       builder.declaration(closure.name, closure.id, bodyScope, Some(input))
-      val actualOutput = closure.body.constraints(builder, bodyScope)
+      val actualOutput = closure.body.getType(builder, bodyScope)
       builder.add(CheckSubType(actualOutput, output))
       generatedConstraints ++= builder.getConstraints
       true

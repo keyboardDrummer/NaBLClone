@@ -5,9 +5,6 @@ import language.modules.Module
 
 case class TypeCheckException(message: String) extends RuntimeException(message)
 
-
-
-
 object Machine
 {
   def expressionMachine: Machine = {

@@ -7,8 +7,8 @@ import constraints.types.objects.Type
 
 case class Application(function: Expression, value: Expression) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
-    val functionType = function.constraints(builder, scope)
-    val argumentType = value.constraints(builder, scope)
+    val functionType = function.getType(builder, scope)
+    val argumentType = value.getType(builder, scope)
     builder.typesAreEqual(functionType, builder.getFunctionType(argumentType, _type, this))
   }
 
